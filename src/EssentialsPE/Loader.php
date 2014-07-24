@@ -141,11 +141,17 @@ class Loader extends PluginBase{
         if($player !== null && $player instanceof Player && !$player->hasPermission("essentials.colorchat")){
             return $message;
         }
-        $search = ["&0", "&1", "&2", "&3", "&4", "&5", "&6", "&7", "&8", "&9", "&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
+        $search = ["&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
+        for($i = ord("0"); $i <= ord("9"); $i++){
+            $search[] = "&" . chr($i);
+        }
         //$formats = ["§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f", "§k", "§l", "§m", "§n", "§o", "§r"];
-        foreach($search as $s){
-            $code = substr($s, -1, 1);
-            $message = str_replace($s, "§" . $code, $message);
+        $strings = implode("|", $search);
+        preg_replace_callback("#([\\\\]{0,2})($strings)#", function($match){
+            if(strlen($match[1]) === 1){
+                return $match[2];
+            }
+            return str_replace("\\\\", "\\", $match[1]) . "§" . substr($match[2], 1, 1));
         }
         return $message;
     }
