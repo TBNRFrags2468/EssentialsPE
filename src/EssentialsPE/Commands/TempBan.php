@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\permission\BanEntry;
 use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{
@@ -20,37 +21,28 @@ class TempBan extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
             return false;
         }
-        $player = $this->getAPI()->getPlayer($args[0]);
+        $player = $this->getAPI()->getPlayer(array_shift($args));
         if($player === false){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $years = date("Y", time()); //Numeric representation of the year (4 digits)
-        $months = date("n", time()); //Month number of the year
-        $weeks = date("W", time()); //Week number of the year
-        $days = date("z", time()); //Day number of the year
-        $hours = date("g", time()); //12 hour format
-        $minutes = date("i", time()); //Minutes with leading zeros
-        $seconds = date("s", time()); //Seconds with leading zeros
-        foreach($args as $a){
-            if(substr($a, -1, 1) == "y"){
-                $years = substr($a, 0, strlen($a) - 1);
-            }elseif(substr($a, -1, 1) == "mo"){
-                $mo = substr($a, 0, strlen($a) - 2);
-            }elseif(substr($a, -1, 1) == "w"){
-                $w = substr($a, 0, strlen($a) - 1);
-            }elseif(substr($a, -1, 1) == "d"){
-                $d = substr($a, 0, strlen($a) - 1);
-            }elseif(substr($a, -1, 1) == "h"){
-                $h = substr($a, 0, strlen($a) - 1);
-            }elseif(substr($a, -1, 1) == "m"){
-                $m = substr($a, 0, strlen($a) - 1);
-            }elseif(substr($a, -1, 1) == "s"){
-                $s = substr($a, 0, strlen($a) - 1);
+        $seconds = 0; // TODO
+        while(preg_match("#\\A([0-9\\.]{1,}(y|mo|w|d|h|m|s)\\Z#i", array_shift($args), $match)){
+            $match = $match[0]; // TODO check if the flag is wrong
+            if(!is_numeric($match[1])){
+                break;
+            }
+            switch(strtolower($match[2])){
+                // TODO
             }
         }
-        $date = date_create_from_format("format", "time");
-        //Server::getInstance()->getNameBans()->addBan($player, "reason", "expire date", "source");
+//        $reason = ""; // TODO
+        $date = new \DateTime;
+        $date->setTimestamp(time() + $seconds);
+        $ban = new BanEntry($player->getName());
+        $ban->setExpires($date);
+//        $ban->setReason($reason);
+        $this->getPlugin()->getServer()->getNameBans()->add($ban);
         return true;
     }
 }
