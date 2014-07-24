@@ -408,21 +408,23 @@ class Loader extends PluginBase{
      * @param Player $player
      * @param $nick
      * @param bool $save
+     * @return bool
      */
     public function setNick(Player $player, $nick, $save = true){
-        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $nick));
         if($event->isCancelled()){
-            return;
+            return false;
         }
+        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $nick = $event->getNewNick();
-        $player->setNameTag($nick);
+        $player->setNameTag($event->getNameTag());
         $player->setDisplayName($nick);
         $player->sendMessage(TextFormat::YELLOW . "Your nick is now $nick");
         if($save == true){
             $config->set($player->getName(), $nick);
             $config->save();
         }
+        return true;
     }
 
     /**
@@ -430,24 +432,27 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param bool $save
+     * @return bool
      */
     public function removeNick(Player $player, $save = true){
-        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $player->getName()));
         if($event->isCancelled()){
-            return;
+            return false;
         }
-        $player->setNameTag($player->getName());
-        $player->setDisplayName($player->getName());
-        $player->sendMessage(TextFormat::YELLOW . "Your nick has been disabled");
-        if($save === true){
-            $config->remove($player->getName());
+        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
+        $nick = $event->getNewNick();
+        $player->setNameTag($event->getNameTag());
+        $player->setDisplayName($nick);
+        $player->sendMessage(TextFormat::YELLOW . "Your nick is now $nick");
+        if($save == true){
+            $config->set($player->getName(), $nick);
             $config->save();
         }
+        return true;
     }
 
     /**
-     * Get's the player current Nick
+     * Get's the player saved Nick
      *
      * @param Player $player
      * @return bool|mixed
