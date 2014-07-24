@@ -32,7 +32,7 @@ class TempBan extends BaseCommand{
             if(!is_numeric($match[1])){
                 break;
             }
-            $unit = 1:
+            $unit = 1;
             switch(strtolower($match[2])){
                 case "m": $unit = 60; break;
                 case "h": $unit = 60 * 60; break;
