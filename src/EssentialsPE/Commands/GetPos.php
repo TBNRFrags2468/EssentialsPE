@@ -49,4 +49,4 @@ class GetPos extends BaseCommand{
         }
         return true;
     }
-} 
+}

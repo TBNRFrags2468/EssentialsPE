@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{

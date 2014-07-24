@@ -62,4 +62,4 @@ class God extends BaseCommand{
         }
         return true;
     }
-} 
+}

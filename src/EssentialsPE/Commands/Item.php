@@ -50,4 +50,4 @@ class Item extends BaseCommand{
         $sender->sendMessage(TextFormat::YELLOW . "Giving " . $item->getCount() . " of " . $item->getName());
         return false;
     }
-} 
+}

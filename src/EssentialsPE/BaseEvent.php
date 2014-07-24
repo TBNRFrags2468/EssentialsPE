@@ -1,7 +1,6 @@
 <?php
 namespace EssentialsPE;
 
-use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 
 abstract class BaseEvent extends PluginEvent{
@@ -11,4 +10,4 @@ abstract class BaseEvent extends PluginEvent{
     public function __construct(Loader $plugin){
         parent::__construct($plugin);
     }
-} 
+}

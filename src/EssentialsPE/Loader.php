@@ -10,8 +10,8 @@ use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God; //Use API
 use EssentialsPE\Commands\Heal;
-use EssentialsPE\Commands\Item as ItemCommand;
-use EssentialsPE\Commands\Jump;
+//use EssentialsPE\Commands\Item as ItemCommand;
+//use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute; //Use API
@@ -26,9 +26,9 @@ use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Vanish; //Use API
-use EssentialsPE\Commands\Warps\RemoveWarp;
-use EssentialsPE\Commands\Warps\SetWarp;
-use EssentialsPE\Commands\Warps\Warp;
+//use EssentialsPE\Commands\Warps\RemoveWarp;
+//use EssentialsPE\Commands\Warps\SetWarp;
+//use EssentialsPE\Commands\Warps\Warp;
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerNickChangeEvent;
 use pocketmine\item\Item;
@@ -71,40 +71,38 @@ class Loader extends PluginBase{
     }
 
     private function registerCommands(){
-        $fallbackPrefix = "essentialspe";
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Broadcast($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Burn($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new ClearInventory($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Compass($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Essentials($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Extinguish($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new GetPos($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new God($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Heal($this));
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new ItemCommand($this)); //TODO :D
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new Jump($this)); //TODO :D
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new KickAll($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new More($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Mute($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Nick($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new PowerTool($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new PowerToolToggle($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new PvP($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new RealName($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Repair($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Seen($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new SetSpawn($this));
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new TempBan($this)); //TODO :D
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Top($this));
-        $this->getServer()->getCommandMap()->register($fallbackPrefix, new Vanish($this));
-
-        //Warps:
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new RemoveWarp($this)); //TODO
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new SetWarp($this)); //TODO
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new Warp($this)); //TODO
-
-        //Default Commands:
-        //$this->getServer()->getCommandMap()->register($fallbackPrefix, new Me($this)); //TODO
+        $this->getServer()->getCommandMap()->registerAll("essentialspe", [ // maybe shorten the prefix?
+            new Broadcast($this),
+            new Burn($this),
+            new ClearInventory($this),
+            new Compass($this),
+            new Essentials($this),
+            new Extinguish($this),
+            new GetPos($this),
+            new God($this),
+            new Heal($this),
+//            new ItemCommand($this), // TODO
+//            new Jump($this), // TODO
+            new TempBan($this),
+            new KickAll($this),
+            new More($this),
+            new Mute($this),
+            new Nick($this),
+            new PowerTool($this),
+            new PowerToolToggle($this),
+            new PvP($this),
+            new RealName($this),
+            new Repair($this),
+            new Seen($this),
+            new SetSpawn($this),
+            new Top($this),
+            new Vanish($this),
+            // wraps
+//            new RemoveWarp($this), // TODO
+//            new SetWarp($this), // TODO
+//            new Warp($this), // TODO
+//            new Me($this), // TODO
+        ]);
     }
 
     /*
@@ -151,8 +149,8 @@ class Loader extends PluginBase{
             if(strlen($match[1]) === 1){
                 return $match[2];
             }
-            return str_replace("\\\\", "\\", $match[1]) . "§" . substr($match[2], 1, 1));
-        }
+            return str_replace("\\\\", "\\", $match[1]) . "§" . substr($match[2], 1, 1);
+        }, $message);
         return $message;
     }
 

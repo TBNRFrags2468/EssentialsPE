@@ -33,4 +33,4 @@ class Top extends BaseCommand{
         $sender->teleport($pos);
         return true;
     }
-} 
+}

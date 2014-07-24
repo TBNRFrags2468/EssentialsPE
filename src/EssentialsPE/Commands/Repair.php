@@ -36,4 +36,4 @@ class Repair extends BaseCommand{
         $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
         return true;
     }
-} 
+}

@@ -72,4 +72,4 @@ class Nick extends BaseCommand{
         }
         return true;
     }
-} 
+}

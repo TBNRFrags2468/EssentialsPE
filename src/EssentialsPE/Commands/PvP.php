@@ -43,4 +43,4 @@ class PvP extends BaseCommand{
         }
         return true;
     }
-} 
+}

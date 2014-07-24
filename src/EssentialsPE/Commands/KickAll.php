@@ -30,4 +30,4 @@ class KickAll extends BaseCommand{
         $sender->sendMessage(TextFormat::AQUA . "Kicked all the players!");
         return true;
     }
-} 
+}

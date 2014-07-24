@@ -4,7 +4,6 @@ namespace EssentialsPE;
 use pocketmine\command\Command;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\event\Listener;
-use pocketmine\Server;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand, Listener{
     /** @var \EssentialsPE\Loader  */
@@ -22,4 +21,4 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand,
     public function getPlugin(){
         return $this->api;
     }
-} 
+}

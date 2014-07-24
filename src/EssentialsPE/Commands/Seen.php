@@ -71,4 +71,4 @@ class Seen extends BaseCommand{
         }
         return true;
     }
-} 
+}

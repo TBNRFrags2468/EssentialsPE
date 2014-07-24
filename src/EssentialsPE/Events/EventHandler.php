@@ -12,10 +12,8 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\Server;
-use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
 class EventHandler implements Listener{

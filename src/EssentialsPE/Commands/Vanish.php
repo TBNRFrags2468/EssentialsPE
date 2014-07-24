@@ -58,4 +58,4 @@ class Vanish extends BaseCommand{
         }
         return true;
     }
-} 
+}

@@ -31,4 +31,4 @@ class More extends BaseCommand{
         $inv->setItemInHand($item);
         return true;
     }
-} 
+}

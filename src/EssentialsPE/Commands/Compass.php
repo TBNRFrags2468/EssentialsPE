@@ -1,4 +1,5 @@
 <?php
+
 namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseCommand;
@@ -38,4 +39,4 @@ class Compass extends BaseCommand{
         $sender->sendMessage(TextFormat::AQUA . "You're facing $direction");
         return true;
     }
-} 
+}

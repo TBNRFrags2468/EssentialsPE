@@ -55,4 +55,4 @@ class ClearInventory extends BaseCommand{
         }
         return true;
     }
-} 
+}

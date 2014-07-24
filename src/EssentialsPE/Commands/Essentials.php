@@ -20,4 +20,4 @@ class Essentials extends BaseCommand{
         $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::GREEN . "v" . Server::getInstance()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
         return true;
     }
-} 
+}

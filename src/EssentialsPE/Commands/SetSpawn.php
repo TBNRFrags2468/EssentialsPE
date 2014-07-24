@@ -29,4 +29,4 @@ class SetSpawn extends BaseCommand{
         $sender->sendMessage(TextFormat::YELLOW . "Spawn point changed!");
         return true;
     }
-} 
+}

@@ -49,4 +49,4 @@ class Extinguish extends BaseCommand{
         }
         return true;
     }
-} 
+}
