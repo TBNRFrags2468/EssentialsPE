@@ -73,4 +73,4 @@ class PlayerNickChangeEvent extends BaseEvent implements Cancellable{
     public function setNameTag($nametag){
         $this->nametag = $nametag;
     }
-} 
+}
