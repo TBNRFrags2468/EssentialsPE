@@ -44,12 +44,12 @@ class TempBan extends BaseCommand{
             $amplifier = floatval($match[1]);
             $seconds += $amplifier * $unit;
         }
-//        $reason = ""; // TODO
+        //$reason = ""; // TODO
         $date = new \DateTime;
         $date->setTimestamp(time() + $seconds);
         $ban = new BanEntry($player->getName());
         $ban->setExpires($date);
-//        $ban->setReason($reason);
+        //$ban->setReason($reason);
         $this->getPlugin()->getServer()->getNameBans()->add($ban);
         return true;
     }

@@ -71,7 +71,7 @@ class Loader extends PluginBase{
     }
 
     private function registerCommands(){
-        $this->getServer()->getCommandMap()->registerAll("essentialspe", [ // maybe shorten the prefix?
+        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -81,9 +81,9 @@ class Loader extends PluginBase{
             new GetPos($this),
             new God($this),
             new Heal($this),
-//            new ItemCommand($this), // TODO
-//            new Jump($this), // TODO
-            new TempBan($this),
+            //new ItemCommand($this), // TODO
+            //new Jump($this), // TODO
+            //new TempBan($this), //TODO
             new KickAll($this),
             new More($this),
             new Mute($this),
@@ -97,11 +97,12 @@ class Loader extends PluginBase{
             new SetSpawn($this),
             new Top($this),
             new Vanish($this),
-            // wraps
-//            new RemoveWarp($this), // TODO
-//            new SetWarp($this), // TODO
-//            new Warp($this), // TODO
-//            new Me($this), // TODO
+
+            //Wraps
+            //new RemoveWarp($this), // TODO
+            //new SetWarp($this), // TODO
+            //new Warp($this), // TODO
+            //new Me($this), // TODO
         ]);
     }
 
@@ -135,22 +136,22 @@ class Loader extends PluginBase{
         return $r;
     }
 
+    /**
+     * @param $message
+     * @param null $player
+     * @return mixed
+     */
     public function colorMessage($message, $player = null){
-        if($player !== null && $player instanceof Player && !$player->hasPermission("essentials.colorchat")){
-            return $message;
-        }
-        $search = ["&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
-        for($i = ord("0"); $i <= ord("9"); $i++){
-            $search[] = "&" . chr($i);
-        }
+        $search = ["&0","&1","&2","&3","&4","&5","&6","&7","&8","&9","&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
         //$formats = ["§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f", "§k", "§l", "§m", "§n", "§o", "§r"];
-        $strings = implode("|", $search);
-        preg_replace_callback("#([\\\\]{0,2})($strings)#", function($match){
-            if(strlen($match[1]) === 1){
-                return $match[2];
-            }
-            return str_replace("\\\\", "\\", $match[1]) . "§" . substr($match[2], 1, 1);
-        }, $message);
+        foreach($search as $s){
+            $code = substr($s, -1, 1);
+            $message = str_replace($s, "§" . $code, $message);
+        }
+        if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
+            $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
+            return false;
+        }
         return $message;
     }
 

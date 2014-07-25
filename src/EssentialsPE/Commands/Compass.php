@@ -1,5 +1,4 @@
 <?php
-
 namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseCommand;
