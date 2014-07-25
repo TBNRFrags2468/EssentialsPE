@@ -2,7 +2,7 @@ name: EssentialsPE
 main: EssentialsPE\Loader
 version: 1.0.0
 api: 1.0.0
-author: LegendOfMCPE
+author: iksaku
 website: https://github.com/LegendOfMCPE/EssentialsPE
 
 permissions:
