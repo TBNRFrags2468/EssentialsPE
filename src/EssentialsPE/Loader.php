@@ -10,8 +10,8 @@ use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God; //Use API
 use EssentialsPE\Commands\Heal;
-//use EssentialsPE\Commands\Item as ItemCommand;
-//use EssentialsPE\Commands\Jump;
+use EssentialsPE\Commands\Item as ItemCommand;
+use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute; //Use API
@@ -26,9 +26,9 @@ use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Vanish; //Use API
-//use EssentialsPE\Commands\Warps\RemoveWarp;
-//use EssentialsPE\Commands\Warps\SetWarp;
-//use EssentialsPE\Commands\Warps\Warp;
+use EssentialsPE\Commands\Warps\RemoveWarp;
+use EssentialsPE\Commands\Warps\SetWarp;
+use EssentialsPE\Commands\Warps\Warp;
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerNickChangeEvent;
 use pocketmine\item\Item;
