@@ -27,13 +27,13 @@ class TempBan extends BaseCommand{
             return false;
         }
         $seconds = 0;
-        while(preg_match("#\\A([0-9\\.]{1,}(y|mo|w|d|h|m|s)\\Z#i", array_shift($args), $match)){
+        while(preg_match('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#i', array_shift($args), $match)){
             $match = $match[0]; // TODO check if the flag is wrong
             if(!is_numeric($match[1])){
                 break;
             }
             $unit = 1;
-            switch(strtolower($match[2])){
+            switch(strtolower($match[3])){
                 case "m": $unit = 60; break;
                 case "h": $unit = 60 * 60; break;
                 case "d": $unit = 60 * 60 * 24; break;
