@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tempban", "Temporary bans the specified player", "/tempban <player> <time>");
+        parent::__construct($plugin, "tempban", "Temporary bans the specified player", "/tempban <player> <time ...> [reason ...]");
         $this->setPermission("essentials.command.tempban");
     }
 
@@ -44,13 +44,14 @@ class TempBan extends BaseCommand{
             $amplifier = floatval($match[1]);
             $seconds += $amplifier * $unit;
         }
-        //$reason = ""; // TODO
+        $reason = implode(" ", $args);
         $date = new \DateTime;
         $date->setTimestamp(time() + $seconds);
         $ban = new BanEntry($player->getName());
         $ban->setExpires($date);
-        //$ban->setReason($reason);
+        $ban->setReason($reason);
         $this->getPlugin()->getServer()->getNameBans()->add($ban);
+        $player->close("Temp-banned for $seconds seconds"); // TODO improve the value expression, change to expiry date ("until %s") or just delete the period
         return true;
     }
 }
