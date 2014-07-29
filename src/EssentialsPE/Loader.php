@@ -133,9 +133,6 @@ class Loader extends PluginBase{
             if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
                 $r = $p;
                 break;
-            }elseif(stripos($p->getDisplayName(), $player) !== false || stripos($p->getName(), $player) !== false){
-                $r = [];
-                $r[] = $p;
             }
         }
         return $r;
