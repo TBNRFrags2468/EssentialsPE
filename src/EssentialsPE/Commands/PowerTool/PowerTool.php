@@ -26,7 +26,7 @@ class PowerTool extends BaseCommand{
         if($item->getID() == Item::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't assign a command to an empty hand.");
             return false;
-        }elseif($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool"){
+        }elseif($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool" || $args[0] == "powertooltoggle"){
             $sender->sendMessage(TextFormat::RED . "This command can't be assigned");
             return false;
         }
