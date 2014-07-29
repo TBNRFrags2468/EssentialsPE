@@ -102,7 +102,6 @@ class Loader extends PluginBase{
             //new RemoveWarp($this), // TODO
             //new SetWarp($this), // TODO
             //new Warp($this), // TODO
-            //new Me($this), // TODO
         ]);
     }
 
@@ -122,8 +121,10 @@ class Loader extends PluginBase{
      */
 
     /**
-     * @param string $player
-     * @return bool|Player|string
+     * Let you search for a player using his Display name(Nick) or Real name
+     *
+     * @param $player
+     * @return bool|Player
      */
     public function getPlayer($player){
         $player = strtolower($player);
@@ -131,12 +132,19 @@ class Loader extends PluginBase{
         foreach($this->getServer()->getOnlinePlayers() as $p){
             if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
                 $r = $p;
+                break;
+            }elseif(stripos($p->getDisplayName(), $player) !== false || stripos($p->getName(), $player) !== false){
+                $r = [];
+                $r[] = $p;
             }
         }
         return $r;
     }
 
     /**
+     * Return a colored message replacing every
+     * color code (&a = §a)
+     *
      * @param $message
      * @param null $player
      * @return mixed
@@ -457,7 +465,7 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Get's the player saved Nick
+     * Get players' saved Nicks
      *
      * @param Player $player
      * @return bool|mixed
@@ -465,10 +473,9 @@ class Loader extends PluginBase{
     public function getNick(Player $player){
         $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         if(!$config->exists($player->getName())){
-            return false;
-        }else{
-            return $config->get($player->getName());
+            return $player->getName();
         }
+        return $config->get($player->getName());
     }
 
     /**  _____                    _______          _

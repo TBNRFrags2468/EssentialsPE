@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class PowerTool extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command> <arguments>", ["pt"]);
+        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command> <arguments...>", ["pt"]);
         $this->setPermission("essentials.command.powertool");
     }
 
@@ -26,12 +26,16 @@ class PowerTool extends BaseCommand{
         if($item->getID() == Item::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't assign a command to an empty hand.");
             return false;
-        }
-        if($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool" || $args[0] == "ptt"){
+        }elseif($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool" || $args[0] == "ptt"){
             $sender->sendMessage(TextFormat::RED . "This command can't be assigned");
             return false;
         }
+
         if(count($args) == 0){
+            if(!$this->getAPI()->getPowerToolItemCommand($sender, $item)){
+                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+                return false;
+            }
             $this->getAPI()->disablePowerToolItem($sender, $item);
             $sender->sendMessage(TextFormat::GREEN . "Command removed from this item.");
         }else{

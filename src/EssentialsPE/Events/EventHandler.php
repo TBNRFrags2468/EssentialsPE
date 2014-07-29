@@ -46,9 +46,7 @@ class EventHandler implements Listener{
         $this->api->muteSessionCreate($player);
         $this->api->createSession($player);
         //Nick and NameTag set:
-        if($this->api->getNick($player) != false){
-            $this->api->setNick($player, $this->api->getNick($player), false);
-        }
+        $this->api->setNick($player, $this->api->getNick($player), false);
         $event->setJoinMessage($player->getDisplayName() . " joined the game");
         //Hide vanished players
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
@@ -123,6 +121,9 @@ class EventHandler implements Listener{
         $victim = $event->getEntity();
         $issuer = $event->getDamager();
         if($victim instanceof Player && $issuer instanceof Player){
+            if($this->api->isGod($victim)){
+                $event->setCancelled(true);
+            }
             if(!$this->api->isPvPEnabled($victim)){
                 $issuer->sendMessage(TextFormat::RED . $victim->getDisplayName() . " have PvP disabled!");
                 $event->setCancelled(true);
@@ -138,7 +139,6 @@ class EventHandler implements Listener{
      */
     public function onBlockTap(PlayerInteractEvent $event){
         $player = $event->getPlayer();
-        $block = $event->getBlock();
         $item = $event->getItem();
 
         //PowerTool

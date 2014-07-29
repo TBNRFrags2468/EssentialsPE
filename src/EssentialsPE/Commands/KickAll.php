@@ -17,11 +17,13 @@ class KickAll extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
+
         if(count($args) == 0){
             $reason = "Unknown";
         }else{
             $reason = implode(" ", $args);
         }
+
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
             if($p != $sender){
                 $p->kick($reason);

@@ -20,12 +20,12 @@ class PvP extends BaseCommand{
         if(!$sender instanceof Player){
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
             return false;
-        }
-        if(count($args) != 1){
+        }elseif(count($args) != 1){
             $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
             return false;
         }
-        switch($args[0]){
+
+        switch(strtolower($args[0])){
             case "on":
                 if(!$this->getAPI()->isPvPEnabled($sender)){
                     $this->getAPI()->switchPvP($sender);

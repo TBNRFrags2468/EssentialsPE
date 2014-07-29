@@ -16,6 +16,7 @@ class RealName extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
+
         if(count($args) != 1){
             $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
         }else{

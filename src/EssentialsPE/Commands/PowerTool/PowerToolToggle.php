@@ -21,7 +21,7 @@ class PowerToolToggle extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
             return false;
         }
-        if(count($args) != 0){
+        if(count($args) > 0){
             $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
             return false;
         }
