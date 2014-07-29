@@ -46,12 +46,13 @@ class TempBan extends BaseCommand{
         }
         $reason = implode(" ", $args);
         $date = new \DateTime;
-        $date->setTimestamp(time() + $seconds);
+        $date->setTimestamp($expiryTimestamp = time() + $seconds);
         $ban = new BanEntry($player->getName());
         $ban->setExpires($date);
         $ban->setReason($reason);
         $this->getPlugin()->getServer()->getNameBans()->add($ban);
-        $player->close("Temp-banned for $seconds seconds"); // TODO improve the value expression, change to expiry date ("until %s") or just delete the period
+        $format = "M jS y H:i:s";
+        $player->close("Banned until ".date($format, $expiryTimestamp));
         return true;
     }
 }
