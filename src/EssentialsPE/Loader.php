@@ -2,33 +2,33 @@
 namespace EssentialsPE;
 
 use EssentialsPE\Commands\Broadcast; //Use API
-use EssentialsPE\Commands\Burn;
-use EssentialsPE\Commands\ClearInventory;
+use EssentialsPE\Commands\Burn; //Use API
+use EssentialsPE\Commands\ClearInventory; //Use API
 use EssentialsPE\Commands\Compass;
 use EssentialsPE\Commands\Essentials;
-use EssentialsPE\Commands\Extinguish;
-use EssentialsPE\Commands\GetPos;
+use EssentialsPE\Commands\Extinguish; //Use API
+use EssentialsPE\Commands\GetPos; //Use API
 use EssentialsPE\Commands\God; //Use API
-use EssentialsPE\Commands\Heal;
+use EssentialsPE\Commands\Heal; //Use API
 use EssentialsPE\Commands\Item as ItemCommand;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute; //Use API
 use EssentialsPE\Commands\Nick; //Use API
-use EssentialsPE\Commands\PowerTool\PowerTool;
-use EssentialsPE\Commands\PowerTool\PowerToolToggle;
+use EssentialsPE\Commands\PowerTool\PowerTool; //Use API
+use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
 use EssentialsPE\Commands\PvP; //Use API
-use EssentialsPE\Commands\RealName;
+use EssentialsPE\Commands\RealName; //Use API
 use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Vanish; //Use API
-use EssentialsPE\Commands\Warps\RemoveWarp;
-use EssentialsPE\Commands\Warps\SetWarp;
-use EssentialsPE\Commands\Warps\Warp;
+use EssentialsPE\Commands\Warps\RemoveWarp; //Use API
+use EssentialsPE\Commands\Warps\SetWarp; //Use API
+use EssentialsPE\Commands\Warps\Warp; //Use API
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerNickChangeEvent;
 use pocketmine\item\Item;
