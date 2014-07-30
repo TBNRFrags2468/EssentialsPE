@@ -34,6 +34,8 @@ class EventHandler implements Listener{
         if($player->isBanned() && $player->hasPermission("essentials.ban.exempt")){
             $player->setBanned(false);
         }
+        //Nick and NameTag set:
+        $this->api->setNick($player, $this->api->getNick($player), false);
     }
 
     /**
@@ -46,7 +48,6 @@ class EventHandler implements Listener{
         $this->api->muteSessionCreate($player);
         $this->api->createSession($player);
         //Nick and NameTag set:
-        $this->api->setNick($player, $this->api->getNick($player), false);
         $event->setJoinMessage($player->getDisplayName() . " joined the game");
         //Hide vanished players
         foreach(Server::getInstance()->getOnlinePlayers() as $p){
