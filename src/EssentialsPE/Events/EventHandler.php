@@ -12,6 +12,8 @@ use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\server\DataPacketSendEvent;
+use pocketmine\network\protocol\MessagePacket;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -78,15 +80,22 @@ class EventHandler implements Listener{
      */
     public function onPlayerChat(PlayerChatEvent $event){
         $player = $event->getPlayer();
-        $message = $event->getMessage();
         if($this->api->isMuted($player)){
             $event->setCancelled(true);
         }
-        $message = $this->api->colorMessage($message, $player);
-        if($message === false){
-            $event->setCancelled(true);
+    }
+
+    public function onMessageBroadcast(DataPacketSendEvent $event){
+        $player = $event->getPlayer();
+        $packet = $event->getPacket();
+        if($packet instanceof MessagePacket){
+            $message = $this->api->colorMessage($packet->message, $player);
+            if($message === false){
+                $event->setCancelled(true);
+            }
+            $packet->source = "";
+            $packet->message = $message;
         }
-        $event->setMessage($message);
     }
 
     /**
@@ -125,6 +134,7 @@ class EventHandler implements Listener{
             if($this->api->isGod($victim)){
                 $event->setCancelled(true);
             }
+
             if(!$this->api->isPvPEnabled($victim)){
                 $issuer->sendMessage(TextFormat::RED . $victim->getDisplayName() . " have PvP disabled!");
                 $event->setCancelled(true);
