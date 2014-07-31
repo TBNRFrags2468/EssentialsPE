@@ -93,7 +93,6 @@ class EventHandler implements Listener{
             if($message === false){
                 $event->setCancelled(true);
             }
-            $packet->source = "";
             $packet->message = $message;
         }
     }
