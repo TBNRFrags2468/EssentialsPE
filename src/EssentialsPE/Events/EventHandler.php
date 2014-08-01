@@ -8,12 +8,12 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
+use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\server\DataPacketSendEvent;
-use pocketmine\network\protocol\MessagePacket;
+use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -85,16 +85,28 @@ class EventHandler implements Listener{
         }
     }
 
-    public function onMessageBroadcast(DataPacketSendEvent $event){
+    /**
+     * @param PlayerCommandPreprocessEvent $event
+     */
+    public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
         $player = $event->getPlayer();
-        $packet = $event->getPacket();
-        if($packet instanceof MessagePacket){
-            $message = $this->api->colorMessage($packet->message, $player);
-            if($message === false){
-                $event->setCancelled(true);
-            }
-            $packet->message = $message;
+        $command = $this->api->colorMessage($event->getMessage(), $player);
+        if($command === false){
+            $event->setCancelled(true);
         }
+        $event->setMessage($command);
+    }
+
+    /**
+     * @param ServerCommandEvent $event
+     */
+    public function onServerCommand(ServerCommandEvent $event){
+        $sender = $event->getSender();
+        $command = $this->api->colorMessage($event->getCommand());
+        if($command === false){
+            $event->setCancelled(true);
+        }
+        $event->setCommand($command);
     }
 
     /**

@@ -148,10 +148,14 @@ class Loader extends PluginBase{
      */
     public function colorMessage($message, $player = null){
         $search = ["&0","&1","&2","&3","&4","&5","&6","&7","&8","&9","&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
-        //$formats = ["§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f", "§k", "§l", "§m", "§n", "§o", "§r"];
+        $formats = ["§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f", "§k", "§l", "§m", "§n", "§o", "§r"];
         foreach($search as $s){
             $code = substr($s, -1, 1);
             $message = str_replace($s, "§" . $code, $message);
+        }
+        foreach($formats as $f){
+            $code = $code = substr($f, -1, 1);
+            $message = str_replace("\\" . $f, "&" . $code, $message);
         }
         if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
             $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
