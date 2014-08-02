@@ -10,13 +10,13 @@ use pocketmine\Player;
 class PlayerNickChangeEvent extends BaseEvent implements Cancellable{
     public static $handlerList = null;
     /** @var Player  */
-    private $player;
+    protected $player;
     /** @var  string */
-    private   $new_nick;
+    protected   $new_nick;
     /** @var  string */
-    private   $old_nick;
+    protected   $old_nick;
     /** @var  string */
-    private $nametag;
+    protected $nametag;
 
     /**
      * @param Loader $plugin

@@ -6,14 +6,14 @@ use EssentialsPE\Loader;
 use pocketmine\Player;
 
 class PlayerVanishEvent extends BaseEvent{
-    public static  $handlerList = null;
+    public static $handlerList = null;
 
     /** @var \pocketmine\Player  */
-    public $player;
+    protected $player;
     /** @var bool  */
-    public $isVanished;
+    protected $isVanished;
     /** @var  bool */
-    public $willVanish;
+    protected $willVanish;
 
     /**
      * @param Loader $plugin
@@ -28,6 +28,8 @@ class PlayerVanishEvent extends BaseEvent{
     }
 
     /**
+     * Return the player that will be vanished/shown
+     *
      * @return Player
      */
     public function getPlayer(){
@@ -35,6 +37,8 @@ class PlayerVanishEvent extends BaseEvent{
     }
 
     /**
+     * Tell if the player is already vanished or not
+     *
      * @return bool
      */
     public function isVanished(){
@@ -42,6 +46,8 @@ class PlayerVanishEvent extends BaseEvent{
     }
 
     /**
+     * Tell if the player will be vanished or showed
+     *
      * @return bool
      */
     public function willVanish(){
@@ -49,6 +55,10 @@ class PlayerVanishEvent extends BaseEvent{
     }
 
     /**
+     * Change the vanish mode that will be set
+     * false = Player will be shown
+     * true = Player will be vanished
+     *
      * @param $value
      */
     public function setVanished($value){

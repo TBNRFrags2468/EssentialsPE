@@ -118,7 +118,7 @@ class EventHandler implements Listener{
         $entity = $event->getEntity();
         $origin = $event->getOrigin();
         $target = $event->getTarget();
-        if($entity instanceof Player){
+        if($entity instanceof Player && !$event->isCancelled()){
             $this->api->switchLevelVanish($entity, $origin, $target);
         }
     }

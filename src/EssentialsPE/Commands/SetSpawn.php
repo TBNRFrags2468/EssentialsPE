@@ -24,7 +24,7 @@ class SetSpawn extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
             return false;
         }
-        $sender->getLevel()->setSpawn(new Vector3($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ()));
+        $sender->getLevel()->setSpawnLocation(new Vector3($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ()));
         Server::getInstance()->setDefaultLevel($sender->getLevel());
         $sender->sendMessage(TextFormat::YELLOW . "Spawn point changed!");
         return true;

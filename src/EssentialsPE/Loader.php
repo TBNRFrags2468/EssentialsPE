@@ -31,6 +31,7 @@ use EssentialsPE\Commands\Warps\SetWarp; //Use API
 use EssentialsPE\Commands\Warps\Warp; //Use API
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerNickChangeEvent;
+use EssentialsPE\Events\PlayerVanishEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\math\Vector3;
@@ -707,6 +708,8 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
+        $state = $ev->willVanish();
         $this->setSession($player, "vanish", $state);
         if($state === false){
             foreach($this->getServer()->getOnlinePlayers() as $p){
@@ -729,14 +732,9 @@ class Loader extends PluginBase{
     public function switchVanish(Player $player){
         if(!$this->isVanished($player)){
             $this->setVanish($player, true);
-
         }else{
             $this->setVanish($player, false);
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                $p->showPlayer($player);
-            }
         }
-        return true;
     }
 
     /**
@@ -755,14 +753,14 @@ class Loader extends PluginBase{
 
     /**
      * Allow to switch between levels Vanished!
-     * you need to teleport the player first and call the EntityLevelChangeEvent first...
+     * You need to teleport the player to a different level
      *
      * @param Player $player
      * @param Level $origin
      * @param Level $target
      */
     public function switchLevelVanish(Player $player, Level $origin, Level $target){
-        if($this->isVanished($player)){
+        if($origin->getName() !== $target->getName() && $this->isVanished($player)){
             foreach($origin->getPlayers() as $p){
                 $p->showPlayer($player);
             }
