@@ -90,6 +90,13 @@ class EventHandler implements Listener{
      */
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
         $player = $event->getPlayer();
+        $command = $event->getMessage();
+
+        $a = explode(" ", $command);
+        if($a[0] === ("//say" || "//me")){
+            $event->setCancelled(true);
+        }
+
         $command = $this->api->colorMessage($event->getMessage(), $player);
         if($command === false){
             $event->setCancelled(true);

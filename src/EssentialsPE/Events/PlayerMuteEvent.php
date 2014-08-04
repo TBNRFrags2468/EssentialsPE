@@ -6,14 +6,14 @@ use pocketmine\event\Cancellable;
 use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
+class PlayerMuteEvent extends PluginEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var \pocketmine\Player  */
     protected $player;
-    /** @var bool  */
-    protected $isEnabled;
-    /** @var bool  */
+    /** @var  bool */
+    protected $isMuted;
+    /** @var  bool */
     protected $mode;
 
     /**
@@ -24,7 +24,7 @@ class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
     public function __construct(Loader $plugin, Player $player, $mode){
         parent::__construct($plugin);
         $this->player = $player;
-        $this->isEnabled = $plugin->isPvPEnabled($player);
+        $this->isMuted = $plugin->isMuted($player);
         $this->mode = $mode;
     }
 
@@ -38,31 +38,31 @@ class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
     }
 
     /**
-     * Tell if the player already have PvP enabled
+     * Tell is the player is already muted
      *
      * @return bool
      */
-    public function isPvPEnabled(){
-        return $this->isEnabled;
+    public function isMuted(){
+        return $this->isMuted;
     }
 
     /**
-     * Tell the mode to be set
+     * Tell if the player will be muted or not
      *
      * @return bool
      */
-    public function getPvPMode(){
+    public function willMute(){
         return $this->mode;
     }
 
     /**
-     * Change the PVP mode
-     * false = PvP mode will be disabled for the player
-     * true = PvP mode will be enabled for the player
+     * Change the Mute mode to be set
+     * false = Player will not be muted
+     * true = Player will be muted
      *
      * @param bool $mode
      */
-    public function setPvPMode($mode){
+    public function setMuted($mode){
         if(is_bool($mode)){
             $this->mode = $mode;
         }

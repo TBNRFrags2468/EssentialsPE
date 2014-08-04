@@ -30,7 +30,9 @@ use EssentialsPE\Commands\Warps\RemoveWarp; //Use API
 use EssentialsPE\Commands\Warps\SetWarp; //Use API
 use EssentialsPE\Commands\Warps\Warp; //Use API
 use EssentialsPE\Events\EventHandler; //Use API
+use EssentialsPE\Events\PlayerMuteEvent;
 use EssentialsPE\Events\PlayerNickChangeEvent;
+use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -359,6 +361,9 @@ class Loader extends PluginBase{
     /**
      * Create the mute session for a player
      *
+     * The mute session is handled separately of other Sessions because
+     * using it separately, players can't be unmuted by leaving and joining again...
+     *
      * @param Player $player
      */
     public function muteSessionCreate(Player $player){
@@ -378,6 +383,11 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerMuteEvent($this, $player, $state));
+        if($ev->isCancelled()){
+            return false;
+        }
+        $state = $ev->willMute();
         $this->mutes[$player->getName()] = $state;
         return true;
     }
@@ -569,6 +579,11 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerPvPModeChangeEvent($this, $player, $state));
+        if($ev->isCancelled()){
+            return false;
+        }
+        $state = $ev->getPvPMode();
         $this->setSession($player, "pvp", $state);
         return true;
     }
@@ -709,6 +724,9 @@ class Loader extends PluginBase{
             return false;
         }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
+        if($ev->isCancelled()){
+            return false;
+        }
         $state = $ev->willVanish();
         $this->setSession($player, "vanish", $state);
         if($state === false){
@@ -753,7 +771,7 @@ class Loader extends PluginBase{
 
     /**
      * Allow to switch between levels Vanished!
-     * You need to teleport the player to a different level
+     * You need to teleport the player to a different level in order to call this event
      *
      * @param Player $player
      * @param Level $origin

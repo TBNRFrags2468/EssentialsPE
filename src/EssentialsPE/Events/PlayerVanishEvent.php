@@ -1,11 +1,12 @@
 <?php
 namespace EssentialsPE\Events;
 
-use EssentialsPE\BaseEvent;
 use EssentialsPE\Loader;
+use pocketmine\event\Cancellable;
+use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerVanishEvent extends BaseEvent{
+class PlayerVanishEvent extends PluginEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var \pocketmine\Player  */
@@ -18,7 +19,7 @@ class PlayerVanishEvent extends BaseEvent{
     /**
      * @param Loader $plugin
      * @param Player $player
-     * @param $willVanish
+     * @param bool $willVanish
      */
     public function __construct(Loader $plugin, Player $player, $willVanish){
         parent::__construct($plugin);
@@ -59,7 +60,7 @@ class PlayerVanishEvent extends BaseEvent{
      * false = Player will be shown
      * true = Player will be vanished
      *
-     * @param $value
+     * @param bool $value
      */
     public function setVanished($value){
         if(is_bool($value)){
