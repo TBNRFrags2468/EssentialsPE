@@ -27,7 +27,7 @@ class TempBan extends BaseCommand{
             return false;
         }
         $seconds = 0;
-        while(preg_match('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#i', array_shift($args), $match)){
+        while(preg_match('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#i', array_shift($args), $match, PREG_SET_ORDER)){
             $match = $match[0]; // TODO check if the flag is wrong
             if(!is_numeric($match[1])){
                 break;
