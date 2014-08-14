@@ -66,10 +66,10 @@ class AFK extends BaseCommand{
     }
 
     private function broadcastAFKStatus(Player $player, $message){
+        $player->getServer()->getLogger()->info(TextFormat::GREEN . $player->getDisplayName() . " " . $message);
         foreach($player->getServer()->getOnlinePlayers() as $p){
             if($p !== $player){
                 $p->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " " . $message);
-                $player->getServer()->getLogger()->info(TextFormat::GREEN . $player->getDisplayName() . " " . $message);
             }
         }
     }
