@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class TempBan extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "tempban", "Temporary bans the specified player", "/tempban <player> <time ...> [reason ...]");
-        $this->setPermission("essentials.command.tempban");
+        $this->setPermission("essentials.tempban");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -52,7 +52,7 @@ class TempBan extends BaseCommand{
         $ban->setReason($reason);
         $this->getPlugin()->getServer()->getNameBans()->add($ban);
         $format = "M jS y H:i:s";
-        $player->close("Banned until ".date($format, $expiryTimestamp));
+        $player->close("Banned until " . date($format, $expiryTimestamp));
         return true;
     }
 }

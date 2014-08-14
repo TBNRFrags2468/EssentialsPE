@@ -6,6 +6,7 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
+use pocketmine\event\entity\EntityMoveEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
@@ -14,8 +15,8 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
+use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class EventHandler implements Listener{
@@ -52,7 +53,7 @@ class EventHandler implements Listener{
         //Nick and NameTag set:
         $event->setJoinMessage($player->getDisplayName() . " joined the game");
         //Hide vanished players
-        foreach(Server::getInstance()->getOnlinePlayers() as $p){
+        foreach($player->getServer()->getOnlinePlayers() as $p){
             if($this->api->isVanished($p)){
                 $player->hidePlayer($p);
             }
@@ -87,13 +88,14 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerCommandPreprocessEvent $event
+     *
+     * @priority HIGH
      */
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
         $player = $event->getPlayer();
         $command = $event->getMessage();
 
-        $a = explode(" ", $command);
-        if($a[0] === ("//say" || "//me")){
+        if((substr($command, 0, 4) === "/say" || substr($command, 0, 3) === "/me") && $this->api->isMuted($player)){
             $event->setCancelled(true);
         }
 
@@ -108,12 +110,30 @@ class EventHandler implements Listener{
      * @param ServerCommandEvent $event
      */
     public function onServerCommand(ServerCommandEvent $event){
-        $sender = $event->getSender();
         $command = $this->api->colorMessage($event->getCommand());
         if($command === false){
             $event->setCancelled(true);
         }
         $event->setCommand($command);
+    }
+
+    /**
+     * @param EntityMoveEvent $event
+     */
+    public function onEntityMove(EntityMoveEvent $event){
+        $entity = $event->getEntity();
+        if($entity instanceof Player){
+            if($this->api->isAFK($entity)){
+                $this->api->setAFKMode($entity, false);
+                $entity->sendMessage(TextFormat::GREEN . "You're no longer AFK");
+                foreach($entity->getServer()->getOnlinePlayers() as $p){
+                    if($p !== $entity){
+                        $p->sendMessage(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
+                        $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
+                    }
+                }
+            }
+        }
     }
 
     /**
@@ -125,7 +145,7 @@ class EventHandler implements Listener{
         $entity = $event->getEntity();
         $origin = $event->getOrigin();
         $target = $event->getTarget();
-        if($entity instanceof Player && !$event->isCancelled()){
+        if($entity instanceof Player){
             $this->api->switchLevelVanish($entity, $origin, $target);
         }
     }
@@ -137,27 +157,34 @@ class EventHandler implements Listener{
      */
     public function onEntityDamage(EntityDamageEvent $event){
         $entity = $event->getEntity();
-        if($entity instanceof Player && $this->api->isGod($entity)){
-            $event->setCancelled(true);
+        if($entity instanceof Player){
+            if($this->api->isGod($entity)){
+                $event->setCancelled(true);
+            }
         }
     }
 
     /**
      * @param EntityDamageByEntityEvent $event
+     *
+     * @priority HIGH
      */
     public function onEntityDamageByEntity(EntityDamageByEntityEvent $event){
         $victim = $event->getEntity();
         $issuer = $event->getDamager();
         if($victim instanceof Player && $issuer instanceof Player){
-            if($this->api->isGod($victim)){
+            if($this->api->isGod($victim) || ($this->api->isAFK($victim) && $this->api->getConfig()->get("safe-afk") === true)){
+                $event->setCancelled(true);
+            }elseif($this->api->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
                 $event->setCancelled(true);
             }
 
+            if(!$this->api->isPvPEnabled($issuer)){
+                $issuer->sendMessage(TextFormat::RED . "You have PvP disabled!");
+                $event->setCancelled(true);
+            }
             if(!$this->api->isPvPEnabled($victim)){
                 $issuer->sendMessage(TextFormat::RED . $victim->getDisplayName() . " have PvP disabled!");
-                $event->setCancelled(true);
-            }elseif(!$this->api->isPvPEnabled($issuer)){
-                $issuer->sendMessage(TextFormat::RED . "You have PvP disabled!");
                 $event->setCancelled(true);
             }
         }
@@ -165,6 +192,8 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerInteractEvent $event
+     *
+     * @priority HIGH
      */
     public function onBlockTap(PlayerInteractEvent $event){
         $player = $event->getPlayer();
@@ -172,10 +201,8 @@ class EventHandler implements Listener{
 
         //PowerTool
         if($this->api->isPowerToolEnabled($player)){
-            if($this->api->getPowerToolItemCommand($player, $item) !== false){
-                Server::getInstance()->dispatchCommand($player, $this->api->getPowerToolItemCommand($player, $item));
-                $event->setCancelled(true);
-            }
+            $event->setCancelled(true);
+            $this->api->executePowerTool($player, $item);
         }
     }
 
@@ -187,12 +214,20 @@ class EventHandler implements Listener{
     public function onBlockPlace(BlockPlaceEvent $event){
         $player = $event->getPlayer();
         $item = $event->getItem();
+        $block = $event->getBlock();
 
+        //PowerTool
         if($this->api->isPowerToolEnabled($player)){
-            if($this->api->getPowerToolItemCommand($player, $item) !== false){
-                Server::getInstance()->dispatchCommand($player, $this->api->getPowerToolItemCommand($player, $item));
-                $event->setCancelled(true);
-            }
+            $this->api->executePowerTool($player, $item);
+            $event->setCancelled(true);
+        }
+
+        //Unlimited block placing
+        elseif($this->api->isUnlimitedEnabled($player)){
+            $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
+            $player->getLevel()->setBlock($pos, $block, true);
+            $event->setCancelled(true);
+            //$player->getLevel()->setBlock($pos, $block, true);
         }
     }
 }

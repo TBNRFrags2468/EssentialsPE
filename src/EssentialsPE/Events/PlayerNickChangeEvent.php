@@ -16,13 +16,13 @@ class PlayerNickChangeEvent extends PluginEvent implements Cancellable{
     protected   $new_nick;
     /** @var  string */
     protected   $old_nick;
-    /** @var  string */
+    /** @var bool|mixed  */
     protected $nametag;
 
     /**
      * @param Loader $plugin
      * @param Player $player
-     * @param $new_nick
+     * @param string $new_nick
      * @param mixed $nametag
      */
     public function __construct(Loader $plugin, Player $player, $new_nick, $nametag = false){

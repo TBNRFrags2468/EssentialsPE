@@ -48,6 +48,8 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
 
     /**
      * Tell if the player will be vanished or showed
+     * false = Player will be showed
+     * true = Player will be vanished
      *
      * @return bool
      */
