@@ -27,7 +27,7 @@ class TempBan extends BaseCommand{
             return false;
         }
         $seconds = 0;
-        while(preg_match_all('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#', array_shift($args), $match, PREG_SET_ORDER)){
+        while(preg_match_all('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#', $shifted = array_shift($args), $match, PREG_SET_ORDER)){
             $match = $match[0]; // it won't get two matches anyways, or we will just ignore it (like 2w3s will only be parsed as 2 "w"eeks)
             if(!is_numeric($match[1])){
                 break;
@@ -43,6 +43,9 @@ class TempBan extends BaseCommand{
             }
             $amplifier = floatval($match[1]);
             $seconds += $amplifier * $unit;
+        }
+        if(is_string($shifted)) {
+            array_unshift($args, $shifted);
         }
         $reason = implode(" ", $args);
         $date = new \DateTime;
