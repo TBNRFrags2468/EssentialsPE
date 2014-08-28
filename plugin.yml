@@ -52,7 +52,7 @@ permissions:
                     essentials.clearinventory.other:
                         defult: op
                         description: "Clear other's inventory"
-            essentialc.command.compass:
+            essentials.command.compass:
                 default: true
                 description: "Display your current bearing direction"
             essentials.essentials:
@@ -87,7 +87,7 @@ permissions:
                         decription: "Prevent you to take damage"
                     essentials.god.other:
                         default: op
-                        decription: "Prevent other player to take damage"
+                        decription: "Prevent other players to take damage"
                     essentials.god.other:
                         default: op
                         decription: "Let you attack other players while in god mode"
