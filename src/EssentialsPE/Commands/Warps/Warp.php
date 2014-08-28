@@ -22,7 +22,7 @@ class Warp extends BaseCommand{
                 $sender->sendMessage(TextFormat::RED . "Usage: /warp <name> <player>");
                 return false;
             }else{
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+                $sender->sendMessage(TextFormat::RED . $this->getUsage());
             }
         }
         switch(count($args)){

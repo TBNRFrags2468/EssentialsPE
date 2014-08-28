@@ -18,44 +18,65 @@ class TempBan extends BaseCommand{
             return false;
         }
         if(count($args) < 2){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $player = $this->getAPI()->getPlayer(array_shift($args));
-        if($player === false){
-            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-            return false;
-        }
+        $player = $this->getAPI()->getPlayer($name = array_shift($args));
+        /**
+         * s = Seconds (with leading zeros)
+         * i = Minutes
+         * h = Hour (12 hours format with leading zeros)
+         * j = Day number (1 - 30/31)
+         * m = Month number
+         * Y = Year in 4 digits (1999)
+         */
         $seconds = 0;
-        while(preg_match_all('#^(\d+(\.\d+)?)(y|mo|w|d|h|m|s)$#', $shifted = array_shift($args), $match, PREG_SET_ORDER)){
-            $match = $match[0]; // it won't get two matches anyways, or we will just ignore it (like 2w3s will only be parsed as 2 "w"eeks)
-            if(!is_numeric($match[1])){
-                break;
+        $v = explode(",", array_shift($args));
+        foreach($v as $t){
+            if(strpos($t, "s")){
+                $time = substr($t, -2);
+                $seconds += (is_numeric($time) ? $time : 0);
             }
-            $unit = 1;
-            switch(strtolower($match[3])){
-                case "m": $unit = 60; break;
-                case "h": $unit = 60 * 60; break;
-                case "d": $unit = 60 * 60 * 24; break;
-                case "w": $unit = 60 * 60 * 24 * 7; break;
-                case "mo": $unit = 60 * 60 * 24 * ((int) date("t")); break; // never knew I were to use "t" ;)
-                case "y": $unit = 60 * 60 * 24 * (date("L") === "1" ? 366:365); break;
+            if(strpos($t, "m")){
+                $time = substr($t, -2) * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
             }
-            $amplifier = floatval($match[1]);
-            $seconds += $amplifier * $unit;
-        }
-        if(is_string($shifted)) {
-            array_unshift($args, $shifted);
+            if(strpos($t, "h")){
+                $time = substr($t, -2) * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }
+            if(strpos($t, "d")){
+                $time = substr($t, -2) * 24 * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }
+            if(strpos($t, "w")){
+                $time = substr($t, -2) * 7 * 24 * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }
+            if(strpos($t, "mo")){
+                $time = substr($t, -3) * 30 * 24 * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }
+            if(strpos($t, "y")){
+                $time = substr($t, -2) * 365 * 24 * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }
         }
         $reason = implode(" ", $args);
-        $date = new \DateTime;
-        $date->setTimestamp($expiryTimestamp = time() + $seconds);
-        $ban = new BanEntry($player->getName());
-        $ban->setExpires($date);
-        $ban->setReason($reason);
-        $this->getPlugin()->getServer()->getNameBans()->add($ban);
-        $format = "M jS y H:i:s";
-        $player->close("Banned until " . date($format, $expiryTimestamp));
+        $date = new \DateTime();
+        $date->setTimestamp($time = time() + $seconds);
+        if($player !== false){
+            if($player->hasPermission("essentials.banexempt")){
+                $sender->sendMessage(TextFormat::RED . "[Error] $name can't be banned");
+                return false;
+            }else{
+                $name = $player->getName();
+                $player->kick(TextFormat::RED . "Banned until " . TextFormat::AQUA . date("l, F j, Y", $time) . TextFormat::RED . " at " . TextFormat::AQUA . date("h:1a", $time));
+            }
+        }
+        $sender->getServer()->getNameBans()->addBan($name, ($reason !== "" ? $reason : null), $date, "essentialspe");
+
+        $this->broadcastCommandMessage($sender, "Banned player " . $name);
         return true;
     }
 }

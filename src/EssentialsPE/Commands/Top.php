@@ -23,7 +23,7 @@ class Top extends BaseCommand{
             return false;
         }
         if(count($args) != 0){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
         $block = $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ());

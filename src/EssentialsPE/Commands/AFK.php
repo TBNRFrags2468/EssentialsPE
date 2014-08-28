@@ -17,14 +17,6 @@ class AFK extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) > 1){
-            if(!$sender instanceof Player){
-                $sender->sendMessage(TextFormat::RED . "Usage: /afk <player>");
-            }else{
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-            }
-            return false;
-        }
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
@@ -39,7 +31,6 @@ class AFK extends BaseCommand{
                     $sender->sendMessage(TextFormat::YELLOW . "You're now AFK");
                     $this->broadcastAFKStatus($sender, "is now AFK");
                 }
-                return true;
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.afk.other")){
@@ -59,7 +50,14 @@ class AFK extends BaseCommand{
                     $player->sendMessage(TextFormat::YELLOW . "You're now AFK");
                     $this->broadcastAFKStatus($player, "is now AFK");
                 }
-                return true;
+                break;
+            default:
+                if(!$sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "Usage: /afk <player>");
+                }else{
+                    $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                }
+                return false;
                 break;
         }
         return true;

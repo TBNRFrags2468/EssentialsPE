@@ -17,58 +17,41 @@ class Nick extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) == 0 || count($args) > 2){
-            if(!$sender instanceof Player){
-                $sender->sendMessage(TextFormat::RED . "Usage: /nick <new nick|off> <player>");
-            }else{
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-            }
-        }else{
-            switch(count($args)){
-                case 1:
-                    $nickname = $args[0];
-                    if(!$sender instanceof Player){
-                        $sender->sendMessage(TextFormat::RED . "Usage: /nick <new nick|off> <player>");
-                    }else{
-                        if($nickname == "off"){
-                            $this->getAPI()->removeNick($sender, true);
-                        }else{
-                            $this->getAPI()->setNick($sender, $nickname, true);
-                        }
-                    }
-                    break;
-                case 2:
-                    if(!$sender->hasPermission("essentials.nick.other")){
-                        $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    }else{
-                        $nickname = $args[0];
-                        $player = $this->getAPI()->getPlayer($args[1]);
-                        if($player == false){
-                            $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                        }else{
-                            if($nickname == "off"){
-                                if($player->getName() != $sender->getName()){
-                                    if(substr($player->getDisplayName(), -1, 1) == "s"){
-                                        $sender->sendMessage(TextFormat::GREEN . "$args[1]' nick has been disabled");
-                                    }else{
-                                        $sender->sendMessage(TextFormat::GREEN . "$args[1]'s nick has been disabled");
-                                    }
-                                }
-                                $this->getAPI()->removeNick($player, true);
-                            }else{
-                                if($player->getName() != $sender->getName()){
-                                    if(substr($player->getDisplayName(), -1, 1) == "s"){
-                                        $sender->sendMessage(TextFormat::GREEN . "$args[1]' nick has been changed");
-                                    }else{
-                                        $sender->sendMessage(TextFormat::GREEN . "$args[1]'s nick has been changed");
-                                    }
-                                }
-                                $this->getAPI()->setNick($player, $nickname, true);
-                            }
-                        }
-                    }
-                    break;
-            }
+        switch(count($args)){
+            case 1:
+                if(!$sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "Usage: /nick <new nick|off> <player>");
+                    return false;
+                }
+                $nickname = $args[0];
+                $nickname === "off" ? $this->getAPI()->removeNick($sender, true) : $this->getAPI()->setNick($sender, $nickname, true);
+                $sender->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . $nickname);
+                break;
+            case 2:
+                if(!$sender->hasPermission("essentials.nick.other")){
+                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                    return false;
+                }
+                $player = $this->getAPI()->getPlayer($args[1]);
+                if($player == false){
+                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
+                    return false;
+                }
+                $nickname = $args[0];
+                if($nickname == "off"){
+                    $this->getAPI()->removeNick($player, true);
+                    $sender->sendMessage(TextFormat::GREEN . "$args[1]'" . (substr($args[1], -1, 1) === "s" ? "" : "s") . " nick has been disabled");
+                    $player->sendMessage(TextFormat::GREEN . "Your nick has been disabled");
+                }else{
+                    $this->getAPI()->setNick($player, $nickname, true);
+                    $sender->sendMessage(TextFormat::GREEN . "$args[1]'" . (substr($args[1], -1, 1) === "s" ? "" : "s") . " nick is now " . TextFormat::RED . $nickname);
+                    $player->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . $nickname);
+                }
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /nick <new nick|off> <player>");
+                return false;
+                break;
         }
         return true;
     }

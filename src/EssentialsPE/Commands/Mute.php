@@ -18,26 +18,22 @@ class Mute extends BaseCommand{
             return false;
         }
         if(count($args) != 1){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
         $player = $this->getAPI()->getPlayer($args[0]);
         if($player === false){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-        }else{
-            if($player->hasPermission("essentials.mute.exempt")){
-                if(!$this->getAPI()->isMuted($player)){
-                    $sender->sendMessage(TextFormat::RED . "$args[0] can't be muted");
-                    return false;
-                }
-            }
-            $this->getAPI()->switchMute($player);
+            return false;
+        }
+        if($player->hasPermission("essentials.mute.exempt")){
             if(!$this->getAPI()->isMuted($player)){
-                $sender->sendMessage(TextFormat::YELLOW . "$args[0] has been unmuted!");
-            }else{
-                $sender->sendMessage(TextFormat::YELLOW . "$args[0] has been muted!");
+                $sender->sendMessage(TextFormat::RED . "$args[0] can't be muted");
+                return false;
             }
         }
+        $this->getAPI()->switchMute($player);
+        $sender->sendMessage(TextFormat::YELLOW . "$args[0] has been " . $this->getAPI()->isMuted($player) ? "muted!" : "unmuted!");
         return true;
     }
 } 

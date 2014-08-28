@@ -17,20 +17,20 @@ class Burn extends BaseCommand{
             return false;
         }
         if(count($args) != 2){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            return false;
+        }
+        $player = $this->getAPI()->getPlayer($args[0]);
+        $time = $args[1];
+        if($player === false){
+            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+            return false;
+        }
+        if(!is_numeric($time)){
+            $sender->sendMessage(TextFormat::RED . "[Error] Invalid time");
         }else{
-            $player = $this->getAPI()->getPlayer($args[0]);
-            $time = $args[1];
-            if($player === false){
-                $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-            }else{
-                if(!is_numeric($time)){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Invalid time.");
-                }else{
-                    $player->setOnFire($time);
-                    $sender->sendMessage(TextFormat::YELLOW . "$args[0] is now on fire!");
-                }
-            }
+            $player->setOnFire($time);
+            $sender->sendMessage(TextFormat::YELLOW . "$args[0] is now on fire!");
         }
         return true;
     }

@@ -20,8 +20,8 @@ class Compass extends BaseCommand{
         if(!$sender instanceof Player){
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
         }
-        if(count($args) > 0){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+        if(count($args) !== 0){
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
         }
 
         $direction = "";

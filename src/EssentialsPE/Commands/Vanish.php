@@ -17,43 +17,28 @@ class Vanish extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) > 1){
-            if(!$sender instanceof Player){
-                $sender->sendMessage(TextFormat::RED . "Usage: /vanish <player>");
-            }else{
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-            }
-            return false;
-        }
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
                     $sender->sendMessage(TextFormat::RED . "Usage: /vanish <player>");
-                }else{
-                    $this->getAPI()->switchVanish($sender);
-                    if(!$this->getAPI()->isVanished($sender)){
-                        $sender->sendMessage(TextFormat::GRAY . "You're now visible");
-                    }else{
-                        $sender->sendMessage(TextFormat::GRAY . "You're now vanished!");
-                    }
+                    return false;
                 }
-                return true;
+                $this->getAPI()->switchVanish($sender);
+                $sender->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($sender) ? "vanished!" : "visible!"));
                 break;
             case 1:
                 $player = $this->getAPI()->getPlayer($args[0]);
                 if($player == false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                }else{
-                    $this->getAPI()->switchVanish($player);
-                    if(!$this->getAPI()->isVanished($player)){
-                        $player->sendMessage(TextFormat::GRAY . "You're now visible");
-                        $sender->sendMessage(TextFormat::GRAY . "$args[0] is now visible");
-                    }else{
-                        $player->sendMessage(TextFormat::GRAY . "You're now vanished!");
-                        $sender->sendMessage(TextFormat::GRAY . "$args[0] is now vanished!");
-                    }
+                    return false;
                 }
-                return true;
+                $this->getAPI()->switchVanish($player);
+                $sender->sendMessage(TextFormat::GRAY . "$args[0] is now " . ($this->getAPI()->isVanished($player) ? "vanished!" : "visible!"));
+                $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($sender) ? "vanished!" : "visible!"));
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                return false;
                 break;
         }
         return true;

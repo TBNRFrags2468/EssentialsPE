@@ -20,12 +20,14 @@ class SetSpawn extends BaseCommand{
             return false;
         }
         if(count($args) != 0){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $sender->getLevel()->setSpawnLocation(new Vector3($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ()));
-        $sender->getServer()->setDefaultLevel($sender->getLevel());
-        $sender->sendMessage(TextFormat::YELLOW . "Spawn point changed!");
+        $level = $sender->getLevel();
+        $level->setSpawnLocation(new Vector3($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ()));
+        $sender->getServer()->setDefaultLevel($level);
+        $sender->sendMessage(TextFormat::YELLOW . "Server's spawn point changed!");
+        $sender->getServer()->getLogger()->debug(TextFormat::YELLOW . "Server's spawn point set to" . TextFormat::AQUA . $level->getName() . TextFormat::YELLOW . " by " . TextFormat::GREEN . $sender->getName());
         return true;
     }
 }

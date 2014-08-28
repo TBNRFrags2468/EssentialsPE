@@ -16,6 +16,8 @@ class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
     /** @var bool  */
     protected $mode;
 
+    protected $timerID;
+
     /**
      * @param Loader $plugin
      * @param Player $player

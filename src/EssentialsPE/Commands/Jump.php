@@ -24,7 +24,7 @@ class Jump extends BaseCommand{
             return false;
         }
         if(count($args) > 0){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
         }
         $vectors = $sender->getDirectionVector()->divide(4);;
         $pos = $sender->getPosition();

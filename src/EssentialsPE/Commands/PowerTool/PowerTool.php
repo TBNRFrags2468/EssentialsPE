@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 class PowerTool extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command> <arguments...>", ["pt"]);
-        $this->setPermission("essentials.powertool");
+        $this->setPermission("essentials.powertool.use");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -29,12 +29,19 @@ class PowerTool extends BaseCommand{
         }
 
         if(count($args) === 0){
-            if(!$this->getAPI()->getPowerToolItemCommands($sender, $item)){
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            if(!$this->getAPI()->getPowerToolItemCommand($sender, $item) || !$this->getAPI()->getPowerToolItemChatMacro($sender, $item)){
+                $sender->sendMessage(TextFormat::RED . $this->getUsage());
                 return false;
             }
+            if($this->getAPI()->getPowerToolItemCommand($sender, $item) !== false){
+                $sender->sendMessage(TextFormat::GREEN . "Command removed from this item.");
+            }elseif($this->getAPI()->getPowerToolItemCommands($sender, $item) !== false){
+                $sender->sendMessage(TextFormat::GREEN . "Commands removed from this item.");
+            }
+            if($this->getAPI()->getPowerToolItemChatMacro($sender, $item) !== false){
+                $sender->sendMessage(TextFormat::GREEN . "Chat macro removed from this item.");
+            }
             $this->getAPI()->disablePowerToolItem($sender, $item);
-            $sender->sendMessage(TextFormat::GREEN . "Command removed from this item.");
         }else{
             if($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool" || $args[0] == "powertooltoggle"){
                 $sender->sendMessage(TextFormat::RED . "This command can't be assigned");
@@ -45,25 +52,42 @@ class PowerTool extends BaseCommand{
                 $c = substr($command, 2);
                 $this->getAPI()->setPowerToolItemChatMacro($sender, $item, $c);
                 $sender->sendMessage(TextFormat::GREEN . "Chat macro successfully assigned to this item!");
-            }elseif(stripos($command, "a:") !== false){ //Add multiple commands
-                $a = substr($command, 2);
-                $a = explode(";", $a);
-                $this->getAPI()->setPowerToolItemCommands($sender, $item, $a);
+            }elseif(stripos($command, "a:") !== false){
+                if(!$sender->hasPermission("essentials.powertool.append")){
+                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                    return false;
+                }
+                $commands = substr($command, 2);
+                $commands = explode(";", $commands);
+                $this->getAPI()->setPowerToolItemCommands($sender, $item, $commands);
                 $sender->sendMessage(TextFormat::GREEN . "Commands successfully assigned to this item!");
-            }elseif(stripos($command, "r:") !== false){ //Remove a single command
-                $r = substr($command, 2);
-                $this->getAPI()->removePowerToolCommand($sender, $item, $r);
-                $sender->sendMessage(TextFormat::GREEN . "Command successfully removed from this item!");
+            }elseif(stripos($command, "r:") !== false){
+                if(!$sender->hasPermission("essentials.powertool.append")){
+                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                    return false;
+                }
+                $command = substr($command, 2);
+                $this->getAPI()->removePowerToolItemCommand($sender, $item, $command);
+                $sender->sendMessage(TextFormat::YELLOW . "Command successfully removed from this item!");
             }elseif(count($args) === 1){
                 switch(strtolower($args[0])){
                     case "l":
-                        $commands = $this->getAPI()->getPowerToolItemCommands($sender, $item);
-                        $list = "=== List of commands ===";
+                        $commands = false;
+                        if($this->getAPI()->getPowerToolItemCommand($sender, $item) !== false){
+                            $commands = $this->getAPI()->getPowerToolItemCommand($sender, $item);
+                        }elseif($this->getAPI()->getPowerToolItemCommands($sender, $item) !== false){
+                            $commands = $this->getAPI()->getPowerToolItemCommand($sender, $item);
+                        }
+                        $list = "=== Command ===";
                         if($commands === false){
                             $list .= "\n" . TextFormat::ITALIC . "**There aren't any commands for this item**";
                         }else{
-                            foreach($commands as $c){
-                                $list .= "\n* /$c";
+                            if(!is_array($commands)){
+                                $list .= "\n* /$commands";
+                            }else{
+                                foreach($commands as $c){
+                                    $list .= "\n* /$c";
+                                }
                             }
                         }
                         $chat_macro = $this->getAPI()->getPowerToolItemChatMacro($sender, $item);
@@ -73,13 +97,13 @@ class PowerTool extends BaseCommand{
                         }else{
                             $list .= "\n$chat_macro";
                         }
-                        $list .= "=== End of the lists ===";
+                        $list .= "\n=== End of the lists ===";
                         $sender->sendMessage($list);
                         return true;
                         break;
                     case "d":
-                        if(!$this->getAPI()->getPowerToolItemCommands($sender, $item)){
-                            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+                        if(!$this->getAPI()->getPowerToolItemCommand($sender, $item)){
+                            $sender->sendMessage(TextFormat::RED . $this->getUsage());
                             return false;
                         }
                         $this->getAPI()->disablePowerToolItem($sender, $item);

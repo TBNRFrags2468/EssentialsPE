@@ -22,7 +22,7 @@ class PowerToolToggle extends BaseCommand{
             return false;
         }
         if(count($args) > 0){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
         $this->getAPI()->disablePowerTool($sender);

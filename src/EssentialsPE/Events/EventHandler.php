@@ -2,11 +2,15 @@
 namespace EssentialsPE\Events;
 
 use EssentialsPE\Loader;
+use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
+use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityInventoryChangeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityMoveEvent;
+use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
@@ -15,8 +19,11 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
+use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
+use pocketmine\tile\Furnace;
+use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
 class EventHandler implements Listener{
@@ -93,11 +100,6 @@ class EventHandler implements Listener{
      */
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
         $player = $event->getPlayer();
-        $command = $event->getMessage();
-
-        if((substr($command, 0, 4) === "/say" || substr($command, 0, 3) === "/me") && $this->api->isMuted($player)){
-            $event->setCancelled(true);
-        }
 
         $command = $this->api->colorMessage($event->getMessage(), $player);
         if($command === false){
@@ -129,9 +131,9 @@ class EventHandler implements Listener{
                 foreach($entity->getServer()->getOnlinePlayers() as $p){
                     if($p !== $entity){
                         $p->sendMessage(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
-                        $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
                     }
                 }
+                $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
             }
         }
     }
@@ -179,11 +181,14 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
             }
 
+            if($this->api->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
+                $event->setCancelled(true);
+            }
+
             if(!$this->api->isPvPEnabled($issuer)){
                 $issuer->sendMessage(TextFormat::RED . "You have PvP disabled!");
                 $event->setCancelled(true);
-            }
-            if(!$this->api->isPvPEnabled($victim)){
+            }elseif(!$this->api->isPvPEnabled($victim)){
                 $issuer->sendMessage(TextFormat::RED . $victim->getDisplayName() . " have PvP disabled!");
                 $event->setCancelled(true);
             }
@@ -198,12 +203,134 @@ class EventHandler implements Listener{
     public function onBlockTap(PlayerInteractEvent $event){
         $player = $event->getPlayer();
         $item = $event->getItem();
+        $block = $event->getBlock();
 
         //PowerTool
-        if($this->api->isPowerToolEnabled($player)){
-            $event->setCancelled(true);
-            $this->api->executePowerTool($player, $item);
+        if($item->isPlaceable()){
+            if($this->api->executePowerTool($player, $item)){
+                $event->setCancelled(true);
+            }
         }
+
+
+        //Special Signs
+        $perm = "essentials.sign.use.";
+
+        $tile = $block->getLevel()->getTile(new Vector3($block->getFloorX(), $block->getFloorY(), $block->getFloorZ()));
+        if($tile instanceof Sign){
+            $text = $tile->getText();
+            $message = TextFormat::RED . "You don't have permissions to use this sign";
+
+            //Free sign
+            if($text[0] === "[Free]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "free")){
+                    $player->sendMessage($message);
+                }else{
+                    if(($gm = $player->getServer()->getGamemodeString($player->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
+                        $player->sendMessage(TextFormat::RED . "[Error] You're in " . strtolower($gm) . " mode");
+                        return false;
+                    }
+
+                    $item_name = $text[1];
+                    $damage = $text[2];
+
+                    if(!is_numeric($item_name)){
+                        $item = Item::fromString($item_name);
+                    }else{
+                        $item = Item::get($item_name);
+                    }
+                    $item->setDamage($damage);
+
+                    $player->getInventory()->addItem($item);
+                    $player->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED .( $item->getName() === "Unknown" ? $item_name : $item->getName()));
+                }
+            }
+
+            //Gamemode sign
+            elseif($text[0] === "[Gamemode]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "gamemode")){
+                    $player->sendMessage($message);
+                }else{
+                    if(($v = strtolower($text[1])) === "survival"){
+                        $player->setGamemode(0);
+                    }elseif($v === "creative"){
+                        $player->setGamemode(1);
+                    }elseif($v === "adventure"){
+                        $player->setGamemode(2);
+                    }elseif($v === "spectator"){
+                        $player->setGamemode(3);
+                    }
+                }
+            }
+
+            //Heal sign
+            elseif($text[0] === "[Heal]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "heal")){
+                    $player->sendMessage($message);
+                }else{
+                    $player->heal($player->getMaxHealth());
+                    $player->sendMessage(TextFormat::GREEN . "You have been healed!");
+                }
+            }
+
+            //Repair sign
+            elseif($text[0] === "[Repair]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "repair")){
+                    $player->sendMessage($message);
+                }else{
+                    if(($v = $text[1]) === "Hand"){
+                        if($this->api->isReparable($item = $player->getInventory()->getItemInHand())){
+                            $item->setDamage(0);
+                            $player->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
+                        }
+                    }elseif($v === "All"){
+                        foreach($player->getInventory()->getContents() as $item){
+                            if($this->api->isReparable($item)){
+                                $item->setDamage(0);
+                            }
+                        }
+                        foreach($player->getInventory()->getArmorContents() as $item){
+                            if($this->api->isReparable($item)){
+                                $item->setDamage(0);
+                            }
+                        }
+                        $player->sendMessage(TextFormat::GREEN . "All the tools on your inventory were repaired!" . TextFormat::AQUA . "\n(including the equipped Armor)");
+                    }
+                }
+            }
+
+            //Time sign
+            elseif($text[0] === "[Time]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "time")){
+                    $player->sendMessage($message);
+                }else{
+                    if(($v = $text[1]) === "Day"){
+                        $player->getLevel()->setTime(0);
+                        $player->sendMessage(TextFormat::GREEN . "Time set to \"Day\"");
+                    }elseif($v === "Night"){
+                        $player->getLevel()->setTime(12500);
+                        $player->sendMessage(TextFormat::GREEN . "Time set to \"Night\"");
+                    }
+                }
+            }
+
+            //Teleport sign
+            elseif($text[0] === "[Teleport]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "teleport")){
+                    $player->sendMessage($message);
+                }else{
+                    $player->teleport(new Vector3($x = $text[1], $y = $text[2], $z = $text[3]));
+                    $player->sendMessage(TextFormat::GREEN . "Teleporting to " . TextFormat::AQUA . $x . TextFormat::GREEN . ", " . TextFormat::AQUA . $y . TextFormat::GREEN . ", " . TextFormat::AQUA . $z);
+                }
+            }
+        }
+        return true;
     }
 
     /**
@@ -217,17 +344,232 @@ class EventHandler implements Listener{
         $block = $event->getBlock();
 
         //PowerTool
-        if($this->api->isPowerToolEnabled($player)){
-            $this->api->executePowerTool($player, $item);
+        if($this->api->executePowerTool($player, $item)){
             $event->setCancelled(true);
         }
 
         //Unlimited block placing
         elseif($this->api->isUnlimitedEnabled($player)){
+            $event->setCancelled(true);
             $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
             $player->getLevel()->setBlock($pos, $block, true);
-            $event->setCancelled(true);
-            //$player->getLevel()->setBlock($pos, $block, true);
+        }
+    }
+
+    public function onBlockBreak(BlockBreakEvent $event){
+        $player = $event->getPlayer();
+        $block = $event->getBlock();
+
+        //Special Signs
+        $perm = "essentials.sign.break.";
+
+        $tile = $block->getLevel()->getTile(new Vector3($block->getFloorX(), $block->getFloorY(), $block->getFloorZ()));
+        if($tile instanceof Sign){
+            $text = $tile->getText();
+            $message = TextFormat::RED . "You don't have permissions to break this sign";
+
+            //Free sign
+            if($text[0] === "[Free]" && !$player->hasPermission($perm . "free")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Gamemode sign
+            if($text[0] === "[Gamemode]" && !$player->hasPermission($perm . "gamemode")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Heal sign
+            if($text[0] === "[Heal]" && !$player->hasPermission($perm . "heal")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Repair sign
+            if($text[0] === "[Repair]" && !$player->hasPermission($perm . "repair")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Time sign
+            if($text[0] === "[Time]" && !$player->hasPermission($perm . "time")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Teleport sign
+            if($text[0] === "[Teleport]" && !$player->hasPermission($perm . "teleport")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+        }
+    }
+
+    public function onSignChange(SignChangeEvent $event){
+        $player = $event->getPlayer();
+        //Colored Sign
+        if($player->hasPermission("essentials.sign.color")){
+            $event->setLine(0, $this->api->colorMessage($event->getLine(0)));
+            $event->setLine(1, $this->api->colorMessage($event->getLine(1)));
+            $event->setLine(2, $this->api->colorMessage($event->getLine(2)));
+            $event->setLine(3, $this->api->colorMessage($event->getLine(3)));
+        }
+
+        //Special Signs
+        $perm = "essentials.sign.create.";
+
+        //Free sign
+        if(strtolower($event->getLine(0)) === "[free]" && $player->hasPermission($perm . "free")){
+            if(trim($event->getLine(1)) !== "" || $event->getLine(1) !== null){
+
+                $item_name = $event->getLine(1);
+
+                if(trim($event->getLine(2)) !== "" || $event->getLine(2) !== null){
+                    $damage = $event->getLine(2);
+                }else{
+                    $damage = 0;
+                }
+
+                if(!is_numeric($item_name)){
+                    $item = Item::fromString($item_name);
+                }else{
+                    $item = Item::get($item_name);
+                }
+
+                if($item->getID() === 0 || $item->getName() === "Air"){
+                    $player->sendMessage(TextFormat::RED . "[Error] Invalid item name/ID");
+                    $event->setCancelled(true);
+                }else{
+                    $player->sendMessage(TextFormat::GREEN . "Free sign successfully created!");
+                    $event->setLine(0, "[Free]");
+                    $event->setLine(1, ($item->getName() === "Unknown" ? $item->getID() : $item->getName()));
+                    $event->setLine(2, $damage);
+                }
+            }else{
+                $player->sendMessage(TextFormat::RED . "[Error] You should provide an item name/ID");
+                $event->setCancelled(true);
+            }
+        }
+
+        //Gamemode sign
+        elseif(strtolower($event->getLine(0)) === "[gamemode]" && $player->hasPermission($perm . "gamemode")){
+            switch(strtolower($event->getLine(1))){
+                case "survival":
+                    $event->setLine(1, "Survival");
+                    break;
+                case "creative":
+                    $event->setLine(1, "Creative");
+                    break;
+                case "adventure":
+                    $event->setLine(1, "Adventure");
+                    break;
+                case "spectator":
+                    $event->setLine(1, "Spectator");
+                    break;
+                default:
+                    $player->sendMessage(TextFormat::RED . "[Error] Unknown Gamemode, you should use \"Survival\", \"Creative\", \"Adventure\" or \"Spectator\"");
+                    $event->setCancelled(true);
+                    return false;
+                    break;
+            }
+            $player->sendMessage(TextFormat::GREEN . "Gamemode sign successfully created!");
+            $event->setLine(0, "[Gamemode]");
+        }
+
+        //Heal sign
+        elseif(strtolower($event->getLine(0)) === "[heal]" && $player->hasPermission($perm . "heal")){
+            $player->sendMessage(TextFormat::GREEN . "Heal sign successfully created!");
+            $event->setLine(0, "[Heal]");
+        }
+
+        //Repair sign
+        elseif(strtolower($event->getLine(0)) === "[repair]" && $player->hasPermission($perm . "repair")){
+            switch(strtolower($event->getLine(1))){
+                case "hand":
+                    $event->setLine(1, "Hand");
+                    break;
+                case "all":
+                    $event->setLine(1, "All");
+                    break;
+                default:
+                    $player->sendMessage(TextFormat::RED . "[Error] Invalid argument, you should use \"Hand\" or \"All\"");
+                    $event->setCancelled(true);
+                    return false;
+                    break;
+            }
+            $player->sendMessage(TextFormat::GREEN . "Repair sign successfully created!");
+            $event->setLine(0, "[Repair]");
+        }
+
+        //Time sign
+        elseif(strtolower($event->getLine(0)) === "[time]" && $player->hasPermission($perm . "time")){
+            switch(strtolower($event->getLine(1))){
+                case "day":
+                    $event->setLine(1, "Day");
+                    break;
+                case "night";
+                    $event->setLine(1, "Night");
+                    break;
+                default:
+                    $player->sendMessage(TextFormat::RED . "[Error] Invalid time, you should use \"Day\" or \"Night\"");
+                    $event->setCancelled(true);
+                    return false;
+                    break;
+            }
+            $player->sendMessage(TextFormat::GREEN . "Time sign successfully created!");
+            $event->setLine(0, "[Time]");
+        }
+
+        //Teleport sign
+        elseif(strtolower($event->getLine(0)) === "[teleport]" && $player->hasPermission($perm . "teleport")){
+            if(!is_numeric($event->getLine(1))){
+                $player->sendMessage(TextFormat::RED . "[Error] Invalid X position, Teleport sign will not work");
+                $event->setCancelled(true);
+            }elseif(!is_numeric($event->getLine(2))){
+                $player->sendMessage(TextFormat::RED . "[Error] Invalid Y position, Teleport sign will not work");
+                $event->setCancelled(true);
+            }elseif(!is_numeric($event->getLine(3))){
+                $player->sendMessage(TextFormat::RED . "[Error] Invalid Z position, Teleport sign will not work");
+                $event->setCancelled(true);
+            }else{
+                $player->sendMessage(TextFormat::GREEN . "Teleport sign successfully created!");
+                $event->setLine(0, "[Teleport]");
+                $event->setLine(1, $event->getLine(1));
+                $event->setLine(2, $event->getLine(2));
+                $event->setLine(3, $event->getLine(3));
+            }
+        }
+        return true;
+    }
+
+    /**
+     * @param EntityInventoryChangeEvent $event
+     */
+    public function onEntityInventoryChange(EntityInventoryChangeEvent $event){
+        $entity = $event->getEntity();
+        if($entity instanceof Player){
+            //Invsee
+            if($this->api->isPlayerWatchingOtherInventory($entity)){
+                if(!$entity->hasPermission("essentials.invsee.modify")){
+                    $event->setCancelled(true);
+                }elseif(($player = $this->api->getInventoryOwner($entity)) !== false){
+                    if($player->hasPermission("essentials.invsee.preventmodify")){
+                        $event->setCancelled(true);
+                    }else{
+                        //$player->getInventory()->setItem($event->getSlot(), $event->getNewItem(), "essentialspe-invsee");
+                        //TODO Sync changes
+                    }
+                }
+            }elseif(($player = $this->api->isOtherWatchingPlayerInventory($entity))){
+                if($entity->hasPermission("essentials.invsee.preventmodify")){
+                    $event->setCancelled(true);
+                }elseif(!$player->hasPermission("essentials.invsee.modify")){
+                    $event->setCancelled(true);
+                }else{
+                    //TODO Sync changes
+                }
+            }
         }
     }
 }

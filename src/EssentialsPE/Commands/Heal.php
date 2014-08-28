@@ -17,35 +17,32 @@ class Heal extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) > 1){
-            if(!$sender instanceof Player){
-                $sender->sendMessage(TextFormat::RED . "Usage: /heal <player>");
-            }else{
-                $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
-            }
-        }
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
                     $sender->sendMessage(TextFormat::RED . "Usage: /heal <player>");
-                }else{
-                    $sender->heal($sender->getMaxHealth());
-                    $sender->sendMessage(TextFormat::GREEN . "You have been healed!");
+                    return false;
                 }
+                $sender->heal($sender->getMaxHealth());
+                $sender->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.heal.other")){
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                }else{
-                    $player = $this->getAPI()->getPlayer($args[0]);
-                    if($player === false){
-                        $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                    }else{
-                        $player->heal($player->getMaxHealth());
-                        $player->sendMessage(TextFormat::GREEN . "You have been healed!");
-                        $sender->sendMessage(TextFormat::GREEN . "$args[0] has been healed!");
-                    }
+                    return false;
                 }
+                $player = $this->getAPI()->getPlayer($args[0]);
+                if($player === false){
+                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                    return false;
+                }
+                $player->heal($player->getMaxHealth());
+                $sender->sendMessage(TextFormat::GREEN . "$args[0] has been healed!");
+                $player->sendMessage(TextFormat::GREEN . "You have been healed!");
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /heal <player>");
+                return false;
                 break;
         }
         return true;

@@ -11,17 +11,21 @@ use EssentialsPE\Commands\Extinguish; //Use API
 use EssentialsPE\Commands\GetPos; //Use API
 use EssentialsPE\Commands\God; //Use API
 use EssentialsPE\Commands\Heal; //Use API
-use EssentialsPE\Commands\Item as ItemCommand;
+use EssentialsPE\Commands\Invsee;
+use EssentialsPE\Commands\ItemCommand;
+use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute; //Use API
+use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick; //Use API
 use EssentialsPE\Commands\PowerTool\PowerTool; //Use API
 use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
 use EssentialsPE\Commands\PvP; //Use API
 use EssentialsPE\Commands\RealName; //Use API
 use EssentialsPE\Commands\Repair;
+use EssentialsPE\Commands\RotateHead;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\TempBan;
@@ -31,6 +35,7 @@ use EssentialsPE\Commands\Vanish; //Use API
 use EssentialsPE\Commands\Warps\RemoveWarp; //Use API
 use EssentialsPE\Commands\Warps\SetWarp; //Use API
 use EssentialsPE\Commands\Warps\Warp; //Use API
+use EssentialsPE\Commands\World;
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
@@ -39,8 +44,11 @@ use EssentialsPE\Events\PlayerNickChangeEvent;
 use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
+use EssentialsPE\Tasks\AFKKickTask;
+use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -92,12 +100,15 @@ class Loader extends PluginBase{
             new GetPos($this),
             new God($this),
             new Heal($this),
-            //new ItemCommand($this), // TODO
+            new Invsee($this),
+            new ItemCommand($this),
+            new ItemDB($this),
             //new Jump($this), // TODO
-            //new TempBan($this), //TODO
+            new TempBan($this),
             new KickAll($this),
             new More($this),
             new Mute($this),
+            new Near($this),
             new Nick($this),
             new PowerTool($this),
             new PowerToolToggle($this),
@@ -109,6 +120,7 @@ class Loader extends PluginBase{
             new Top($this),
             new Unlimited($this),
             new Vanish($this),
+            new World($this)
 
             //Wraps
             //new RemoveWarp($this), // TODO
@@ -117,15 +129,30 @@ class Loader extends PluginBase{
         ]);
     }
 
-    private function checkConfig(){
+    public function checkConfig(){
         $this->saveDefaultConfig();
+        $cfg = $this->getConfig();
 
-        if(!is_bool($this->getConfig()->get("safe-afk"))){
-            $this->getConfig()->set("safe-afk", true);
+        if(!is_bool($cfg->get("safe-afk"))){
+            $cfg->set("safe-afk", true);
+        }if(!is_numeric($cfg->get("auto-afk-kick"))){
+            $cfg->set("auto-afk-kick", 5);
         }
 
-        $this->saveConfig();
-        $this->reloadConfig();
+        if(!is_numeric($cfg->get("oversized-stacks"))){
+            $cfg->set("oversized-stacks", 64);
+        }
+
+        if(!is_numeric($rl = $cfg->get("near-radius-limit"))){
+            $cfg->set("near-radius-limit", 200);
+        }if(!is_numeric($dr = $cfg->get("near-default-radius"))){
+            $cfg->set("near-default-radius", 100);
+        }if($dr > $rl){
+            $cfg->set("near-default-radius", $rl);
+        }
+
+        $cfg->save();
+        $cfg->reload();
     }
 
     /*
@@ -187,6 +214,66 @@ class Loader extends PluginBase{
         return $message;
     }
 
+    /**
+     * Let you know if the item is a Tool or Armor
+     * (Items that can get "real damage"
+     *
+     * @param Item $item
+     * @return bool
+     */
+    public  function isReparable(Item $item){
+        $IDs = [
+                               /** Wood */            /** Stone */             /** Iron */            /** Gold */              /** Diamond */
+            /** Swords */   Item::WOODEN_SWORD,     Item::STONE_SWORD,      Item::IRON_SWORD,       Item::GOLD_SWORD,       Item::DIAMOND_SWORD,
+            /** Shovels */  Item::WOODEN_SHOVEL,    Item::STONE_SHOVEL,     Item::IRON_SHOVEL,      Item::GOLD_SHOVEL,      Item::DIAMOND_SHOVEL,
+            /** Pickaxes */ Item::WOODEN_PICKAXE,   Item::STONE_PICKAXE,    Item::IRON_PICKAXE,     Item::GOLD_PICKAXE,     Item::DIAMOND_PICKAXE,
+            /** Axes */     Item::WOODEN_AXE,       Item::STONE_AXE,        Item::IRON_AXE,         Item::GOLD_AXE,         Item::DIAMOND_AXE,
+            /** Hoes */     Item::WOODEN_HOE,       Item::STONE_HOE,        Item::IRON_HOE,         Item::GOLD_HOE,         Item::DIAMOND_HOE,
+
+
+                                   /** Leather */          /** Chain */                /** Iron */                 /** Gold */                 /** Diamond */
+            /** Boots */        Item::LEATHER_BOOTS,    Item::CHAIN_BOOTS,          Item::IRON_BOOTS,           Item::GOLD_BOOTS,           Item::DIAMOND_BOOTS,
+            /** Leggings */     Item::LEATHER_PANTS,    Item::CHAIN_LEGGINGS,       Item::IRON_LEGGINGS,        Item::GOLD_LEGGINGS,        Item::DIAMOND_LEGGINGS,
+            /** Chestplates */  Item::LEATHER_TUNIC,    Item::CHAIN_CHESTPLATE,     Item::IRON_CHESTPLATE,      Item::GOLD_CHESTPLATE,      Item::DIAMOND_CHESTPLATE,
+            /** Helmets */      Item::LEATHER_CAP,      Item::CHAIN_HELMET,         Item::IRON_HELMET,          Item::GOLD_HELMET,          Item::DIAMOND_HELMET,
+
+
+            /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
+        ];
+        $r = false;
+        foreach($IDs as $id){
+            if($item->getID() === $id){
+                $r = true;
+            }
+        }
+        return $r;
+    }
+
+    /**
+     * Let you see who is near a specific player
+     *
+     * @param Player $player
+     * @param int $radius
+     * @return bool|Player[]
+     */
+    public function getNearPlayers(Player $player, $radius = null){
+        if($radius === null){
+            $radius = $this->getConfig()->get("near-default-radius");
+        }
+        if(!is_numeric($radius)){
+            return false;
+        }
+        $radius = new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius);
+        $entities = $player->getLevel()->getNearbyEntities($radius, $player);
+        $players = [];
+        foreach($entities as $e){
+            if($e instanceof Player){
+                $player[] = $e;
+            }
+        }
+        return $players;
+    }
+
     /**   _____              _
      *   / ____|            (_)
      *  | (___   ___ ___ ___ _  ___  _ __  ___
@@ -201,8 +288,16 @@ class Loader extends PluginBase{
     private $mutes = [];
     /** @var array  */
     private $default = [
-        "afk" => false,
+        "afk" => [
+            "mode" => false,
+            "kick-taskID" => false,
+            "auto-taskID" => false,
+        ],
         "god" => false,
+        "invsee" => [
+            "user" => null,
+            "other" => false
+        ],
         "powertool" => [
             "commands" => false,
             "chat-macro" => false,
@@ -271,6 +366,7 @@ class Loader extends PluginBase{
 
     /**
      * Change the AFK mode of a player
+     * Also
      *
      * @param Player $player
      * @param bool $state
@@ -285,7 +381,14 @@ class Loader extends PluginBase{
             return false;
         }
         $state = $ev->getAFKMode();
-        $this->setSession($player, "afk", $state);
+        $this->sessions[$player->getName()]["afk"]["mode"] = $state;
+        if($state === false && ($id = $this->getAFKAutoKickTaskID($player)) !== false){
+            $this->getServer()->getScheduler()->cancelTask($id);
+            $this->sessions[$player->getName()]["afk"]["kick-taskID"] = false;
+        }elseif($state === true && ($time = $this->getAFKAutoKickTime()) >= 0 && !$player->hasPermission("essentials.afk.kickexempt")){
+            $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
+            $this->setAFKAutoKickTaskID($player, $task->getTaskId());
+        }
         return true;
     }
 
@@ -309,7 +412,35 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isAFK(Player $player){
-        return $this->getSession($player, "afk");
+        return $this->sessions[$player->getName()]["afk"]["mode"];
+    }
+
+    public function getAFKAutoKickTime(){
+        return $this->getConfig()->get("auto-afk-kick");
+    }
+
+    /**
+     * Set the TaskID of the player afk-kick-timer
+     *
+     * @param Player $player
+     * @param int $taskID
+     */
+    public function setAFKAutoKickTaskID(Player $player, $taskID){
+        $this->sessions[$player->getName()]["afk"]["kick-taskID"] = $taskID;
+    }
+
+    /**
+     * Return the Auto-kick TaskID of a player for being AFK
+     * Return "false" if the player isn't AFK or isn't on a Kick Queue
+     *
+     * @param Player $player
+     * @return mixed
+     */
+    public function getAFKAutoKickTaskID(Player $player){
+        if(!$this->isAFK($player)){
+            return false;
+        }
+        return $this->sessions[$player->getName()]["afk"]["kick-taskID"];
     }
 
     /**   _____           _
@@ -428,6 +559,90 @@ class Loader extends PluginBase{
         return count($config->getAll());
     }
 
+    /**  _____
+     *  |_   _|
+     *    | |  _ ____   _____  ___  ___
+     *    | | | '_ \ \ / / __|/ _ \/ _ \
+     *   _| |_| | | \ V /\__ |  __|  __/
+     *  |_____|_| |_|\_/ |___/\___|\___|
+     */
+
+    /**
+     * Return the original player inventory
+     *
+     * @param Player $player
+     * @return \pocketmine\inventory\PlayerInventory
+     */
+    public function getPlayerOriginalInventory(Player $player){
+        $inv = $this->sessions[$player->getName()]["invsee"]["user"]["inv"];
+        return (isset($inv) ? $inv : $player->getInventory());
+    }
+
+    /**
+     * Return the original owner of the inventory that $player is watching
+     *
+     * @param Player $player
+     * @return bool|Player
+     */
+    public function getInventoryOwner(Player $player){
+        if($this->isPlayerWatchingOtherInventory($player)){
+            return $this->getPlayer($this->sessions[$player->getName()]["invsee"]["other"]["name"]);
+        }
+        return false;
+    }
+
+    /**
+     * Change player's inventory window
+     *
+     * @param Player $player
+     * @param Player $other
+     */
+    public function setPlayerInventory(Player $player, Player $other){
+        $i = $player->getInventory();
+        $o = $other->getInventory();
+        $this->sessions[$player->getName()]["invsee"]["user"]["inv"] = $i->getContents();
+        $this->sessions[$player->getName()]["invsee"]["user"]["armor"] = $i->getArmorContents();
+        $this->sessions[$player->getName()]["invsee"]["other"]["name"] = $other->getName();
+        $this->sessions[$player->getName()]["invsee"]["other"]["inv"] = $o->getContents();
+        $this->sessions[$player->getName()]["invsee"]["other"]["armor"] = $o->getArmorContents();
+        $i->setContents($o->getContents());
+        $i->setArmorContents($o->getArmorContents());
+    }
+
+    /**
+     * Restore the original player inventory
+     *
+     * @param Player $player
+     */
+    public function restorePlayerInventory(Player $player){
+        if($this->isPlayerWatchingOtherInventory($player)){
+            $player->getInventory()->setContents($this->sessions[$player->getName()]["invsee"]["user"]["inv"]);
+            $player->getInventory()->setArmorContents($this->sessions[$player->getName()]["invsee"]["user"]["armor"]);
+        }
+        $this->sessions[$player->getName()]["invsee"]["user"] = null;
+        $this->sessions[$player->getName()]["invsee"]["other"] = false;
+    }
+
+    /**
+     * Tell if the player is watching other player's inventory
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isPlayerWatchingOtherInventory(Player $player){
+        return ($this->sessions[$player->getName()]["invsee"]["other"] === false ? false : true);
+    }
+
+    public function isOtherWatchingPlayerInventory(Player $player){
+        foreach($this->getServer()->getOnlinePlayers() as $p){
+            if(($s = $this->sessions[$p->getName()]["invsee"]["other"]) !== false && $s["name"] === $player->getName()){
+                return $p;
+                break;
+            }
+        }
+        return false;
+    }
+
     /**  __  __       _
      *  |  \/  |     | |
      *  | \  / |_   _| |_ ___
@@ -518,7 +733,6 @@ class Loader extends PluginBase{
         $nick = $event->getNewNick();
         $player->setNameTag($event->getNameTag());
         $player->setDisplayName($nick);
-        $player->sendMessage(TextFormat::YELLOW . "Your nick is now $nick");
         if($save == true){
             $config->set($player->getName(), $nick);
             $config->save();
@@ -542,7 +756,6 @@ class Loader extends PluginBase{
         $nick = $event->getNewNick();
         $player->setNameTag($event->getNameTag());
         $player->setDisplayName($nick);
-        $player->sendMessage(TextFormat::YELLOW . "Your nick is now $nick");
         if($save == true){
             $config->set($player->getName(), $nick);
             $config->save();
@@ -591,20 +804,31 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param Item $item
+     * @return bool
      */
     public function executePowerTool(Player $player, Item $item){
-        if($this->getPowerToolItemCommands($player, $item)){
-            if(is_array($this->getPowerToolItemCommands($player, $item))){
-                foreach($this->getPowerToolItemCommands($player, $item) as $command){
-                    $this->getServer()->dispatchCommand($player, $command);
-                }
+        $command = false;
+        if($this->getPowerToolItemCommand($player, $item) !== false){
+            $command = $this->getPowerToolItemCommand($player, $item);
+        }elseif($this->getPowerToolItemCommands($player, $item) !== false){
+            $command = $this->getPowerToolItemCommands($player, $item);
+        }
+        if($command !== false){
+            if(!is_array($command)){
+                $this->getServer()->dispatchCommand($player, $command);
             }else{
-                $this->getServer()->dispatchCommand($player, $this->getPowerToolItemCommands($player, $item));
+                foreach($command as $c){
+                    $this->getServer()->dispatchCommand($player, $c);
+                }
             }
         }
-        if($this->getPowerToolItemChatMacro($player, $item)){
-            $this->getServer()->broadcast("<" . $player->getDisplayName() . "> " . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
+        if($chat = $this->getPowerToolItemChatMacro($player, $item) !== false){
+            $this->getServer()->broadcast("<" . $player->getDisplayName() . "> " . TextFormat::RESET . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
         }
+        if($command === false && $chat === false){
+            return false;
+        }
+        return true;
     }
 
     /**
@@ -616,56 +840,74 @@ class Loader extends PluginBase{
      * @param string $command
      */
     public function setPowerToolItemCommand(Player $player, Item $item, $command){
-        if($item->getID() === 0){
-            return;
+        if($item->getID() !== 0){
+            if(!is_array($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()])){
+                $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()] = $command;
+            }else{
+                $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()][] = $command;
+            }
         }
-        $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()] = $command;
     }
 
     /**
-     * Add multiple commands (or a single command to the list) to the item you have in hand
-     * NOTE: If the hand is empty, it will be cancelled
+     * Return the command attached to the specified item if it's available
+     * NOTE: Only return the command if there're no more commands, for that use "getPowerToolItemCommands" (note the "s" at the final :P)
+     *
+     * @param Player $player
+     * @param Item $item
+     * @return bool|array
+     */
+    public function getPowerToolItemCommand(Player $player, Item $item){
+        if(!isset($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()]) || is_array($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()])){
+            return false;
+        }
+        return $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()];
+    }
+
+    /**
+     * Let you assign multiple commands to an item
      *
      * @param Player $player
      * @param Item $item
      * @param array $commands
      */
     public function setPowerToolItemCommands(Player $player, Item $item, array $commands){
-        if($item->getID() === 0){
-            return;
-        }
-        foreach($commands as $c){
-            $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()][] = $c;
+        if($item->getID() !== 0){
+            $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()] = $commands;
         }
     }
 
     /**
-     * @param Player $player
-     * @param Item $item
-     * @param string $command
-     */
-    public function removePowerToolCommand(Player $player, Item $item, $command){
-        if(!isset($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()])){
-            return;
-        }
-        $list = $this->getPowerToolItemCommands($player, $item);
-        if($key = array_search($command, $list) !== false){
-            unset($list[$key]);
-        }
-    }
-
-    /**
-     * Return the command attached to the specified item if it's available
+     * Return a the list of commands assigned to an item
+     * (if they're more than 1)
      *
      * @param Player $player
      * @param Item $item
      * @return bool|array
      */
     public function getPowerToolItemCommands(Player $player, Item $item){
-        if(!isset($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()])){
+        if(!isset($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()]) || !is_array($this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()])){
             return false;
         }
         return $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()];
+    }
+
+    /**
+     *
+     * Let you remove 1 command of the item command list
+     * [if there're more than 1)
+     * @param Player $player
+     * @param Item $item
+     * @param string $command
+     */
+    public function removePowerToolItemCommand(Player $player, Item $item, $command){
+        if(($commands = $this->getPowerToolItemCommands($player, $item)) !== false){
+            foreach($commands as $c){
+                if(stripos(strtolower($c), strtolower($command)) !== false){
+                    unset($c);
+                }
+            }
+        }
     }
 
     /**
@@ -679,7 +921,7 @@ class Loader extends PluginBase{
         if($item->getID() === 0){
             return;
         }
-        $chat_message = str_replace("%n", "\n", $chat_message);
+        $chat_message = str_replace("\\n", "\n", $chat_message);
         $this->sessions[$player->getName()]["powertool"]["chat-macro"][$item->getID()] = $chat_message;
     }
 
