@@ -55,6 +55,9 @@ permissions:
             essentials.compass:
                 default: true
                 description: "Display your current bearing direction"
+            essentials.delwarp:
+                default: op
+                description: "Allow to delete a warp"
             essentials.essentials:
                 default: op
                 description: "See the current Essentials version"
@@ -214,6 +217,9 @@ permissions:
             essentials.setspawn:
                 default: op
                 description: "Change your server's general spawn"
+            essentials.setwarp:
+                default: op
+                description: "Allow to create a new warp"
             essentials.sign:
                 default: op
                 description: "Allow to manage special signs"
@@ -316,3 +322,19 @@ permissions:
                     essentials.vanish.pvp:
                         default: op
                         description: "Let you attack other players while you're vanished"
+            essentials.warps:
+                default: op
+                description: "Access to /warp command"
+                children:
+                    essentials.warp.list:
+                        default: op
+                        description: "Get a list of available warps"
+                    essentials.warp.other:
+                        default: op
+                        description: "Warp another player"
+                    essentials.warps.*:
+                        default: op
+                        description: "Teleport to any warp"
+                    essentials.warp.override.*:
+                        default: op
+                        description: "Allow to override any warp"

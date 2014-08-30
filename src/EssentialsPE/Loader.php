@@ -58,10 +58,13 @@ use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
     public $path;
+    /** @var  \SQLite3 */
+    public $warps;
 
     public function onEnable(){
         @mkdir($this->getDataFolder());
         $this->checkConfig();
+        $this->enableConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
         $this->registerCommands();
@@ -153,6 +156,15 @@ class Loader extends PluginBase{
 
         $cfg->save();
         $cfg->reload();
+    }
+
+    public function enableConfigs(){
+        if(!file_exists($this->getDataFolder() . "warps.db")){
+            $this->warps = new \SQLite3($this->getDataFolder() . "warps.db");
+            $this->warps->exec("CREATE TABLE warps ( name TEXT PRIMARY KEY, x INTEGER, y INTEGER, z INTEGER )");
+        }else{
+            $this->warps = new \SQLite3($this->getDataFolder() . "warps.db", SQLITE3_OPEN_READWRITE);
+        }
     }
 
     /*
@@ -1026,78 +1038,107 @@ class Loader extends PluginBase{
      * it use Player to handle the position, but may change later
      *
      * @param Player $player
-     * @param string $warp
+     * @param string $name
      */
-    public function setWarp(Player $player, $warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        $pos = array();
-        $pos["x"] = $player->getX();
-        $pos["y"] = $player->getY();
-        $pos["z"] = $player->getZ();
-        $pos["yaw"] = $player->yaw;
-        $pos["pitch"] = $player->pitch;
-        $pos["level"] = $player->getLevel()->getName();
-        $config->set($warp, $pos);
+    public function setWarp(Player $player, $name){
+        if(!$this->warpExist($name)){
+            $prepare = $this->warps->prepare("INSERT INTO warps (name, x, y, z) VALUES (:name, :x, :y, :z)");
+            $prepare->bindValue(":name", $name, SQLITE3_TEXT);
+            $prepare->bindValue(":x", $player->getX(), SQLITE3_INTEGER);
+            $prepare->bindValue(":y", $player->getY(), SQLITE3_INTEGER);
+            $prepare->bindValue(":z", $player->getZ(), SQLITE3_INTEGER);
+            $prepare->execute();
+        }elseif($player->hasPermission("essentials.warps")){
+            $prepare = $this->warps->prepare("UPDATE warps SET x = :x, y = :y, z = :z WHERE name = :name");
+            $prepare->bindValue(":name", $name);
+            $prepare->bindValue(":x", $player->getX());
+            $prepare->bindValue(":y", $player->getY());
+            $prepare->bindValue(":z", $player->getZ());
+            $prepare->execute();
+        }
     }
 
     /**
      * Remove a Warp if exists
      *
-     * @param string $warp
-     * @return bool
+     * @param string $name
      */
-    public function removeWarp($warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$this->warpExist($warp)){
-            return false;
-        }else{
-            $config->remove($warp);
-            return true;
-        }
+    public function removeWarp($name){
+        $prepare = $this->warps->prepare("DELETE FROM players WHERE name = :name");
+        $prepare->bindValue(":name", $name);
+        $prepare->execute();
     }
 
     /**
-     * Tell if a Warp exists
+     * Return warp information
      *
-     * @param string $warp
+     * @param $name
+     * @return array|bool
+     */
+    public function getWarp($name){
+        $prepare = $this->warps->prepare("SELECT * FROM players WHERE name = :name");
+        $prepare->bindValue(":name", $name);
+        $result = $prepare->execute();
+
+        if($result instanceof \SQLite3Result){
+            $data = $result->fetchArray(SQLITE3_ASSOC);
+            $result->finalize();
+            if(isset($data["name"]) && $data["name"] === $name){
+                unset($data["name"]);
+                $prepare->close();
+                return $data;
+            }
+        }
+
+        $prepare->close();
+        return false;
+    }
+
+    /**
+     * Tell if a warp exists
+     *
+     * @param $name
      * @return bool
      */
-    public function warpExist($warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$config->exists($warp)){
-            return false;
-        }else{
-            return true;
-        }
+    public function warpExist($name){
+        return $this->getWarp($name) !== false;
     }
 
     /**
      * Teleport a player to a Warp
      *
      * @param Player $player
-     * @param string $warp
+     * @param string $name
      * @return bool
      */
-    public function tpWarp(Player $player, $warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$config->exists($warp)){
-            return false;
+    public function warpPlayer(Player $player, $name){
+        if(($warp = $this->getWarp($name)) !== false){
+            $player->teleport(new Vector3($warp["x"], $warp["y"], $warp["z"]));
+            return true;
         }
-        $home = $config->get($warp);
-        if($player->getLevel()->getName() != $home["level"]){
-            $player->setLevel($home["level"]);
-        }
-        $player->teleport(new Vector3($home["x"], $home["y"], $home["z"]), $home["yaw"], $home["pitch"]);
-        return true;
+        return false;
     }
 
     /**
      * Return a list with all the available warps
      *
-     * TODO
+     * @return array|bool
      */
     public function warpList(){
-        //NOTE: Consider using wordwrap($string, $width, "\n", true)
+        $prepare = $this->warps->prepare("SELECT * FROM warps");
+        $result = $prepare->execute();
+
+        if($result instanceof \SQLite3Result){
+            $data = $result->fetchArray(SQLITE3_ASSOC);
+            $result->finalize();
+            $r = [];
+            foreach($data as $name => $array){
+                unset($array);
+                $r[] = $name;
+            }
+            return $r;
+        }
+        return false;
     }
 
     /**  _    _       _ _           _ _           _   _____ _
