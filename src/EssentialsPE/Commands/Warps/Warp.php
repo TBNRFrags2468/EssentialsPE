@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class Warp extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "warp", "Teleport to a warp", "/warp <name> [player]", ["warps"]);
-        $this->setPermission("essentials.warp.use");
+        $this->setPermission("essentials.warp");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -39,25 +39,25 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /warp <name> <player>");
                     return false;
                 }
-                if(!$this->getAPI()->warpExist($args[0])){
+                if(!$this->getPlugin()->warpExist($args[0])){
                     $sender->sendMessage(TextFormat::RED . "[Error] Unknown warp name.");
                 }else{
-                    $this->getAPI()->tpWarp($sender, $args[0]);
+                    $this->getPlugin()->tpWarp($sender, $args[0]);
                     $sender->sendMessage(TextFormat::YELLOW . "Teleporting to warp: $args[0]");
                 }
                 return true;
                 break;
             case 2:
-                $player = $this->getAPI()->getPlayer($args[1]);
+                $player = $this->getPlugin()->getPlayer($args[1]);
                 if($player === false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                 }else{
-                    if(!$this->getAPI()->warpExist($args[0])){
+                    if(!$this->getPlugin()->warpExist($args[0])){
                         $sender->sendMessage(TextFormat::RED . "[Error] Unknown warp name.");
                     }else{
                         $sender->sendMessage(TextFormat::YELLOW . "Teleporting $args[1] to warp: $args[0]");
                         $player->sendMessage(TextFormat::YELLOW . "Teleporting to warp: $args[0]");
-                        $this->getAPI()->tpWarp($player, $args[0]);
+                        $this->getPlugin()->tpWarp($player, $args[0]);
                     }
                 }
                 return true;

@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class ClearInventory extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", ["ci", "clean", "clearinvent"]);
-        $this->setPermission("essentials.clearinventory.use");
+        $this->setPermission("essentials.clearinventory");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -35,7 +35,7 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
+                $player = $this->getPlugin()->getPlayer($args[0]);
                 if($player === false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;

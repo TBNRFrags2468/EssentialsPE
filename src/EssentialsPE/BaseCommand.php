@@ -7,18 +7,14 @@ use pocketmine\event\Listener;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand, Listener{
     /** @var \EssentialsPE\Loader  */
-    private $api;
+    private $plugin;
 
     public function __construct(Loader $plugin, $name, $description = "", $usageMessage = null, array $aliases = []){
         parent::__construct($name, $description, $usageMessage, $aliases);
-        $this->api = $plugin;
-    }
-
-    public function getAPI(){
-        return $this->api;
+        $this->plugin = $plugin;
     }
 
     public function getPlugin(){
-        return $this->api;
+        return $this->plugin;
     }
 }

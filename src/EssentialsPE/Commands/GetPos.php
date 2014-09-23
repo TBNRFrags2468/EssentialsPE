@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class GetPos extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "getpos", "Get your/other's position", "/getpos [player]", ["coords", "position", "whereami", "getlocation", "getloc"]);
-        $this->setPermission("essentials.getpos.use");
+        $this->setPermission("essentials.getpos");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -31,7 +31,7 @@ class GetPos extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
+                $player = $this->getPlugin()->getPlayer($args[0]);
                 if($player === false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                 }else{

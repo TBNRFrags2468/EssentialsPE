@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class Extinguish extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "extinguish", "Extinguish a player", "/extinguish [player]", ["ext"]);
-        $this->setPermission("essentials.extinguish.use");
+        $this->setPermission("essentials.extinguish");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -31,7 +31,7 @@ class Extinguish extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
+                $player = $this->getPlugin()->getPlayer($args[0]);
                 if($player === false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                 }else{
