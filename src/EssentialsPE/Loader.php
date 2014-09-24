@@ -21,6 +21,7 @@ use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute; //Use API
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick; //Use API
+use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\PowerTool\PowerTool; //Use API
 use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
 use EssentialsPE\Commands\PvP; //Use API
@@ -46,11 +47,16 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
+use pocketmine\entity\PrimedTNT;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\NBT;
+use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\Double;
+use pocketmine\nbt\tag\Enum;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -112,6 +118,7 @@ class Loader extends PluginBase{
             new Mute($this),
             new Near($this),
             new Nick($this),
+            //new Nuke($this),
             new PowerTool($this),
             new PowerToolToggle($this),
             new PvP($this),
@@ -274,6 +281,14 @@ class Loader extends PluginBase{
             }
         }
         return $players;
+    }
+
+    public function nuke(Player $player){
+        for($x = -10; $x <= 10; $x += 5){
+            for($z = -10; $z <= 10; $z += 5){
+                //TODO
+            }
+        }
     }
 
     /**   _____              _

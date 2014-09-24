@@ -142,6 +142,13 @@ permissions:
                     essentials.nick.other:
                         default: op
                         description: "Change others name"
+            essentials.nucke:
+                defualt: op
+                description: "Spawn a thin carpet of bomb"
+                children:
+                    essentials.nuke.other:
+                        default: op
+                        description: "Allow to spawn a nuke on other player's position"
             essentials.oversizedstacks:
                 default: op
                 description: "Allow to get oversized stacks"
