@@ -6,6 +6,7 @@ use EssentialsPE\Commands\Broadcast; //Use API
 use EssentialsPE\Commands\Burn; //Use API
 use EssentialsPE\Commands\ClearInventory; //Use API
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
 use EssentialsPE\Commands\Extinguish; //Use API
 use EssentialsPE\Commands\GetPos; //Use API
@@ -95,6 +96,7 @@ class Loader extends PluginBase{
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
+            new Depth($this),
             new Essentials($this),
             new Extinguish($this),
             new GetPos($this),

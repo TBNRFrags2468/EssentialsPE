@@ -45,6 +45,9 @@ permissions:
             essentials.compass:
                 default: true
                 description: "Display your current bearing direction"
+            essentials.depth:
+                default: true
+                description: "Get your current height related to sea-level"
             essentials.essentials:
                 default: op
                 description: "See the current Essentials version"
