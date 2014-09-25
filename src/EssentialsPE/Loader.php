@@ -112,14 +112,14 @@ class Loader extends PluginBase{
             new Invsee($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), // TODO
+            //new Jump($this), //TODO
             new TempBan($this),
             new KickAll($this),
             new More($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
-            //new Nuke($this),
+            //new Nuke($this), //TODO (API)
             new PowerTool($this),
             new PowerToolToggle($this),
             new PvP($this),
@@ -134,9 +134,9 @@ class Loader extends PluginBase{
             new World($this)
 
             //Wraps
-            //new RemoveWarp($this), // TODO
-            //new SetWarp($this), // TODO
-            //new Warp($this), // TODO
+            //new RemoveWarp($this), //TODO
+            //new SetWarp($this), //TODO
+            //new Warp($this), //TODO
         ]);
     }
 
@@ -289,6 +289,11 @@ class Loader extends PluginBase{
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
                 //TODO
+                /*$player->getLevel()->addEntity(new PrimedTNT($player->chunk, new Compound("", [
+                    "Pos" => [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z],
+                    "Rotation" => [0, 0],
+                    "Motion" => [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z]
+                ])));*/ //Maybe?
             }
         }
     }
