@@ -10,6 +10,7 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityInventoryChangeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityMoveEvent;
+use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
@@ -135,6 +136,13 @@ class EventHandler implements Listener{
                 }
                 $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
             }
+        }
+    }
+
+    public function onEntityTeleport(EntityTeleportEvent $event){
+        $entity = $event->getEntity();
+        if($entity instanceof Player){
+            $this->plugin->setPlayerLastPosition($entity, $entity->getPosition(), $entity->yaw, $entity->pitch);
         }
     }
 

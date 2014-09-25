@@ -52,6 +52,7 @@ use pocketmine\entity\PrimedTNT;
 use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
 use pocketmine\nbt\NBT;
@@ -317,6 +318,10 @@ class Loader extends PluginBase{
             "kick-taskID" => false,
             "auto-taskID" => false,
         ],
+        "back" => [
+            "position" => false,
+            "rotation" => false,
+        ],
         "god" => false,
         "invsee" => [
             "user" => null,
@@ -465,6 +470,63 @@ class Loader extends PluginBase{
             return false;
         }
         return $this->sessions[$player->getName()]["afk"]["kick-taskID"];
+    }
+
+    /**  ____             _
+     *  |  _ \           | |
+     *  | |_) | __ _  ___| | __
+     *  |  _ < / _` |/ __| |/ /
+     *  | |_) | (_| | (__|   <
+     *  |____/ \__,_|\___|_|\_\
+     */
+
+    /**
+     * @param Player $player
+     * @return bool|Position
+     */
+    public function getLastPlayerPosition(Player $player){
+        $session = $this->sessions[$player->getName()]["back"]["position"];
+        if(!isset($session) || $session === false){
+            return false;
+        }
+        return $session;
+    }
+
+    /**
+     * @param Player $player
+     * @return bool|array
+     */
+    public function getLastPlayerRotation(Player $player){
+        $session = $this->sessions[$player->getName()]["back"]["rotation"];
+        if(!isset($session) || $session === false){
+            return false;
+        }
+        return $session;
+    }
+
+    /**
+     * @param Player $player
+     * @param Position $pos
+     */
+    public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
+        $this->sessions[$player->getName()]["back"]["position"] = $pos;
+        $this->sessions[$player->getName()]["back"]["rotation"] = [$yaw, $pitch];
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public function returnPlayerToLastKnownPosition(Player $player){
+        $pos = $this->getLastPlayerPosition($player);
+        $rotation = $this->getLastPlayerRotation($player);
+        if(!$pos instanceof Position || !is_array($rotation)){
+            return false;
+        }
+        $yaw = $rotation[0];
+        $pitch = $rotation[1];
+        $player->setPositionAndRotation($pos, $yaw, $pitch);
+        return true;
     }
 
     /**   _____           _
