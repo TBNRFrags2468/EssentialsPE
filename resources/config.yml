@@ -10,7 +10,7 @@ auto-afk-kick: 300
 # Let you configure the size of a stack that players (with permission) can get (via /more or /item)
 oversized-stacks: 64
 
-# Let you set a limit for the /near command to search for players (in Meters)
+# Let you set a limit for the /near command to search for players (in meters)
 near-radius-limit: 200
 # Let you set a default value to search for players (it can't be higher than the default limit)
 near-default-radius: 200
