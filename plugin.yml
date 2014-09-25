@@ -257,6 +257,9 @@ permissions:
                             essentials.sign.use.teleport:
                                 default: op
                                 description: "Allow to use Teleport signs"
+            essentials.sudo:
+                default: op
+                description: "Run a command as another player"
             essentials.tempban:
                 default: op
                 description: "Temporary bans a player"

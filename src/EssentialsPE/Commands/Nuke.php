@@ -20,7 +20,7 @@ class Nuke extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+                    $sender->sendMessage(TextFormat::RED . "Usage: /nuke <player>");
                     return false;
                 }
                 $this->getPlugin()->nuke($sender);
@@ -36,6 +36,10 @@ class Nuke extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->nuke($player);
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /nuke <player>"));
+                return false;
                 break;
         }
         return true;

@@ -30,6 +30,7 @@ use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\RotateHead;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
+use EssentialsPE\Commands\Sudo;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Unlimited;
@@ -126,6 +127,7 @@ class Loader extends PluginBase{
             new Repair($this),
             new Seen($this),
             new SetSpawn($this),
+            new Sudo($this),
             new Top($this),
             new Unlimited($this),
             new Vanish($this),
