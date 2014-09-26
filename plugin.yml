@@ -260,6 +260,12 @@ permissions:
             essentials.sudo:
                 default: op
                 description: "Run a command as another player"
+            essentials.tpall:
+                default: op
+                description: "Teleport all the online players to you"
+            essentials.tphere:
+                default: op
+                description: "Teleport another player to you"
             essentials.tempban:
                 default: op
                 description: "Temporary bans a player"

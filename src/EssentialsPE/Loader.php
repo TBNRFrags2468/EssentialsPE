@@ -30,6 +30,8 @@ use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\Sudo;
+use EssentialsPE\Commands\Teleport\TPAll;
+use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Unlimited;
@@ -125,7 +127,11 @@ class Loader extends PluginBase{
             new Top($this),
             new Unlimited($this),
             new Vanish($this),
-            new World($this)
+            new World($this),
+
+            //Teleport
+            new TPAll($this),
+            new TPHere($this)
 
             //Wraps
             //new RemoveWarp($this), //TODO
@@ -520,7 +526,7 @@ class Loader extends PluginBase{
         }
         $yaw = $rotation[0];
         $pitch = $rotation[1];
-        $player->setPositionAndRotation($pos, $yaw, $pitch);
+        $player->teleport($pos, $yaw, $pitch);
         return true;
     }
 
