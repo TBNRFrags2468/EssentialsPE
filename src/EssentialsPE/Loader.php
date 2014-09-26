@@ -27,7 +27,6 @@ use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
 use EssentialsPE\Commands\PvP; //Use API
 use EssentialsPE\Commands\RealName; //Use API
 use EssentialsPE\Commands\Repair;
-use EssentialsPE\Commands\RotateHead;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\Sudo;
@@ -48,17 +47,11 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
-use pocketmine\entity\PrimedTNT;
-use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
-use pocketmine\nbt\NBT;
-use pocketmine\nbt\tag\Compound;
-use pocketmine\nbt\tag\Double;
-use pocketmine\nbt\tag\Enum;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -507,6 +500,8 @@ class Loader extends PluginBase{
     /**
      * @param Player $player
      * @param Position $pos
+     * @param $yaw
+     * @param $pitch
      */
     public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
         $this->sessions[$player->getName()]["back"]["position"] = $pos;
