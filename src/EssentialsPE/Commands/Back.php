@@ -27,9 +27,9 @@ class Back extends BaseCommand{
         }
         if(!$this->getPlugin()->returnPlayerToLastKnownPosition($sender)){
             $sender->sendMessage(TextFormat::RED . "[Error] No previous position available");
-            return false;
+        }else{
+            $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
         }
-        $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
         return true;
     }
 } 
