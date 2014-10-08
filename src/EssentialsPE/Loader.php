@@ -49,11 +49,13 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
+use pocketmine\entity\PrimedTNT;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\Compound;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -115,7 +117,7 @@ class Loader extends PluginBase{
             new Mute($this),
             new Near($this),
             new Nick($this),
-            //new Nuke($this), //TODO (API)
+            new Nuke($this), //TODO (API)
             new PowerTool($this),
             new PowerToolToggle($this),
             new PvP($this),
@@ -133,7 +135,7 @@ class Loader extends PluginBase{
             new TPAll($this),
             new TPHere($this)
 
-            //Wraps
+            //Warps
             //new RemoveWarp($this), //TODO
             //new SetWarp($this), //TODO
             //new Warp($this), //TODO
@@ -288,12 +290,12 @@ class Loader extends PluginBase{
     public function nuke(Player $player){
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
-                //TODO
-                /*$player->getLevel()->addEntity(new PrimedTNT($player->chunk, new Compound("", [
-                    "Pos" => [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z],
+                $pos = [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z];
+                $player->getLevel()->addEntity(new PrimedTNT($player->chunk, new Compound("", [
+                    "Pos" => $pos,
                     "Rotation" => [0, 0],
-                    "Motion" => [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z]
-                ])));*/ //Maybe?
+                    "Motion" => $pos
+                ])));
             }
         }
     }
