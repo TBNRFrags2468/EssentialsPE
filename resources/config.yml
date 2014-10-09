@@ -14,3 +14,6 @@ oversized-stacks: 64
 near-radius-limit: 200
 # Let you set a default value to search for players (it can't be higher than the default limit)
 near-default-radius: 200
+
+# Max distance that a player can reach to use /jump (in meters)
+jump-distance: 100

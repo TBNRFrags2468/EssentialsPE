@@ -5,6 +5,7 @@ use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -23,42 +24,19 @@ class Jump extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
             return false;
         }
-        if(count($args) > 0){
+        if(count($args) !== 0){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
         }
-        $vectors = $sender->getDirectionVector()->divide(4);;
-        $pos = $sender->getPosition();
-        $level = $sender->getLevel();
-        $confirmedPosition = null;
-        for($lastPos = null; true; $lastPos = $pos, $pos = $pos->add($vectors)){
-            if($lastPos instanceof Vector3){
-                if($lastPos->getFloorX() === $pos->getFloorX() and $lastPos->getFloorY() === $pos->getFloorY() and $lastPos->getFloorZ() === $pos->getFloorZ()){
-                    continue;
-                }
-            }
-            if($pos->y < 0){
-                $sender->sendMessage("You can't jump into the void!");
-                return true;
-            }
-            if($pos->y >= 128){
-                $sender->sendMessage("You can't teleport into the space!");
-            }
-            $X = $pos->x >> 4;
-            $Z = $pos->z >> 4;
-            if(!$level->isChunkGenerated($X, $Z)){
-                $level->generateChunk($X, $Z);
-            }
-            $block = $level->getBlock($pos->floor());
-            if(!($block instanceof Block)){
-                $sender->sendMessage("You can't teleport to that position."); // unknown error?
-                return true;
-            }
-            if(!in_array($block->getID(), [Block::AIR, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA])){
-                $confirmedPosition = $pos->floor();
+        $transparent = [];
+        foreach(Block::$list as $block){
+            if(!$block->isSolid){
+                $transparent[] = $block;
             }
         }
-        $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
-        $sender->teleport($confirmedPosition->add(0, 1));
+        $block = $sender->getTargetBlock($this->getPlugin()->getConfig()->get("jump-distance"), $transparent);
+        $pos = new Position($block->getX(), $block->getY(), $block->getZ());
+        //TODO Check for secure teleport
+        $sender->teleport($pos);
         return true;
     }
 }

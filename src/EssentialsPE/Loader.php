@@ -2,6 +2,7 @@
 namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
+use EssentialsPE\Commands\Back;
 use EssentialsPE\Commands\Broadcast; //Use API
 use EssentialsPE\Commands\Burn; //Use API
 use EssentialsPE\Commands\ClearInventory; //Use API
@@ -97,6 +98,7 @@ class Loader extends PluginBase{
         //$cmdmap->getCommand("gamemode")->unregister($cmdmap);
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
+            new Back($this),
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -163,6 +165,10 @@ class Loader extends PluginBase{
             $cfg->set("near-default-radius", 100);
         }if($dr > $rl){
             $cfg->set("near-default-radius", $rl);
+        }
+
+        if(!is_numeric($cfg->get("jump-distance"))){
+            $cfg->set("jump-distance", 100);
         }
 
         $cfg->save();
