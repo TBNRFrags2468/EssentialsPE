@@ -5,7 +5,6 @@ use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -34,8 +33,9 @@ class Jump extends BaseCommand{
             }
         }
         $block = $sender->getTargetBlock($this->getPlugin()->getConfig()->get("jump-distance"), $transparent);
-        $pos = new Position($block->getX(), $block->getY(), $block->getZ());
+        $pos = new Vector3($block->getX(), $block->getY(), $block->getZ());
         //TODO Check for secure teleport
+        $pos->y += 1;
         $sender->teleport($pos);
         return true;
     }
