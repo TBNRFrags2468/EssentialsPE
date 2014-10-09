@@ -6,6 +6,7 @@ use EssentialsPE\Commands\Broadcast; //Use API
 use EssentialsPE\Commands\Burn; //Use API
 use EssentialsPE\Commands\ClearInventory; //Use API
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Defaults\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
 use EssentialsPE\Commands\Extinguish; //Use API
@@ -36,9 +37,6 @@ use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish; //Use API
-use EssentialsPE\Commands\Warps\RemoveWarp; //Use API
-use EssentialsPE\Commands\Warps\SetWarp; //Use API
-use EssentialsPE\Commands\Warps\Warp; //Use API
 use EssentialsPE\Commands\World;
 use EssentialsPE\Events\EventHandler; //Use API
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
@@ -95,7 +93,9 @@ class Loader extends PluginBase{
     }
 
     private function registerCommands(){
-        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
+        $cmdmap = $this->getServer()->getCommandMap();
+        //$cmdmap->getCommand("gamemode")->unregister($cmdmap);
+        $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Broadcast($this),
             new Burn($this),
@@ -104,6 +104,7 @@ class Loader extends PluginBase{
             new Depth($this),
             new Essentials($this),
             new Extinguish($this),
+            //new Gamemode($this),
             new GetPos($this),
             new God($this),
             new Heal($this),
