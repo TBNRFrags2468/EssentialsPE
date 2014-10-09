@@ -135,11 +135,6 @@ class Loader extends PluginBase{
             //Teleport
             new TPAll($this),
             new TPHere($this)
-
-            //Warps
-            //new RemoveWarp($this), //TODO
-            //new SetWarp($this), //TODO
-            //new Warp($this), //TODO
         ]);
     }
 
