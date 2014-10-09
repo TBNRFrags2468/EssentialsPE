@@ -33,9 +33,8 @@ class Jump extends BaseCommand{
             }
         }
         $block = $sender->getTargetBlock($this->getPlugin()->getConfig()->get("jump-distance"), $transparent);
-        $pos = new Vector3($block->getX(), $block->getY(), $block->getZ());
+        $pos = new Vector3($block->getX(), $block->getY() + 1, $block->getZ());
         //TODO Check for secure teleport
-        $pos->y += 1;
         $sender->teleport($pos);
         return true;
     }
