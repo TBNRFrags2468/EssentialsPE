@@ -33,6 +33,10 @@ class Jump extends BaseCommand{
             }
         }
         $block = $sender->getTargetBlock($this->getPlugin()->getConfig()->get("jump-distance"), $transparent);
+        if($block === null){
+            $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
+            return false;
+        }
         //TODO Check for secure teleport
         $sender->teleport(new Vector3($block->getX(), $block->getY() + 1, $block->getZ()));
         return true;
