@@ -30,10 +30,10 @@ class PvP extends BaseCommand{
             case "off":
                 $this->getPlugin()->setPvP($sender, (strtolower($args[0]) === "on" ? true : false));
                 $sender->sendMessage(TextFormat::GREEN . "PvP " . ($this->getPlugin()->isPvPEnabled($sender) ? "enabled!" : "disabled!"));
-                return true;
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                return false;
                 break;
         }
         return true;

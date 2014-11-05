@@ -17,6 +17,15 @@ class God extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
+        if(strtolower($alias) === "tgm"){
+            if($sender instanceof Player){
+                $this->getPlugin()->switchGodMode($sender);
+                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($sender) ? "enabled" : "disabled"));
+            }else{
+                $sender->sendMessage(TextFormat::RED . "Usage: /god <player>");
+            }
+            return true;
+        }
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
