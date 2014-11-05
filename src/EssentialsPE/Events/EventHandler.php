@@ -9,21 +9,19 @@ use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityInventoryChangeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
-use pocketmine\event\entity\EntityMoveEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
-use pocketmine\event\inventory\CraftItemEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
-use pocketmine\tile\Furnace;
 use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
@@ -121,21 +119,19 @@ class EventHandler implements Listener{
     }
 
     /**
-     * @param EntityMoveEvent $event
+     * @param PlayerMoveEvent $event
      */
-    public function onEntityMove(EntityMoveEvent $event){
-        $entity = $event->getEntity();
-        if($entity instanceof Player){
-            if($this->plugin->isAFK($entity)){
-                $this->plugin->setAFKMode($entity, false);
-                $entity->sendMessage(TextFormat::GREEN . "You're no longer AFK");
-                foreach($entity->getServer()->getOnlinePlayers() as $p){
-                    if($p !== $entity){
-                        $p->sendMessage(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
-                    }
+    public function onPlayerMove(PlayerMoveEvent $event){
+        $entity = $event->getPlayer();
+        if($this->plugin->isAFK($entity)){
+            $this->plugin->setAFKMode($entity, false);
+            $entity->sendMessage(TextFormat::GREEN . "You're no longer AFK");
+            foreach($entity->getServer()->getOnlinePlayers() as $p){
+                if($p !== $entity){
+                    $p->sendMessage(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
                 }
-                $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
             }
+            $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
         }
     }
 

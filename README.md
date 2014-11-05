@@ -1,4 +1,4 @@
-Essentials
+EssentialsPE
 ================
 
 The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/essentials/) for [PocketMine-MP Software](http://http://www.pocketmine.net/)
