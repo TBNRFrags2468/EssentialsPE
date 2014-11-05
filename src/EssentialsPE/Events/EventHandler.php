@@ -7,7 +7,6 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityInventoryChangeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
@@ -534,35 +533,5 @@ class EventHandler implements Listener{
             }
         }
         return true;
-    }
-
-    /**
-     * @param EntityInventoryChangeEvent $event
-     */
-    public function onEntityInventoryChange(EntityInventoryChangeEvent $event){
-        $entity = $event->getEntity();
-        if($entity instanceof Player){
-            //Invsee
-            if($this->plugin->isPlayerWatchingOtherInventory($entity)){
-                if(!$entity->hasPermission("essentials.invsee.modify")){
-                    $event->setCancelled(true);
-                }elseif(($player = $this->plugin->getInventoryOwner($entity)) !== false){
-                    if($player->hasPermission("essentials.invsee.preventmodify")){
-                        $event->setCancelled(true);
-                    }else{
-                        //$player->getInventory()->setItem($event->getSlot(), $event->getNewItem(), "essentialspe-invsee");
-                        //TODO Sync changes
-                    }
-                }
-            }elseif(($player = $this->plugin->isOtherWatchingPlayerInventory($entity))){
-                if($entity->hasPermission("essentials.invsee.preventmodify")){
-                    $event->setCancelled(true);
-                }elseif(!$player->hasPermission("essentials.invsee.modify")){
-                    $event->setCancelled(true);
-                }else{
-                    //TODO Sync changes
-                }
-            }
-        }
     }
 }

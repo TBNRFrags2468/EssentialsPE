@@ -3,31 +3,30 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
-use EssentialsPE\Commands\Broadcast; //Use API
-use EssentialsPE\Commands\Burn; //Use API
-use EssentialsPE\Commands\ClearInventory; //Use API
+use EssentialsPE\Commands\Broadcast;
+use EssentialsPE\Commands\Burn;
+use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
 use EssentialsPE\Commands\Defaults\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
-use EssentialsPE\Commands\Extinguish; //Use API
-use EssentialsPE\Commands\GetPos; //Use API
-use EssentialsPE\Commands\God; //Use API
-use EssentialsPE\Commands\Heal; //Use API
-use EssentialsPE\Commands\Invsee;
+use EssentialsPE\Commands\Extinguish;
+use EssentialsPE\Commands\GetPos;
+use EssentialsPE\Commands\God;
+use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
-use EssentialsPE\Commands\Mute; //Use API
+use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
-use EssentialsPE\Commands\Nick; //Use API
+use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
-use EssentialsPE\Commands\PowerTool\PowerTool; //Use API
-use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
-use EssentialsPE\Commands\PvP; //Use API
-use EssentialsPE\Commands\RealName; //Use API
+use EssentialsPE\Commands\PowerTool\PowerTool;
+use EssentialsPE\Commands\PowerTool\PowerToolToggle;
+use EssentialsPE\Commands\PvP;
+use EssentialsPE\Commands\RealName;
 use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
@@ -37,9 +36,9 @@ use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\Unlimited;
-use EssentialsPE\Commands\Vanish; //Use API
+use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\World;
-use EssentialsPE\Events\EventHandler; //Use API
+use EssentialsPE\Events\EventHandler;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
@@ -106,11 +105,10 @@ class Loader extends PluginBase{
             new Depth($this),
             new Essentials($this),
             new Extinguish($this),
-            //new Gamemode($this),
+            //new Gamemode($this), //TODO
             new GetPos($this),
             new God($this),
             new Heal($this),
-            new Invsee($this),
             new ItemCommand($this),
             new ItemDB($this),
             //new Jump($this), //TODO
@@ -644,90 +642,6 @@ class Loader extends PluginBase{
     public function countHomes(Player $player){
         $config = new Config($this->getDataFolder() . $player->getName() . ".yml");
         return count($config->getAll());
-    }
-
-    /**  _____
-     *  |_   _|
-     *    | |  _ ____   _____  ___  ___
-     *    | | | '_ \ \ / / __|/ _ \/ _ \
-     *   _| |_| | | \ V /\__ |  __|  __/
-     *  |_____|_| |_|\_/ |___/\___|\___|
-     */
-
-    /**
-     * Return the original player inventory
-     *
-     * @param Player $player
-     * @return \pocketmine\inventory\PlayerInventory
-     */
-    public function getPlayerOriginalInventory(Player $player){
-        $inv = $this->sessions[$player->getName()]["invsee"]["user"]["inv"];
-        return (isset($inv) ? $inv : $player->getInventory());
-    }
-
-    /**
-     * Return the original owner of the inventory that $player is watching
-     *
-     * @param Player $player
-     * @return bool|Player
-     */
-    public function getInventoryOwner(Player $player){
-        if($this->isPlayerWatchingOtherInventory($player)){
-            return $this->getPlayer($this->sessions[$player->getName()]["invsee"]["other"]["name"]);
-        }
-        return false;
-    }
-
-    /**
-     * Change player's inventory window
-     *
-     * @param Player $player
-     * @param Player $other
-     */
-    public function setPlayerInventory(Player $player, Player $other){
-        $i = $player->getInventory();
-        $o = $other->getInventory();
-        $this->sessions[$player->getName()]["invsee"]["user"]["inv"] = $i->getContents();
-        $this->sessions[$player->getName()]["invsee"]["user"]["armor"] = $i->getArmorContents();
-        $this->sessions[$player->getName()]["invsee"]["other"]["name"] = $other->getName();
-        $this->sessions[$player->getName()]["invsee"]["other"]["inv"] = $o->getContents();
-        $this->sessions[$player->getName()]["invsee"]["other"]["armor"] = $o->getArmorContents();
-        $i->setContents($o->getContents());
-        $i->setArmorContents($o->getArmorContents());
-    }
-
-    /**
-     * Restore the original player inventory
-     *
-     * @param Player $player
-     */
-    public function restorePlayerInventory(Player $player){
-        if($this->isPlayerWatchingOtherInventory($player)){
-            $player->getInventory()->setContents($this->sessions[$player->getName()]["invsee"]["user"]["inv"]);
-            $player->getInventory()->setArmorContents($this->sessions[$player->getName()]["invsee"]["user"]["armor"]);
-        }
-        $this->sessions[$player->getName()]["invsee"]["user"] = null;
-        $this->sessions[$player->getName()]["invsee"]["other"] = false;
-    }
-
-    /**
-     * Tell if the player is watching other player's inventory
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isPlayerWatchingOtherInventory(Player $player){
-        return ($this->sessions[$player->getName()]["invsee"]["other"] === false ? false : true);
-    }
-
-    public function isOtherWatchingPlayerInventory(Player $player){
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            if(($s = $this->sessions[$p->getName()]["invsee"]["other"]) !== false && $s["name"] === $player->getName()){
-                return $p;
-                break;
-            }
-        }
-        return false;
     }
 
     /**  __  __       _
