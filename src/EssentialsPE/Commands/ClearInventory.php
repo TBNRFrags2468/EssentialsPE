@@ -23,8 +23,9 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /clearinventory <player>");
                     return false;
                 }
-                if($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1|3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1 ? "creative" : "adventure") . " mode");
+                $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+                if($gm === 1 || $gm === 3){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
                 $sender->getInventory()->clearAll();
