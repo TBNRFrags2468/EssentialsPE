@@ -36,6 +36,13 @@ permissions:
                     essentials.back.ondeath:
                         default: op
                         description: "Return to the place where you die"
+            essentials.break:
+                default: op
+                description: "Breaks the block you're looking at"
+                children:
+                    essentials.break.bedrock:
+                        default: op
+                        description: "Allow to break Bedrock"
             essentials.broadcast:
                 default: op
                 description: "Broadcast a message"

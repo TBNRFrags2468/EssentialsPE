@@ -3,6 +3,7 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
+use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
@@ -98,6 +99,7 @@ class Loader extends PluginBase{
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
+            //new BreakCommand($this), //TODO
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -118,7 +120,7 @@ class Loader extends PluginBase{
             new Mute($this),
             new Near($this),
             new Nick($this),
-            new Nuke($this), //TODO (API)
+            //new Nuke($this), //TODO (API)
             new PowerTool($this),
             new PowerToolToggle($this),
             new PvP($this),
@@ -145,7 +147,7 @@ class Loader extends PluginBase{
         if(!is_bool($cfg->get("safe-afk"))){
             $cfg->set("safe-afk", true);
         }if(!is_numeric($cfg->get("auto-afk-kick"))){
-            $cfg->set("auto-afk-kick", 5);
+            $cfg->set("auto-afk-kick", 300);
         }
 
         if(!is_numeric($cfg->get("oversized-stacks"))){
@@ -158,10 +160,6 @@ class Loader extends PluginBase{
             $cfg->set("near-default-radius", 100);
         }if($dr > $rl){
             $cfg->set("near-default-radius", $rl);
-        }
-
-        if(!is_numeric($cfg->get("jump-distance"))){
-            $cfg->set("jump-distance", 100);
         }
 
         $cfg->save();
@@ -294,6 +292,36 @@ class Loader extends PluginBase{
                 ])));
             }
         }
+    }
+
+    public function transparentJumpBlockList(){
+        return [
+            0,
+            6,
+            8,
+            9,
+            10,
+            11,
+            30, //What do you think?
+            31,
+            32,
+            37,
+            38,
+            39,
+            40,
+            50,
+            51,
+            63,
+            68,
+            83,
+            104,
+            105,
+            106,
+            120,
+            141,
+            142,
+            244
+        ];
     }
 
     /**   _____              _
