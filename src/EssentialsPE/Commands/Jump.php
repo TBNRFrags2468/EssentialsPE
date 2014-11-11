@@ -25,8 +25,15 @@ class Jump extends BaseCommand{
         if(count($args) !== 0){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
         }
-        $transparent = $this->getPlugin()->transparentJumpBlockList();
+        $transparent = [];
         $block = $sender->getTargetBlock(100, $transparent);
+        while(!$block->isSolid){
+            if($block === null){
+                break;
+            }
+            $transparent[] = $block->getID();
+            $block = $sender->getTargetBlock(100, $transparent);
+        }
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;

@@ -113,7 +113,7 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), //TODO
+            new Jump($this),
             new TempBan($this),
             new KickAll($this),
             new More($this),
@@ -292,36 +292,6 @@ class Loader extends PluginBase{
                 ])));
             }
         }
-    }
-
-    public function transparentJumpBlockList(){
-        return [
-            0,
-            6,
-            8,
-            9,
-            10,
-            11,
-            30, //What do you think?
-            31,
-            32,
-            37,
-            38,
-            39,
-            40,
-            50,
-            51,
-            63,
-            68,
-            83,
-            104,
-            105,
-            106,
-            120,
-            141,
-            142,
-            244
-        ];
     }
 
     /**   _____              _
