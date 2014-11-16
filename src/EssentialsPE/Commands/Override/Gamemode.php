@@ -1,5 +1,5 @@
 <?php
-namespace EssentialsPE\Commands\Defaults;
+namespace EssentialsPE\Commands\Override;
 
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;

@@ -8,7 +8,7 @@ use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
-use EssentialsPE\Commands\Defaults\Gamemode;
+use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
 use EssentialsPE\Commands\Extinguish;
@@ -48,17 +48,23 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
-use pocketmine\entity\PrimedTNT;
+use pocketmine\block\TNT;
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\Double;
+use pocketmine\nbt\tag\Enum;
+use pocketmine\nbt\tag\Float;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
@@ -69,6 +75,7 @@ class Loader extends PluginBase{
         $this->checkConfig();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
+        //$this->overrideDefaultCommands();
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){
@@ -93,13 +100,21 @@ class Loader extends PluginBase{
         }
     }
 
+    private function overrideDefaultCommands(){
+        $cmdmap = $this->getServer()->getCommandMap();
+
+        //Gamemode
+        $cmd = $cmdmap->getCommand("gamemode");
+        $cmd->setLabel("gamemode_disabled");
+        $cmd->unregister($cmdmap);
+    }
+
     private function registerCommands(){
         $cmdmap = $this->getServer()->getCommandMap();
-        //$cmdmap->getCommand("gamemode")->unregister($cmdmap);
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
-            //new BreakCommand($this), //TODO
+            //new BreakCommand($this), //TODO (Unhandled exception?)
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -113,14 +128,14 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            new Jump($this),
+            //new Jump($this), //TODO (Unhandled exception?)
             new TempBan($this),
             new KickAll($this),
             new More($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
-            //new Nuke($this), //TODO (API)
+            new Nuke($this),
             new PowerTool($this),
             new PowerToolToggle($this),
             new PvP($this),
@@ -284,12 +299,29 @@ class Loader extends PluginBase{
     public function nuke(Player $player){
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
-                $pos = [$player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z];
-                $player->getLevel()->addEntity(new PrimedTNT($player->chunk, new Compound("", [
-                    "Pos" => $pos,
-                    "Rotation" => [0, 0],
-                    "Motion" => $pos
-                ])));
+                $pos = new Vector3($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z);
+                $block = new TNT();
+                $level = $player->getLevel();
+                $mot = (new Random())->nextSignedFloat() * M_PI * 2;
+                $tnt = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
+                    "Pos" => new Enum("Pos", [
+                        new Double("", $pos->x + 0.5),
+                        new Double("", $pos->y),
+                        new Double("", $pos->z + 0.5)
+                    ]),
+                    "Motion" => new Enum("Motion", [
+                        new Double("", -sin($mot) * 0.02),
+                        new Double("", 0.2),
+                        new Double("", -cos($mot) * 0.02)
+                    ]),
+                    "Rotation" => new Enum("Rotation", [
+                        new Float("", 0),
+                        new Float("", 0)
+                    ]),
+                    "Fuse" => new Byte("Fuse", 80),
+                ]));
+                $tnt->namedtag->setName("EssNuke");
+                $tnt->spawnToAll();
             }
         }
     }

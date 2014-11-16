@@ -7,6 +7,7 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
@@ -188,8 +189,6 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerInteractEvent $event
-     *
-     * @priority HIGH
      * @return bool
      */
     public function onBlockTap(PlayerInteractEvent $event){
@@ -348,6 +347,11 @@ class EventHandler implements Listener{
         }
     }
 
+    /**
+     * @param BlockBreakEvent $event
+     *
+     * @priority HIGH
+     */
     public function onBlockBreak(BlockBreakEvent $event){
         $player = $event->getPlayer();
         $block = $event->getBlock();
@@ -398,6 +402,10 @@ class EventHandler implements Listener{
         }
     }
 
+    /**
+     * @param SignChangeEvent $event
+     * @return bool
+     */
     public function onSignChange(SignChangeEvent $event){
         $player = $event->getPlayer();
         //Colored Sign
@@ -533,5 +541,15 @@ class EventHandler implements Listener{
             }
         }
         return true;
+    }
+
+    /**
+     * @param EntityExplodeEvent $event
+     */
+    public function onTNTExplode(EntityExplodeEvent $event){
+        $tnt = $event->getEntity();
+        if($tnt->namedtag->getName() === "EssNuke"){
+            $event->setBlockList([]);
+        }
     }
 }
