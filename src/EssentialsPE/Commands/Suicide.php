@@ -22,6 +22,10 @@ class Suicide extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
             return false;
         }
+        if(count($args) !== 0){
+            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            return false;
+        }
         $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, 1000));
         if($ev->isCancelled()){
             return true;

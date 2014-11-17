@@ -36,6 +36,9 @@ permissions:
                     essentials.back.ondeath:
                         default: op
                         description: "Return to the place where you die"
+            essentials.bigtree:
+                default: op
+                description: "Spawns a big tree"
             essentials.break:
                 default: op
                 description: "Breaks the block you're looking at"
@@ -304,6 +307,9 @@ permissions:
             essentials.top:
                 default: op
                 description: "Teleport to the highest block above you"
+            essentials.tree:
+                default: op
+                description: "Spawns a tree"
             essentials.unlimited:
                 default: op
                 description: "Allow the player to place unlimited blocks"

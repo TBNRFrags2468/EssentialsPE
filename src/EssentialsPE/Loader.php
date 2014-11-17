@@ -3,6 +3,7 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
+use EssentialsPE\Commands\BigTreeCommand;
 use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
@@ -39,6 +40,7 @@ use EssentialsPE\Commands\Teleport\TPAll;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
+use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\World;
@@ -102,6 +104,11 @@ class Loader extends PluginBase{
         }
     }
 
+    /**
+     * Function to easily disable commands
+     *
+     * @param array $commands
+     */
     private function unregisterCommands(array $commands){
         $commandmap = $this->getServer()->getCommandMap();
 
@@ -112,6 +119,10 @@ class Loader extends PluginBase{
         }
     }
 
+    /**
+     * Function to register all EssentialsPE's commands...
+     * And to override some default ones
+     */
     private function registerCommands(){
         //Unregister commands to override
         $this->unregisterCommands([
@@ -119,10 +130,12 @@ class Loader extends PluginBase{
             "kill"
         ]);
 
+        //Register the new commands
         $cmdmap = $this->getServer()->getCommandMap();
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
+            new BigTreeCommand($this),
             new BreakCommand($this), //TODO (Unhandled exception?)
             new Broadcast($this),
             new Burn($this),
@@ -157,6 +170,7 @@ class Loader extends PluginBase{
             new Sudo($this),
             new Suicide($this),
             new Top($this),
+            new TreeCommand($this),
             new Unlimited($this),
             new Vanish($this),
             new World($this),
