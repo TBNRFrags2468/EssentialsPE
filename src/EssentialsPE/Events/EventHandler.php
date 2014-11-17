@@ -135,6 +135,9 @@ class EventHandler implements Listener{
         }
     }
 
+    /**
+     * @param EntityTeleportEvent $event
+     */
     public function onEntityTeleport(EntityTeleportEvent $event){
         $entity = $event->getEntity();
         if($entity instanceof Player){
@@ -316,7 +319,7 @@ class EventHandler implements Listener{
                 if(!$player->hasPermission($perm . "teleport")){
                     $player->sendMessage($message);
                 }else{
-                    $player->teleport(new Vector3($x = $text[1], $y = $text[2], $z = $text[3]));
+                    $player->setPosition(new Vector3($x = $text[1], $y = $text[2], $z = $text[3]));
                     $player->sendMessage(TextFormat::GREEN . "Teleporting to " . TextFormat::AQUA . $x . TextFormat::GREEN . ", " . TextFormat::AQUA . $y . TextFormat::GREEN . ", " . TextFormat::AQUA . $z);
                 }
             }

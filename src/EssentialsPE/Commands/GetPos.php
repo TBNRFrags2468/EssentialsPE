@@ -32,12 +32,12 @@ class GetPos extends BaseCommand{
                     return false;
                 }
                 $player = $this->getPlugin()->getPlayer($args[0]);
-                if($player === false){
+                if($player === false) {
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                }else{
-                    $pos = $player->getPosition();
-                    $sender->sendMessage(TextFormat::YELLOW . $args[0] . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
+                    return false;
                 }
+                $pos = $player->getPosition();
+                $sender->sendMessage(TextFormat::YELLOW . $args[0] . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /getpos <player>");

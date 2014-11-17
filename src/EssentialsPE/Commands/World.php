@@ -30,6 +30,7 @@ class World extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] World " . ($sender->getServer()->isLevelGenerated($world) ? "is not loaded" : "not found"));
                     return false;
                 }
+                $this->getPlugin()->setPlayerLastPosition($sender, $sender->getPosition(), $sender->getYaw(), $sender->getPitch());
                 $sender->teleport(new Position($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), $world), 0, 0);
                 $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
                 break;

@@ -39,7 +39,8 @@ class Jump extends BaseCommand{
             return false;
         }
         //TODO Check for secure teleport
-        $sender->teleport(new Vector3($block->getX(), $block->getY() + 1, $block->getZ()));
+        $this->getPlugin()->setPlayerLastPosition($sender, $sender->getPosition(), $sender->getYaw(), $sender->getPitch());
+        $sender->setPosition($block->add(0, 1));
         return true;
     }
 }

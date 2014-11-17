@@ -24,6 +24,7 @@ use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
+use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
 use EssentialsPE\Commands\PvP;
@@ -32,6 +33,7 @@ use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\Sudo;
+use EssentialsPE\Commands\Suicide;
 use EssentialsPE\Commands\Teleport\TPAll;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
@@ -100,21 +102,28 @@ class Loader extends PluginBase{
         }
     }
 
-    private function overrideDefaultCommands(){
-        $cmdmap = $this->getServer()->getCommandMap();
+    private function unregisterCommands(array $commands){
+        $commandmap = $this->getServer()->getCommandMap();
 
-        //Gamemode
-        $cmd = $cmdmap->getCommand("gamemode");
-        $cmd->setLabel("gamemode_disabled");
-        $cmd->unregister($cmdmap);
+        foreach($commands as $commandlabel){
+            $command = $commandmap->getCommand($commandlabel);
+            $command->setLabel($commandlabel . "_disabled");
+            $command->unregister($commandmap);
+        }
     }
 
     private function registerCommands(){
+        //Unregister commands to override
+        $this->unregisterCommands([
+           //"gamemode",
+            "kill"
+        ]);
+
         $cmdmap = $this->getServer()->getCommandMap();
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
-            //new BreakCommand($this), //TODO (Unhandled exception?)
+            new BreakCommand($this), //TODO (Unhandled exception?)
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -128,7 +137,8 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), //TODO (Unhandled exception?)
+            new Jump($this), //TODO (Unhandled exception?)
+            new Kill($this),
             new TempBan($this),
             new KickAll($this),
             new More($this),
@@ -144,6 +154,7 @@ class Loader extends PluginBase{
             new Seen($this),
             new SetSpawn($this),
             new Sudo($this),
+            new Suicide($this),
             new Top($this),
             new Unlimited($this),
             new Vanish($this),
@@ -554,7 +565,8 @@ class Loader extends PluginBase{
         }
         $yaw = $rotation[0];
         $pitch = $rotation[1];
-        $player->teleport($pos, $yaw, $pitch);
+        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
+        $player->setPositionAndRotation($pos, $yaw, $pitch);
         return true;
     }
 
@@ -656,10 +668,8 @@ class Loader extends PluginBase{
             return false;
         }
         $home = $config->get(strtolower($home_name));
-        if($player->getLevel()->getName() != $home["level"]){
-            $player->setLevel($home["level"]);
-        }
-        $player->teleport(new Vector3($home["x"], $home["y"], $home["z"]), $home["yaw"], $home["pitch"]);
+        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
+        $player->setPositionAndRotation(new Position($home["x"], $home["y"], $home["z"], $home["level"]), $home["yaw"], $home["pitch"]);
         return true;
     }
 
@@ -1115,10 +1125,8 @@ class Loader extends PluginBase{
             return false;
         }
         $home = $config->get($warp);
-        if($player->getLevel()->getName() != $home["level"]){
-            $player->setLevel($home["level"]);
-        }
-        $player->teleport(new Vector3($home["x"], $home["y"], $home["z"]), $home["yaw"], $home["pitch"]);
+        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
+        $player->setPositionAndRotation(new Position($home["x"], $home["y"], $home["z"], $home["level"]), $home["yaw"], $home["pitch"]);
         return true;
     }
 

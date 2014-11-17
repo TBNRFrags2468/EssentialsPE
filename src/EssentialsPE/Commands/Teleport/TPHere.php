@@ -30,7 +30,8 @@ class TPHere extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $player->teleport($sender->getPosition());
+        $this->getPlugin()->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
+        $player->setPosition($sender->getPosition());
         $player->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting $args[0] to you...");
         return true;
