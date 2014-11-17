@@ -119,16 +119,6 @@ permissions:
                     essentials.heal.other:
                         default: op
                         description: "Heal other players"
-            essentials.invsee:
-                default: op
-                description: "See other player's inventory"
-                children:
-                    essentials.invsee.modify:
-                        default: op
-                        description: "Let you add/remove items from other player's inventory"
-                    essentials.invsee.preventmodify:
-                        default: op
-                        description: "Prevent other player's to modify your inventory"
             essentials.item:
                 default: op
                 description: "Gives yourself an item"
@@ -151,6 +141,9 @@ permissions:
             essentials.kickall:
                 default: op
                 description: "Kick all the online players except the sender"
+            essentials.kill:
+                default: op
+                description: "Kill other players"
             essentials.more:
                 default: op
                 description: "Get a stack of the item you're holding"
@@ -175,7 +168,7 @@ permissions:
                     essentials.nick.other:
                         default: op
                         description: "Change others name"
-            essentials.nucke:
+            essentials.nuke:
                 defualt: op
                 description: "Spawn a thin carpet of bomb"
                 children:
@@ -290,9 +283,15 @@ permissions:
                             essentials.sign.use.teleport:
                                 default: op
                                 description: "Allow to use Teleport signs"
+            essentials.spawn:
+                default: true
+                description: "Teleport to server's main spawn"
             essentials.sudo:
                 default: op
                 description: "Run a command as another player"
+            essentials.suicide:
+                default: op
+                description: "Kill yourself"
             essentials.tpall:
                 default: op
                 description: "Teleport all the online players to you"
@@ -322,3 +321,6 @@ permissions:
                     essentials.vanish.pvp:
                         default: op
                         description: "Let you attack other players while you're vanished"
+            essentials.world:
+                default: op
+                description: "Teleport to another world"

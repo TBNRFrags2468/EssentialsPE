@@ -32,6 +32,7 @@ use EssentialsPE\Commands\RealName;
 use EssentialsPE\Commands\Repair;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
+use EssentialsPE\Commands\Spawn;
 use EssentialsPE\Commands\Sudo;
 use EssentialsPE\Commands\Suicide;
 use EssentialsPE\Commands\Teleport\TPAll;
@@ -50,7 +51,6 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
-use pocketmine\block\TNT;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -153,6 +153,7 @@ class Loader extends PluginBase{
             new Repair($this),
             new Seen($this),
             new SetSpawn($this),
+            new Spawn($this),
             new Sudo($this),
             new Suicide($this),
             new Top($this),
@@ -311,7 +312,6 @@ class Loader extends PluginBase{
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
                 $pos = new Vector3($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z);
-                $block = new TNT();
                 $level = $player->getLevel();
                 $mot = (new Random())->nextSignedFloat() * M_PI * 2;
                 $tnt = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
