@@ -69,7 +69,7 @@ class TreeCommand extends BaseCommand{
                 break;
         }
         $tree = new Tree();
-        $tree->growTree($sender->getLevel(), $block->getFloorX(), ($block->getFloorY() + 1), $block->getFloorZ(), new Random(mt_rand()), $type);
+        $tree->growTree($sender->getLevel(), $block->getFloorX(), $block->getFloorY(), $block->getFloorZ(), new Random(mt_rand()), $type);
         $sender->sendMessage(TextFormat::GREEN . "Tree spawned!");
         return true;
     }
