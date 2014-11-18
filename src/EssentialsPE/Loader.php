@@ -157,7 +157,6 @@ class Loader extends PluginBase{
             new ItemDB($this),
             new Jump($this), //TODO (Unhandled exception?)
             new Kill($this),
-            new TempBan($this),
             new KickAll($this),
             new More($this),
             new Mute($this),
@@ -172,6 +171,7 @@ class Loader extends PluginBase{
             new Spawn($this),
             new Sudo($this),
             new Suicide($this),
+            new TempBan($this),
             new Top($this),
             new TreeCommand($this),
             new Unlimited($this),
