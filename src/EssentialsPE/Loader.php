@@ -156,8 +156,8 @@ class Loader extends PluginBase{
             new ItemCommand($this),
             new ItemDB($this),
             new Jump($this), //TODO (Unhandled exception?)
-            new Kill($this),
             new KickAll($this),
+            new Kill($this),
             new More($this),
             new Mute($this),
             new Near($this),
