@@ -22,7 +22,7 @@ class Burn extends BaseCommand{
         }
         $player = $this->getPlugin()->getPlayer($args[0]);
         $time = $args[1];
-        if($player === false){
+        if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }

@@ -43,6 +43,9 @@ use EssentialsPE\Commands\Top;
 use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
+use EssentialsPE\Commands\Warp\DelWarp;
+use EssentialsPE\Commands\Warp\Setwarp;
+use EssentialsPE\Commands\Warp\Warp;
 use EssentialsPE\Commands\World;
 use EssentialsPE\Events\EventHandler;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
@@ -72,11 +75,13 @@ use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
-    public $path;
+    /** @var Config */
+    public $warps;
 
     public function onEnable(){
         @mkdir($this->getDataFolder());
         $this->checkConfig();
+        $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
         //$this->overrideDefaultCommands();
@@ -159,8 +164,6 @@ class Loader extends PluginBase{
             new Near($this),
             new Nick($this),
             new Nuke($this),
-            new PowerTool($this),
-            new PowerToolToggle($this),
             new PvP($this),
             new RealName($this),
             new Repair($this),
@@ -175,9 +178,18 @@ class Loader extends PluginBase{
             new Vanish($this),
             new World($this),
 
+            //PowerTool
+            new PowerTool($this),
+            new PowerToolToggle($this),
+
             //Teleport
             new TPAll($this),
-            new TPHere($this)
+            new TPHere($this),
+
+            //Warp
+            new DelWarp($this),
+            new Setwarp($this),
+            new Warp($this),
         ]);
     }
 
@@ -207,6 +219,10 @@ class Loader extends PluginBase{
         $cfg->reload();
     }
 
+    private function saveConfigs(){
+        $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+    }
+
     /*
      *  .----------------.  .----------------.  .----------------.
      * | .--------------. || .--------------. || .--------------. |
@@ -230,14 +246,13 @@ class Loader extends PluginBase{
      */
     public function getPlayer($player){
         $player = strtolower($player);
-        $r = false;
         foreach($this->getServer()->getOnlinePlayers() as $p){
             if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
-                $r = $p;
+                return $p;
                 break;
             }
         }
-        return $r;
+        return false;
     }
 
     /**
@@ -635,69 +650,6 @@ class Loader extends PluginBase{
         return $this->getSession($player, "god");
     }
 
-    /**  _    _
-     *  | |  | |
-     *  | |__| | ___  _ __ ___   ___
-     *  |  __  |/ _ \| '_ ` _ \ / _ \
-     *  | |  | | (_) | | | | | |  __/
-     *  |_|  |_|\___/|_| |_| |_|\___|
-     */
-
-    /**
-     * Sets a new home location or modify it if the home exists
-     *
-     * @param Player $player
-     * @param string $home_name
-     * @return bool
-     */
-    public function setHome(Player $player, $home_name){
-        $config = new Config($this->getDataFolder() . $player->getName() . ".yml");
-        if(!$config->exists($home_name)){
-            if(!$player->hasPermission("essentials.home." . ($this->countHomes($player) + 1))){
-                $player->sendMessage("You may only have ".$this->countHomes($player)." homes.");
-                return true;
-            }
-            $pos = array();
-            $pos["x"] = $player->getX();
-            $pos["y"] = $player->getY();
-            $pos["z"] = $player->getZ();
-            $pos["yaw"] = $player->yaw;
-            $pos["pitch"] = $player->pitch;
-            $pos["level"] = $player->getLevel()->getName();
-            $config->set($home_name, $pos);
-        }
-        return true;
-    }
-
-    /**
-     * Teleport to the selected home
-     *
-     * @param Player $player
-     * @param string $home_name
-     * @return bool
-     */
-    public function homeTp(Player $player, $home_name){
-        $config = new Config($this->getDataFolder() . strtolower($player->getName()) . ".yml");
-        if(!$config->exists(strtolower($home_name))){
-            return false;
-        }
-        $home = $config->get(strtolower($home_name));
-        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
-        $player->setPositionAndRotation(new Position($home["x"], $home["y"], $home["z"], $home["level"]), $home["yaw"], $home["pitch"]);
-        return true;
-    }
-
-    /**
-     * Count the number of homes that a player has
-     *
-     * @param Player $player
-     * @return int
-     */
-    public function countHomes(Player $player){
-        $config = new Config($this->getDataFolder() . $player->getName() . ".yml");
-        return count($config->getAll());
-    }
-
     /**  __  __       _
      *  |  \/  |     | |
      *  | \  / |_   _| |_ ___
@@ -1066,93 +1018,6 @@ class Loader extends PluginBase{
         return $this->getSession($player, "pvp");
     }
 
-    /** __          __
-     *  \ \        / /
-     *   \ \  /\  / __ _ _ __ _ __
-     *    \ \/  \/ / _` | '__| '_ \
-     *     \  /\  | (_| | |  | |_) |
-     *      \/  \/ \__,_|_|  | .__/
-     *                       | |
-     *                       |_|
-     */
-
-    /**
-     * Set's a new Warp or modify the position if already exists
-     * it use Player to handle the position, but may change later
-     *
-     * @param Player $player
-     * @param string $warp
-     */
-    public function setWarp(Player $player, $warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        $pos = array();
-        $pos["x"] = $player->getX();
-        $pos["y"] = $player->getY();
-        $pos["z"] = $player->getZ();
-        $pos["yaw"] = $player->yaw;
-        $pos["pitch"] = $player->pitch;
-        $pos["level"] = $player->getLevel()->getName();
-        $config->set($warp, $pos);
-    }
-
-    /**
-     * Remove a Warp if exists
-     *
-     * @param string $warp
-     * @return bool
-     */
-    public function removeWarp($warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$this->warpExist($warp)){
-            return false;
-        }else{
-            $config->remove($warp);
-            return true;
-        }
-    }
-
-    /**
-     * Tell if a Warp exists
-     *
-     * @param string $warp
-     * @return bool
-     */
-    public function warpExist($warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$config->exists($warp)){
-            return false;
-        }else{
-            return true;
-        }
-    }
-
-    /**
-     * Teleport a player to a Warp
-     *
-     * @param Player $player
-     * @param string $warp
-     * @return bool
-     */
-    public function tpWarp(Player $player, $warp){
-        $config = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        if(!$config->exists($warp)){
-            return false;
-        }
-        $home = $config->get($warp);
-        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
-        $player->setPositionAndRotation(new Position($home["x"], $home["y"], $home["z"], $home["level"]), $home["yaw"], $home["pitch"]);
-        return true;
-    }
-
-    /**
-     * Return a list with all the available warps
-     *
-     * TODO
-     */
-    public function warpList(){
-        //NOTE: Consider using wordwrap($string, $width, "\n", true)
-    }
-
     /**  _    _       _ _           _ _           _   _____ _
      *  | |  | |     | (_)         (_| |         | | |_   _| |
      *  | |  | |_ __ | |_ _ __ ___  _| |_ ___  __| |   | | | |_ ___ _ __ ___  ___
@@ -1278,5 +1143,86 @@ class Loader extends PluginBase{
                 $p->hidePlayer($p);
             }
         }
+    }
+
+    /** __          __
+     *  \ \        / /
+     *   \ \  /\  / __ _ _ __ _ __
+     *    \ \/  \/ / _` | '__| '_ \
+     *     \  /\  | (_| | |  | |_) |
+     *      \/  \/ \__,_|_|  | .__/
+     *                       | |
+     *                       |_|
+     */
+
+    /**
+     * Tell if a warp exists
+     *
+     * @param $warp
+     * @return bool
+     */
+    public function warpExists($warp){
+        return ($this->warps->exists(strtolower($warp)) ? true : false);
+    }
+
+    /**
+     * Get an array with all the warp information
+     * If the function returns "false", it means that the warp doesn't exists
+     *
+     * @param $warp
+     * @return array
+     */
+    public function getWarp($warp){
+        if(!$this->warpExists(strtolower($warp))){
+            return false;
+        }
+        return explode(",", $this->warps->get(strtolower($warp)));
+    }
+
+    /**
+     * Create a warp or override its position
+     *
+     * @param $warp
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @param int $yaw
+     * @param int $pitch
+     */
+    public function setWarp($warp, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
+        $value = "$x,$y,$z,$level,$yaw,$pitch";
+        $this->warps->set(strtolower($warp), $value);
+    }
+
+    /**
+     * Removes a warp!
+     * If the function return "false", it means that the warp doesn't exists
+     *
+     * @param $warp
+     * @return bool
+     */
+    public function removeWarp($warp){
+        if(!$this->warpExists($warp)){
+            return false;
+        }
+        $this->warps->remove(strtolower($warp));
+        return true;
+    }
+
+    /**
+     * Return a list of all the available warps
+     *
+     * @param bool $inArray Tell if return the list inside an array or a string
+     * @return array|string
+     */
+    public function warpList($inArray = false){
+        $list = $this->warps->getAll(true);
+        if(!$inArray){
+            $string = wordwrap(implode(", ", $list), 30, "\n", true);
+            $string = substr($string, -3);
+            return $string;
+        }
+        return $list;
     }
 }

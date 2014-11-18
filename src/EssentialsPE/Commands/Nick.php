@@ -25,7 +25,7 @@ class Nick extends BaseCommand{
                 }
                 $nickname = $args[0];
                 $nickname === "off" ? $this->getPlugin()->removeNick($sender, true) : $this->getPlugin()->setNick($sender, $nickname, true);
-                $sender->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . $nickname);
+                $sender->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . ($nickname === "off" ? $sender->getName() : $nickname));
                 break;
             case 2:
                 if(!$sender->hasPermission("essentials.nick.other")){
@@ -33,12 +33,12 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 $player = $this->getPlugin()->getPlayer($args[1]);
-                if($player == false){
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
                 $nickname = $args[0];
-                if($nickname == "off"){
+                if($nickname === "off"){
                     $this->getPlugin()->removeNick($player, true);
                     $sender->sendMessage(TextFormat::GREEN . "$args[1]'" . (substr($args[1], -1, 1) === "s" ? "" : "s") . " nick has been disabled");
                     $player->sendMessage(TextFormat::GREEN . "Your nick has been disabled");

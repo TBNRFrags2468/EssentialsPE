@@ -56,7 +56,7 @@ class Gamemode extends BaseCommand{
                 break;
             case 2:
                 $player = $this->getPlugin()->getPlayer($args[1]);
-                if($player === false){
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

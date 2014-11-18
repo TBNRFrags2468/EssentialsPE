@@ -38,7 +38,7 @@ class AFK extends BaseCommand{
                     return false;
                 }
                 $player = $this->getPlugin()->getPlayer($args[0]);
-                if(!$player instanceof Player){
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

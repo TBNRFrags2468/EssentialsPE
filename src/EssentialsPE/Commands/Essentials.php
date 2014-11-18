@@ -31,6 +31,9 @@ class Essentials extends BaseCommand{
                         $this->getPlugin()->checkConfig();
                         $sender->sendMessage(TextFormat::AQUA . "Config successfully reloaded!");
                         break;
+                    /*case "update":
+                        //TODO
+                        break;*/
                     default:
                         $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
                         return false;

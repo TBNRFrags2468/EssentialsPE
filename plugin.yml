@@ -62,6 +62,9 @@ permissions:
             essentials.compass:
                 default: true
                 description: "Display your current bearing direction"
+            essentials.delwarp:
+                default: op
+                description: "Remove a warp"
             essentials.depth:
                 default: true
                 description: "Get your current height related to sea-level"
@@ -213,6 +216,9 @@ permissions:
             essentials.setspawn:
                 default: op
                 description: "Change your server's general spawn"
+            essentials.setwarp:
+                default: op
+                description: "Create/update a warp"
             essentials.sign:
                 default: op
                 description: "Allow to manage special signs"
@@ -327,6 +333,9 @@ permissions:
                     essentials.vanish.pvp:
                         default: op
                         description: "Let you attack other players while you're vanished"
+            essentials.warp:
+                default: true
+                description: "Teleport to a warp"
             essentials.world:
                 default: op
                 description: "Teleport to another world"
