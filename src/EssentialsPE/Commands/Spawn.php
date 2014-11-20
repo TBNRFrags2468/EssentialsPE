@@ -23,7 +23,7 @@ class Spawn extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /spawn <player>");
                     return false;
                 }
-                $sender->setPosition($sender->getServer()->getDefaultLevel()->getSpawnLocation());
+                $sender->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
                 $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
                 break;
             case 1:
@@ -32,7 +32,7 @@ class Spawn extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $player->setPosition($sender->getServer()->getDefaultLevel()->getSpawnLocation());
+                $player->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
                 $player->sendMessage(TextFormat::GREEN . "Teleporting...");
                 break;
             default:

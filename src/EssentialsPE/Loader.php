@@ -140,8 +140,8 @@ class Loader extends PluginBase{
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
-            new BigTreeCommand($this),
-            new BreakCommand($this), //TODO (Unhandled exception?)
+            //new BigTreeCommand($this),
+            //new BreakCommand($this), //TODO (Unhandled exception?)
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -155,7 +155,7 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            new Jump($this), //TODO (Unhandled exception?)
+            //new Jump($this), //TODO (Unhandled exception?)
             new KickAll($this),
             new Kill($this),
             new More($this),
@@ -173,7 +173,7 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            new TreeCommand($this),
+            //new TreeCommand($this),
             new Unlimited($this),
             new Vanish($this),
             new World($this),
@@ -594,8 +594,7 @@ class Loader extends PluginBase{
         }
         $yaw = $rotation[0];
         $pitch = $rotation[1];
-        $this->setPlayerLastPosition($player, $player->getPosition(), $player->getYaw(), $player->getPitch());
-        $player->setPositionAndRotation($pos, $yaw, $pitch);
+        $player->teleport($pos, $yaw, $pitch);
         return true;
     }
 
@@ -1193,6 +1192,7 @@ class Loader extends PluginBase{
     public function setWarp($warp, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
         $value = "$x,$y,$z,$level,$yaw,$pitch";
         $this->warps->set(strtolower($warp), $value);
+        $this->warps->save();
     }
 
     /**
@@ -1207,6 +1207,7 @@ class Loader extends PluginBase{
             return false;
         }
         $this->warps->remove(strtolower($warp));
+        $this->warps->save();
         return true;
     }
 

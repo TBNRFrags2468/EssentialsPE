@@ -20,6 +20,7 @@ use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\item\Item;
+use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
@@ -319,8 +320,28 @@ class EventHandler implements Listener{
                 if(!$player->hasPermission($perm . "teleport")){
                     $player->sendMessage($message);
                 }else{
-                    $player->setPosition(new Vector3($x = $text[1], $y = $text[2], $z = $text[3]));
+                    $player->teleport(new Vector3($x = $text[1], $y = $text[2], $z = $text[3]));
                     $player->sendMessage(TextFormat::GREEN . "Teleporting to " . TextFormat::AQUA . $x . TextFormat::GREEN . ", " . TextFormat::AQUA . $y . TextFormat::GREEN . ", " . TextFormat::AQUA . $z);
+                }
+            }
+
+            //Warp sign
+            elseif($text[0] === "[Warp]"){
+                $event->setCancelled(true);
+                if(!$player->hasPermission($perm . "warp")){
+                    $player->sendMessage($message);
+                }else{
+                    $warp = $this->plugin->getWarp($text[1]);
+                    if(!$warp){
+                        $player->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
+                        return false;
+                    }
+                    if(!$player->hasPermission("essentials.warps.*") && !$player->hasPermission("essentials.warps.$text[1]")){
+                        $player->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
+                        return false;
+                    }
+                    $player->teleport(new Position($warp[0], $warp[1], $warp[2], $player->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]);
+                    $player->sendMessage(TextFormat::GREEN . "Warping to $text[1]...");
                 }
             }
         }
@@ -374,31 +395,37 @@ class EventHandler implements Listener{
             }
 
             //Gamemode sign
-            if($text[0] === "[Gamemode]" && !$player->hasPermission($perm . "gamemode")){
+            elseif($text[0] === "[Gamemode]" && !$player->hasPermission($perm . "gamemode")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
             //Heal sign
-            if($text[0] === "[Heal]" && !$player->hasPermission($perm . "heal")){
+            elseif($text[0] === "[Heal]" && !$player->hasPermission($perm . "heal")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
             //Repair sign
-            if($text[0] === "[Repair]" && !$player->hasPermission($perm . "repair")){
+            elseif($text[0] === "[Repair]" && !$player->hasPermission($perm . "repair")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
             //Time sign
-            if($text[0] === "[Time]" && !$player->hasPermission($perm . "time")){
+            elseif($text[0] === "[Time]" && !$player->hasPermission($perm . "time")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
             //Teleport sign
-            if($text[0] === "[Teleport]" && !$player->hasPermission($perm . "teleport")){
+            elseif($text[0] === "[Teleport]" && !$player->hasPermission($perm . "teleport")){
+                $event->setCancelled(true);
+                $player->sendMessage($message);
+            }
+
+            //Warp sign
+            elseif($text[0] === "[Warp]" && !$player->hasPermission($perm . "warp")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
@@ -459,15 +486,20 @@ class EventHandler implements Listener{
         elseif(strtolower($event->getLine(0)) === "[gamemode]" && $player->hasPermission($perm . "gamemode")){
             switch(strtolower($event->getLine(1))){
                 case "survival":
+                case "0":
                     $event->setLine(1, "Survival");
                     break;
                 case "creative":
+                case "1":
                     $event->setLine(1, "Creative");
                     break;
                 case "adventure":
+                case "2":
                     $event->setLine(1, "Adventure");
                     break;
                 case "spectator":
+                case "view":
+                case "3":
                     $event->setLine(1, "Spectator");
                     break;
                 default:
@@ -541,6 +573,18 @@ class EventHandler implements Listener{
                 $event->setLine(1, $event->getLine(1));
                 $event->setLine(2, $event->getLine(2));
                 $event->setLine(3, $event->getLine(3));
+            }
+        }
+
+        //Warp sign
+        elseif(strtolower($event->getLine(0)) === "[warp]" && $player->hasPermission($perm . "warp")){
+            $warp = $event->getLine(1);
+            if(!$this->plugin->warpExists($warp)){
+                $player->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
+                $event->setCancelled(true);
+            }else{
+                $player->sendMessage(TextFormat::GREEN . "Warp sign successfully created!");
+                $event->setLine(0, "[Warp]");
             }
         }
         return true;

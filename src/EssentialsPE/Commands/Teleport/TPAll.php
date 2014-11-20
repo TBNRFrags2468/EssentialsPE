@@ -24,8 +24,7 @@ class TPAll extends BaseCommand{
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
-                    $this->getPlugin()->setPlayerLastPosition($p, $p->getPosition(), $p->getYaw(), $p->getPitch());
-                    $p->setPosition($sender->getPosition());
+                    $p->teleport($sender->getPosition());
                     $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
                 }
                 $sender->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
@@ -37,8 +36,7 @@ class TPAll extends BaseCommand{
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
-                    $this->getPlugin()->setPlayerLastPosition($p, $p->getPosition(), $p->getYaw(), $p->getPitch());
-                    $p->setPosition($player->getPosition());
+                    $p->teleport($player->getPosition());
                     $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
                 }
                 $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");

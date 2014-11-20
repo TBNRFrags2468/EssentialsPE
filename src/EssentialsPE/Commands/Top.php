@@ -28,8 +28,7 @@ class Top extends BaseCommand{
         }
         $block = $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ());
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
-        $this->getPlugin()->setPlayerLastPosition($sender, $sender->getPosition(), $sender->getYaw(), $sender->getPitch());
-        $sender->setPosition(new Vector3($sender->getX(), ($block + 1), $sender->getZ()));
+        $sender->teleport(new Vector3($sender->getX(), ($block + 1), $sender->getZ()));
         return true;
     }
 }

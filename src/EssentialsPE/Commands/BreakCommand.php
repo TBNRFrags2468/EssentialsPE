@@ -3,6 +3,7 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
+use pocketmine\block\Air;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
@@ -36,7 +37,9 @@ class BreakCommand extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "You can't break bedrock");
             return false;
         }
-        $sender->getLevel()->useBreakOn(new Vector3($block->getX(), $block->getY(), $block->getZ()));
+        /*$sender->getLevel()->useBreakOn(new Vector3($block->getX(), $block->getY(), $block->getZ()));
+        $sender->getLevel()->useBreakOn($block);*/
+        $sender->getLevel()->setBlock($block, new Air(), true, true);
         return true;
     }
 } 

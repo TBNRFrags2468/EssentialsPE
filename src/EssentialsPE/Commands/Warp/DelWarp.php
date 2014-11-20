@@ -29,7 +29,7 @@ class DelWarp extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You can't delete this warp");
             return false;
         }
-        //$this->getPlugin()->
+        $this->getPlugin()->removeWarp($args[0]);
         $sender->sendMessage(TextFormat::GREEN . "Warp successfully removed!");
         return true;
     }

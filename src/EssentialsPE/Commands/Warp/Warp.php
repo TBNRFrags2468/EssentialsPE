@@ -37,7 +37,7 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
                     return false;
                 }
-                $sender->setPositionAndRotation(new Position($warp[0], $warp[1], $warp[2], $warp[3]), $warp[4], $warp[5]);
+                $sender->teleport(new Position($warp[0], $warp[1], $warp[2], $sender->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]);
                 $sender->sendMessage(TextFormat::GREEN . "Warping to $args[0]...");
                 break;
             case 2:
@@ -50,7 +50,7 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $player->setPositionAndRotation(new Position($warp[0], $warp[1], $warp[2], $warp[3]), $warp[4], $warp[5]);
+                $player->teleport(new Position($warp[0], $warp[1], $warp[2], $sender->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]);
                 $player->sendMessage(TextFormat::GREEN . "Warping to $args[0]...");
                 $sender->sendMessage(TextFormat::GREEN . "Warping $args[1] to $args[0]...");
                 break;
