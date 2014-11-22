@@ -410,6 +410,9 @@ class Loader extends PluginBase{
      */
     public function createSession(Player $player){
         $this->sessions[$player->getName()] = $this->default;
+
+        //Enable Color Chat
+        $player->setRemoveFormat(false);
     }
 
     /**
