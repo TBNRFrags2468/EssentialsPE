@@ -106,6 +106,8 @@ class Loader extends PluginBase{
                     $players->showPlayer($p);
                 }
             }
+            //Sessions
+            $this->removeSession($p);
         }
     }
 
@@ -411,7 +413,7 @@ class Loader extends PluginBase{
     public function createSession(Player $player){
         $this->sessions[$player->getName()] = $this->default;
 
-        //Enable Color Chat
+        //Enable Colored Chat
         $player->setRemoveFormat(false);
     }
 
@@ -422,6 +424,9 @@ class Loader extends PluginBase{
      */
     public function removeSession(Player $player){
         unset($this->sessions[$player->getName()]);
+
+        //Disable Colored Chat
+        $player->setRemoveFormat(true);
     }
 
     /**
