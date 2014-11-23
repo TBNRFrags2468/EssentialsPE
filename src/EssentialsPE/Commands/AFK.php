@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class AFK extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "afk", "Toggle the \"Away From the Keyboard\" status", "/afk [player]", ["away"]);
-        $this->setPermission("essentials.afk.use");
+        $this->setPermission("essentials.afk");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -23,8 +23,8 @@ class AFK extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /afk <player>");
                     return false;
                 }
-                $this->getAPI()->switchAFKMode($sender);
-                if(!$this->getAPI()->isAFK($sender)){
+                $this->getPlugin()->switchAFKMode($sender);
+                if(!$this->getPlugin()->isAFK($sender)){
                     $sender->sendMessage(TextFormat::YELLOW . "You're no longer AFK");
                     $this->broadcastAFKStatus($sender, "is no longer AFK");
                 }else{
@@ -37,13 +37,13 @@ class AFK extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
-                if(!$player instanceof Player){
+                $player = $this->getPlugin()->getPlayer($args[0]);
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $this->getAPI()->switchAFKMode($player);
-                if(!$this->getAPI()->isAFK($player)){
+                $this->getPlugin()->switchAFKMode($player);
+                if(!$this->getPlugin()->isAFK($player)){
                     $player->sendMessage(TextFormat::YELLOW . "You're no longer AFK");
                     $this->broadcastAFKStatus($player, "is no longer AFK");
                 }else{

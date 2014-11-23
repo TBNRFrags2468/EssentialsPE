@@ -4,14 +4,13 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Top extends BaseCommand{
+class Back extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "top", "Teleport to the highest block above you", "/top");
-        $this->setPermission("essentials.top");
+        parent::__construct($plugin, "back", "Teleport to your previous location", "/back", ["return"]);
+        $this->setPermission("essentials.back");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -19,16 +18,18 @@ class Top extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
             return false;
         }
-        if(count($args) != 0){
+        if(count($args) !== 0){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $block = $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ());
-        $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
-        $sender->teleport(new Vector3($sender->getX(), ($block + 1), $sender->getZ()));
+        if(!$this->getPlugin()->returnPlayerToLastKnownPosition($sender)){
+            $sender->sendMessage(TextFormat::RED . "[Error] No previous position available");
+        }else{
+            $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
+        }
         return true;
     }
-}
+} 

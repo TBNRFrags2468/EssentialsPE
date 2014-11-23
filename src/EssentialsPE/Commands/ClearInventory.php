@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class ClearInventory extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", ["ci", "clean", "clearinvent"]);
-        $this->setPermission("essentials.clearinventory.use");
+        $this->setPermission("essentials.clearinventory");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -23,8 +23,9 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /clearinventory <player>");
                     return false;
                 }
-                if($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1|3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1 ? "creative" : "adventure") . " mode");
+                $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+                if($gm === 1 || $gm === 3){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
                 $sender->getInventory()->clearAll();
@@ -35,8 +36,8 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
-                if($player === false){
+                $player = $this->getPlugin()->getPlayer($args[0]);
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }

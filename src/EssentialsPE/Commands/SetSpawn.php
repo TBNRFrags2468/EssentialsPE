@@ -15,6 +15,9 @@ class SetSpawn extends BaseCommand{
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
+        if(!$this->testPermission($sender)){
+            return false;
+        }
         if(!$sender instanceof Player){
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
             return false;

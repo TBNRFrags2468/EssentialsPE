@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class Unlimited extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "unlimited", "Allow you to place unlimited blocks", "/unlimited [player]", ["ul", "unl"]);
-        $this->setPermission("essentials.unlimited.use");
+        $this->setPermission("essentials.unlimited");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -23,20 +23,21 @@ class Unlimited extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /unlimited <player>");
                     return false;
                 }
-                if($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1|3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($sender->getServer()->getGamemodeString($sender->getGamemode()) === 1 ? "creative" : "adventure") . " mode");
+                $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+                if($gm === 1 || $gm === 3){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
-                $this->getAPI()->switchUnlimited($sender);
-                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($sender) ? "enabled!" : "disabled!"));
+                $this->getPlugin()->switchUnlimited($sender);
+                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($sender) ? "enabled!" : "disabled!"));
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.unlimited.other")){
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
-                if($player === false){
+                $player = $this->getPlugin()->getPlayer($args[0]);
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
@@ -44,9 +45,9 @@ class Unlimited extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] $args[0] is in " . ($sender->getServer()->getGamemodeString($player->getGamemode()) === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
-                $this->getAPI()->switchUnlimited($player);
-                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($player) ? "enabled" : "disabled") . " for player $args[0]");
-                $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($player) ? "enabled!" : "disabled!"));
+                $this->getPlugin()->switchUnlimited($player);
+                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled" : "disabled") . " for player $args[0]");
+                $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled!" : "disabled!"));
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());

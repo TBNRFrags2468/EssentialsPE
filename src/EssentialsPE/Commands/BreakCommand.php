@@ -3,15 +3,16 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
+use pocketmine\block\Air;
 use pocketmine\command\CommandSender;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Jump extends BaseCommand{
+class BreakCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", "/jump", ["j", "jumpto"]);
-        $this->setPermission("essentials.jump");
+        parent::__construct($plugin, "break", "Breaks the block you're looking at", "/break");
+        $this->setPermission("essentials.break");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -24,22 +25,21 @@ class Jump extends BaseCommand{
         }
         if(count($args) !== 0){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            return false;
         }
-        $transparent = [];
+        $transparent = [0, 7, 8, 9, 10];
         $block = $sender->getTargetBlock(100, $transparent);
-        while(!$block->isSolid){
-            if($block === null){
-                break;
-            }
-            $transparent[] = $block->getID();
-            $block = $sender->getTargetBlock(100, $transparent);
-        }
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
         }
-        //TODO Check for secure teleport
-        $sender->teleport($block->add(0, 1));
+        if($block->getID() === 7 && !$sender->hasPermission("essentials.break.bedrock")){
+            $sender->sendMessage(TextFormat::RED . "You can't break bedrock");
+            return false;
+        }
+        /*$sender->getLevel()->useBreakOn(new Vector3($block->getX(), $block->getY(), $block->getZ()));
+        $sender->getLevel()->useBreakOn($block);*/
+        $sender->getLevel()->setBlock($block, new Air(), true, true);
         return true;
     }
-}
+} 

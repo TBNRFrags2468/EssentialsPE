@@ -21,8 +21,9 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
             return false;
         }
-        if(($gm = $sender->getServer()->getGamemodeString($sender->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . strtolower($gm) . " mode");
+        $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+        if($gm === 1 || $gm === 3){
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
             return false;
         }
         if(count($args) != 0){
@@ -34,7 +35,7 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "You can't get a stack of AIR");
             return false;
         }
-        $item->setCount(($sender->hasPermission("essentials.oversizedstacks") ? $this->getAPI()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
+        $item->setCount(($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
         return true;
     }
 }

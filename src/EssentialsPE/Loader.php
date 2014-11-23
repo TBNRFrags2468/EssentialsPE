@@ -2,41 +2,52 @@
 namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
-use EssentialsPE\Commands\Broadcast; //Use API
-use EssentialsPE\Commands\Burn; //Use API
-use EssentialsPE\Commands\ClearInventory; //Use API
+use EssentialsPE\Commands\Back;
+use EssentialsPE\Commands\BigTreeCommand;
+use EssentialsPE\Commands\BreakCommand;
+use EssentialsPE\Commands\Broadcast;
+use EssentialsPE\Commands\Burn;
+use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Override\Gamemode;
+use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
-use EssentialsPE\Commands\Extinguish; //Use API
-use EssentialsPE\Commands\GetPos; //Use API
-use EssentialsPE\Commands\God; //Use API
-use EssentialsPE\Commands\Heal; //Use API
-use EssentialsPE\Commands\Invsee;
+use EssentialsPE\Commands\Extinguish;
+use EssentialsPE\Commands\GetPos;
+use EssentialsPE\Commands\God;
+use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
-use EssentialsPE\Commands\Mute; //Use API
+use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
-use EssentialsPE\Commands\Nick; //Use API
-use EssentialsPE\Commands\PowerTool\PowerTool; //Use API
-use EssentialsPE\Commands\PowerTool\PowerToolToggle; //Use API
-use EssentialsPE\Commands\PvP; //Use API
-use EssentialsPE\Commands\RealName; //Use API
+use EssentialsPE\Commands\Nick;
+use EssentialsPE\Commands\Nuke;
+use EssentialsPE\Commands\Override\Kill;
+use EssentialsPE\Commands\PowerTool\PowerTool;
+use EssentialsPE\Commands\PowerTool\PowerToolToggle;
+use EssentialsPE\Commands\PvP;
+use EssentialsPE\Commands\RealName;
 use EssentialsPE\Commands\Repair;
-use EssentialsPE\Commands\RotateHead;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
+use EssentialsPE\Commands\Spawn;
+use EssentialsPE\Commands\Sudo;
+use EssentialsPE\Commands\Suicide;
+use EssentialsPE\Commands\Teleport\TPAll;
+use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
+use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
-use EssentialsPE\Commands\Vanish; //Use API
-use EssentialsPE\Commands\Warps\RemoveWarp; //Use API
-use EssentialsPE\Commands\Warps\SetWarp; //Use API
-use EssentialsPE\Commands\Warps\Warp; //Use API
+use EssentialsPE\Commands\Vanish;
+use EssentialsPE\Commands\Warp\DelWarp;
+use EssentialsPE\Commands\Warp\Setwarp;
+use EssentialsPE\Commands\Warp\Warp;
 use EssentialsPE\Commands\World;
-use EssentialsPE\Events\EventHandler; //Use API
+use EssentialsPE\Events\EventHandler;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
@@ -45,28 +56,35 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Tasks\AFKKickTask;
-use pocketmine\inventory\Inventory;
+use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\math\Vector3;
+use pocketmine\nbt\tag\Byte;
+use pocketmine\nbt\tag\Compound;
+use pocketmine\nbt\tag\Double;
+use pocketmine\nbt\tag\Enum;
+use pocketmine\nbt\tag\Float;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
 use pocketmine\utils\Config;
+use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
-    public $path;
-    /** @var  \SQLite3 */
+    /** @var Config */
     public $warps;
 
     public function onEnable(){
         @mkdir($this->getDataFolder());
         $this->checkConfig();
-        $this->enableConfigs();
+        $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
+        //$this->overrideDefaultCommands();
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){
@@ -88,47 +106,92 @@ class Loader extends PluginBase{
                     $players->showPlayer($p);
                 }
             }
+            //Sessions
+            $this->removeSession($p);
         }
     }
 
+    /**
+     * Function to easily disable commands
+     *
+     * @param array $commands
+     */
+    private function unregisterCommands(array $commands){
+        $commandmap = $this->getServer()->getCommandMap();
+
+        foreach($commands as $commandlabel){
+            $command = $commandmap->getCommand($commandlabel);
+            $command->setLabel($commandlabel . "_disabled");
+            $command->unregister($commandmap);
+        }
+    }
+
+    /**
+     * Function to register all EssentialsPE's commands...
+     * And to override some default ones
+     */
     private function registerCommands(){
-        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
+        //Unregister commands to override
+        $this->unregisterCommands([
+           //"gamemode",
+            "kill"
+        ]);
+
+        //Register the new commands
+        $cmdmap = $this->getServer()->getCommandMap();
+        $cmdmap->registerAll("essentialspe", [
             new AFK($this),
+            new Back($this),
+            //new BigTreeCommand($this),
+            //new BreakCommand($this), //TODO (Unhandled exception?)
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
+            new Depth($this),
             new Essentials($this),
             new Extinguish($this),
+            //new Gamemode($this), //TODO
             new GetPos($this),
             new God($this),
             new Heal($this),
-            new Invsee($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), // TODO
-            new TempBan($this),
+            //new Jump($this), //TODO (Unhandled exception?)
             new KickAll($this),
+            new Kill($this),
             new More($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
-            new PowerTool($this),
-            new PowerToolToggle($this),
+            new Nuke($this),
             new PvP($this),
             new RealName($this),
             new Repair($this),
             new Seen($this),
             new SetSpawn($this),
+            new Spawn($this),
+            new Sudo($this),
+            new Suicide($this),
+            new TempBan($this),
             new Top($this),
+            //new TreeCommand($this),
             new Unlimited($this),
             new Vanish($this),
-            new World($this)
+            new World($this),
 
-            //Wraps
-            //new RemoveWarp($this), // TODO
-            //new SetWarp($this), // TODO
-            //new Warp($this), // TODO
+            //PowerTool
+            new PowerTool($this),
+            new PowerToolToggle($this),
+
+            //Teleport
+            new TPAll($this),
+            new TPHere($this),
+
+            //Warp
+            new DelWarp($this),
+            new Setwarp($this),
+            new Warp($this),
         ]);
     }
 
@@ -139,7 +202,7 @@ class Loader extends PluginBase{
         if(!is_bool($cfg->get("safe-afk"))){
             $cfg->set("safe-afk", true);
         }if(!is_numeric($cfg->get("auto-afk-kick"))){
-            $cfg->set("auto-afk-kick", 5);
+            $cfg->set("auto-afk-kick", 300);
         }
 
         if(!is_numeric($cfg->get("oversized-stacks"))){
@@ -158,13 +221,8 @@ class Loader extends PluginBase{
         $cfg->reload();
     }
 
-    public function enableConfigs(){
-        if(!file_exists($this->getDataFolder() . "warps.db")){
-            $this->warps = new \SQLite3($this->getDataFolder() . "warps.db");
-            $this->warps->exec("CREATE TABLE warps ( name TEXT PRIMARY KEY, x INTEGER, y INTEGER, z INTEGER )");
-        }else{
-            $this->warps = new \SQLite3($this->getDataFolder() . "warps.db", SQLITE3_OPEN_READWRITE);
-        }
+    private function saveConfigs(){
+        $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
     }
 
     /*
@@ -190,14 +248,13 @@ class Loader extends PluginBase{
      */
     public function getPlayer($player){
         $player = strtolower($player);
-        $r = false;
         foreach($this->getServer()->getOnlinePlayers() as $p){
             if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
-                $r = $p;
+                return $p;
                 break;
             }
         }
-        return $r;
+        return false;
     }
 
     /**
@@ -210,14 +267,10 @@ class Loader extends PluginBase{
      */
     public function colorMessage($message, $player = null){
         $search = ["&0","&1","&2","&3","&4","&5","&6","&7","&8","&9","&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
-        $formats = ["§0", "§1", "§2", "§3", "§4", "§5", "§6", "§7", "§8", "§9", "§a", "§b", "§c", "§d", "§e", "§f", "§k", "§l", "§m", "§n", "§o", "§r"];
         foreach($search as $s){
-            $code = substr($s, -1, 1);
-            $message = str_replace($s, "§" . $code, $message);
-        }
-        foreach($formats as $f){
-            $code = $code = substr($f, -1, 1);
-            $message = str_replace("\\" . $f, "&" . $code, $message);
+            $f = str_replace("&", "§", $s);
+            $message = str_replace($s, $f, $message);
+            $message = str_replace("\\" . $f, $s, $message);
         }
         if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
             $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
@@ -286,6 +339,35 @@ class Loader extends PluginBase{
         return $players;
     }
 
+    public function nuke(Player $player){
+        for($x = -10; $x <= 10; $x += 5){
+            for($z = -10; $z <= 10; $z += 5){
+                $pos = new Vector3($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z);
+                $level = $player->getLevel();
+                $mot = (new Random())->nextSignedFloat() * M_PI * 2;
+                $tnt = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
+                    "Pos" => new Enum("Pos", [
+                        new Double("", $pos->x + 0.5),
+                        new Double("", $pos->y),
+                        new Double("", $pos->z + 0.5)
+                    ]),
+                    "Motion" => new Enum("Motion", [
+                        new Double("", -sin($mot) * 0.02),
+                        new Double("", 0.2),
+                        new Double("", -cos($mot) * 0.02)
+                    ]),
+                    "Rotation" => new Enum("Rotation", [
+                        new Float("", 0),
+                        new Float("", 0)
+                    ]),
+                    "Fuse" => new Byte("Fuse", 80),
+                ]));
+                $tnt->namedtag->setName("EssNuke");
+                $tnt->spawnToAll();
+            }
+        }
+    }
+
     /**   _____              _
      *   / ____|            (_)
      *  | (___   ___ ___ ___ _  ___  _ __  ___
@@ -304,6 +386,10 @@ class Loader extends PluginBase{
             "mode" => false,
             "kick-taskID" => false,
             "auto-taskID" => false,
+        ],
+        "back" => [
+            "position" => false,
+            "rotation" => false,
         ],
         "god" => false,
         "invsee" => [
@@ -326,6 +412,9 @@ class Loader extends PluginBase{
      */
     public function createSession(Player $player){
         $this->sessions[$player->getName()] = $this->default;
+
+        //Enable Colored Chat
+        $player->setRemoveFormat(false);
     }
 
     /**
@@ -335,6 +424,9 @@ class Loader extends PluginBase{
      */
     public function removeSession(Player $player){
         unset($this->sessions[$player->getName()]);
+
+        //Disable Colored Chat
+        $player->setRemoveFormat(true);
     }
 
     /**
@@ -455,6 +547,65 @@ class Loader extends PluginBase{
         return $this->sessions[$player->getName()]["afk"]["kick-taskID"];
     }
 
+    /**  ____             _
+     *  |  _ \           | |
+     *  | |_) | __ _  ___| | __
+     *  |  _ < / _` |/ __| |/ /
+     *  | |_) | (_| | (__|   <
+     *  |____/ \__,_|\___|_|\_\
+     */
+
+    /**
+     * @param Player $player
+     * @return bool|Position
+     */
+    public function getLastPlayerPosition(Player $player){
+        $session = $this->sessions[$player->getName()]["back"]["position"];
+        if(!isset($session) || $session === false){
+            return false;
+        }
+        return $session;
+    }
+
+    /**
+     * @param Player $player
+     * @return bool|array
+     */
+    public function getLastPlayerRotation(Player $player){
+        $session = $this->sessions[$player->getName()]["back"]["rotation"];
+        if(!isset($session) || $session === false){
+            return false;
+        }
+        return $session;
+    }
+
+    /**
+     * @param Player $player
+     * @param Position $pos
+     * @param $yaw
+     * @param $pitch
+     */
+    public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
+        $this->sessions[$player->getName()]["back"]["position"] = $pos;
+        $this->sessions[$player->getName()]["back"]["rotation"] = [$yaw, $pitch];
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public function returnPlayerToLastKnownPosition(Player $player){
+        $pos = $this->getLastPlayerPosition($player);
+        $rotation = $this->getLastPlayerRotation($player);
+        if(!$pos instanceof Position || !is_array($rotation)){
+            return false;
+        }
+        $yaw = $rotation[0];
+        $pitch = $rotation[1];
+        $player->teleport($pos, $yaw, $pitch);
+        return true;
+    }
+
     /**   _____           _
      *   / ____|         | |
      *  | |  __  ___   __| |
@@ -504,155 +655,6 @@ class Loader extends PluginBase{
      */
     public function isGod(Player $player){
         return $this->getSession($player, "god");
-    }
-
-    /**  _    _
-     *  | |  | |
-     *  | |__| | ___  _ __ ___   ___
-     *  |  __  |/ _ \| '_ ` _ \ / _ \
-     *  | |  | | (_) | | | | | |  __/
-     *  |_|  |_|\___/|_| |_| |_|\___|
-     */
-
-    /**
-     * Sets a new home location or modify it if the home exists
-     *
-     * @param Player $player
-     * @param string $home_name
-     * @return bool
-     */
-    public function setHome(Player $player, $home_name){
-        $config = new Config($this->getDataFolder() . $player->getName() . ".yml");
-        if(!$config->exists($home_name)){
-            if(!$player->hasPermission("essentials.home." . ($this->countHomes($player) + 1))){
-                $player->sendMessage("You may only have ".$this->countHomes($player)." homes.");
-                return true;
-            }
-            $pos = array();
-            $pos["x"] = $player->getX();
-            $pos["y"] = $player->getY();
-            $pos["z"] = $player->getZ();
-            $pos["yaw"] = $player->yaw;
-            $pos["pitch"] = $player->pitch;
-            $pos["level"] = $player->getLevel()->getName();
-            $config->set($home_name, $pos);
-        }
-        return true;
-    }
-
-    /**
-     * Teleport to the selected home
-     *
-     * @param Player $player
-     * @param string $home_name
-     * @return bool
-     */
-    public function homeTp(Player $player, $home_name){
-        $config = new Config($this->getDataFolder() . strtolower($player->getName()) . ".yml");
-        if(!$config->exists(strtolower($home_name))){
-            return false;
-        }
-        $home = $config->get(strtolower($home_name));
-        if($player->getLevel()->getName() != $home["level"]){
-            $player->setLevel($home["level"]);
-        }
-        $player->teleport(new Vector3($home["x"], $home["y"], $home["z"]), $home["yaw"], $home["pitch"]);
-        return true;
-    }
-
-    /**
-     * Count the number of homes that a player has
-     *
-     * @param Player $player
-     * @return int
-     */
-    public function countHomes(Player $player){
-        $config = new Config($this->getDataFolder() . $player->getName() . ".yml");
-        return count($config->getAll());
-    }
-
-    /**  _____
-     *  |_   _|
-     *    | |  _ ____   _____  ___  ___
-     *    | | | '_ \ \ / / __|/ _ \/ _ \
-     *   _| |_| | | \ V /\__ |  __|  __/
-     *  |_____|_| |_|\_/ |___/\___|\___|
-     */
-
-    /**
-     * Return the original player inventory
-     *
-     * @param Player $player
-     * @return \pocketmine\inventory\PlayerInventory
-     */
-    public function getPlayerOriginalInventory(Player $player){
-        $inv = $this->sessions[$player->getName()]["invsee"]["user"]["inv"];
-        return (isset($inv) ? $inv : $player->getInventory());
-    }
-
-    /**
-     * Return the original owner of the inventory that $player is watching
-     *
-     * @param Player $player
-     * @return bool|Player
-     */
-    public function getInventoryOwner(Player $player){
-        if($this->isPlayerWatchingOtherInventory($player)){
-            return $this->getPlayer($this->sessions[$player->getName()]["invsee"]["other"]["name"]);
-        }
-        return false;
-    }
-
-    /**
-     * Change player's inventory window
-     *
-     * @param Player $player
-     * @param Player $other
-     */
-    public function setPlayerInventory(Player $player, Player $other){
-        $i = $player->getInventory();
-        $o = $other->getInventory();
-        $this->sessions[$player->getName()]["invsee"]["user"]["inv"] = $i->getContents();
-        $this->sessions[$player->getName()]["invsee"]["user"]["armor"] = $i->getArmorContents();
-        $this->sessions[$player->getName()]["invsee"]["other"]["name"] = $other->getName();
-        $this->sessions[$player->getName()]["invsee"]["other"]["inv"] = $o->getContents();
-        $this->sessions[$player->getName()]["invsee"]["other"]["armor"] = $o->getArmorContents();
-        $i->setContents($o->getContents());
-        $i->setArmorContents($o->getArmorContents());
-    }
-
-    /**
-     * Restore the original player inventory
-     *
-     * @param Player $player
-     */
-    public function restorePlayerInventory(Player $player){
-        if($this->isPlayerWatchingOtherInventory($player)){
-            $player->getInventory()->setContents($this->sessions[$player->getName()]["invsee"]["user"]["inv"]);
-            $player->getInventory()->setArmorContents($this->sessions[$player->getName()]["invsee"]["user"]["armor"]);
-        }
-        $this->sessions[$player->getName()]["invsee"]["user"] = null;
-        $this->sessions[$player->getName()]["invsee"]["other"] = false;
-    }
-
-    /**
-     * Tell if the player is watching other player's inventory
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isPlayerWatchingOtherInventory(Player $player){
-        return ($this->sessions[$player->getName()]["invsee"]["other"] === false ? false : true);
-    }
-
-    public function isOtherWatchingPlayerInventory(Player $player){
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            if(($s = $this->sessions[$p->getName()]["invsee"]["other"]) !== false && $s["name"] === $player->getName()){
-                return $p;
-                break;
-            }
-        }
-        return false;
     }
 
     /**  __  __       _
@@ -1023,124 +1025,6 @@ class Loader extends PluginBase{
         return $this->getSession($player, "pvp");
     }
 
-    /** __          __
-     *  \ \        / /
-     *   \ \  /\  / __ _ _ __ _ __
-     *    \ \/  \/ / _` | '__| '_ \
-     *     \  /\  | (_| | |  | |_) |
-     *      \/  \/ \__,_|_|  | .__/
-     *                       | |
-     *                       |_|
-     */
-
-    /**
-     * Set's a new Warp or modify the position if already exists
-     * it use Player to handle the position, but may change later
-     *
-     * @param Player $player
-     * @param string $name
-     */
-    public function setWarp(Player $player, $name){
-        if(!$this->warpExist($name)){
-            $prepare = $this->warps->prepare("INSERT INTO warps (name, x, y, z) VALUES (:name, :x, :y, :z)");
-            $prepare->bindValue(":name", $name, SQLITE3_TEXT);
-            $prepare->bindValue(":x", $player->getX(), SQLITE3_INTEGER);
-            $prepare->bindValue(":y", $player->getY(), SQLITE3_INTEGER);
-            $prepare->bindValue(":z", $player->getZ(), SQLITE3_INTEGER);
-            $prepare->execute();
-        }elseif($player->hasPermission("essentials.warps")){
-            $prepare = $this->warps->prepare("UPDATE warps SET x = :x, y = :y, z = :z WHERE name = :name");
-            $prepare->bindValue(":name", $name);
-            $prepare->bindValue(":x", $player->getX());
-            $prepare->bindValue(":y", $player->getY());
-            $prepare->bindValue(":z", $player->getZ());
-            $prepare->execute();
-        }
-    }
-
-    /**
-     * Remove a Warp if exists
-     *
-     * @param string $name
-     */
-    public function removeWarp($name){
-        $prepare = $this->warps->prepare("DELETE FROM players WHERE name = :name");
-        $prepare->bindValue(":name", $name);
-        $prepare->execute();
-    }
-
-    /**
-     * Return warp information
-     *
-     * @param $name
-     * @return array|bool
-     */
-    public function getWarp($name){
-        $prepare = $this->warps->prepare("SELECT * FROM players WHERE name = :name");
-        $prepare->bindValue(":name", $name);
-        $result = $prepare->execute();
-
-        if($result instanceof \SQLite3Result){
-            $data = $result->fetchArray(SQLITE3_ASSOC);
-            $result->finalize();
-            if(isset($data["name"]) && $data["name"] === $name){
-                unset($data["name"]);
-                $prepare->close();
-                return $data;
-            }
-        }
-
-        $prepare->close();
-        return false;
-    }
-
-    /**
-     * Tell if a warp exists
-     *
-     * @param $name
-     * @return bool
-     */
-    public function warpExist($name){
-        return $this->getWarp($name) !== false;
-    }
-
-    /**
-     * Teleport a player to a Warp
-     *
-     * @param Player $player
-     * @param string $name
-     * @return bool
-     */
-    public function warpPlayer(Player $player, $name){
-        if(($warp = $this->getWarp($name)) !== false){
-            $player->teleport(new Vector3($warp["x"], $warp["y"], $warp["z"]));
-            return true;
-        }
-        return false;
-    }
-
-    /**
-     * Return a list with all the available warps
-     *
-     * @return array|bool
-     */
-    public function warpList(){
-        $prepare = $this->warps->prepare("SELECT * FROM warps");
-        $result = $prepare->execute();
-
-        if($result instanceof \SQLite3Result){
-            $data = $result->fetchArray(SQLITE3_ASSOC);
-            $result->finalize();
-            $r = [];
-            foreach($data as $name => $array){
-                unset($array);
-                $r[] = $name;
-            }
-            return $r;
-        }
-        return false;
-    }
-
     /**  _    _       _ _           _ _           _   _____ _
      *  | |  | |     | (_)         (_| |         | | |_   _| |
      *  | |  | |_ __ | |_ _ __ ___  _| |_ ___  __| |   | | | |_ ___ _ __ ___  ___
@@ -1266,5 +1150,88 @@ class Loader extends PluginBase{
                 $p->hidePlayer($p);
             }
         }
+    }
+
+    /** __          __
+     *  \ \        / /
+     *   \ \  /\  / __ _ _ __ _ __
+     *    \ \/  \/ / _` | '__| '_ \
+     *     \  /\  | (_| | |  | |_) |
+     *      \/  \/ \__,_|_|  | .__/
+     *                       | |
+     *                       |_|
+     */
+
+    /**
+     * Tell if a warp exists
+     *
+     * @param $warp
+     * @return bool
+     */
+    public function warpExists($warp){
+        return ($this->warps->exists(strtolower($warp)) ? true : false);
+    }
+
+    /**
+     * Get an array with all the warp information
+     * If the function returns "false", it means that the warp doesn't exists
+     *
+     * @param $warp
+     * @return array
+     */
+    public function getWarp($warp){
+        if(!$this->warpExists(strtolower($warp))){
+            return false;
+        }
+        return explode(",", $this->warps->get(strtolower($warp)));
+    }
+
+    /**
+     * Create a warp or override its position
+     *
+     * @param $warp
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param $level
+     * @param int $yaw
+     * @param int $pitch
+     */
+    public function setWarp($warp, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
+        $value = "$x,$y,$z,$level,$yaw,$pitch";
+        $this->warps->set(strtolower($warp), $value);
+        $this->warps->save();
+    }
+
+    /**
+     * Removes a warp!
+     * If the function return "false", it means that the warp doesn't exists
+     *
+     * @param $warp
+     * @return bool
+     */
+    public function removeWarp($warp){
+        if(!$this->warpExists($warp)){
+            return false;
+        }
+        $this->warps->remove(strtolower($warp));
+        $this->warps->save();
+        return true;
+    }
+
+    /**
+     * Return a list of all the available warps
+     *
+     * @param bool $inArray Tell if return the list inside an array or a string
+     * @return array|string
+     */
+    public function warpList($inArray = false){
+        $list = $this->warps->getAll(true);
+        if(!$inArray){
+            $string = wordwrap(implode(", ", $list), 30, "\n", true);
+            $string = substr($string, -3);
+            return $string;
+        }
+        return $list;
     }
 }

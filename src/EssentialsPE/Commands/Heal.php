@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 class Heal extends BaseCommand{
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "heal", "Heal yourself or other player", "/heal [player]");
-        $this->setPermission("essentials.heal.use");
+        $this->setPermission("essentials.heal");
     }
 
     public function execute(CommandSender $sender, $alias, array $args){
@@ -31,8 +31,8 @@ class Heal extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getAPI()->getPlayer($args[0]);
-                if($player === false){
+                $player = $this->getPlugin()->getPlayer($args[0]);
+                if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
