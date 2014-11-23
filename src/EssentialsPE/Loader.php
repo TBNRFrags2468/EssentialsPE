@@ -75,6 +75,9 @@ use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
+    /** @var  Config */
+    public  $homes;
+
     /** @var Config */
     public $warps;
 
@@ -222,6 +225,7 @@ class Loader extends PluginBase{
     }
 
     private function saveConfigs(){
+        $this->homes = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
         $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
     }
 
@@ -655,6 +659,42 @@ class Loader extends PluginBase{
      */
     public function isGod(Player $player){
         return $this->getSession($player, "god");
+    }
+
+    /**  _    _
+     *  | |  | |
+     *  | |__| | ___  _ __ ___   ___ ___
+     *  |  __  |/ _ \| '_ ` _ \ / _ / __|
+     *  | |  | | (_) | | | | | |  __\__ \
+     *  |_|  |_|\___/|_| |_| |_|\___|___/
+     */
+
+
+    public function getHome(Player $player, $home){
+        //TODO
+    }
+
+    public function setHome(Player $player, $home, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
+        //TODO
+
+        //Idea:
+        //Each home will be separated with a ";", and the home info with a ","
+    }
+
+    public function removeHome(Player $player, $home){
+        //TODO
+    }
+
+    public function homesList($inArray = false){
+        //TODO
+
+        /*$list = $this->homes->getAll(true);
+        if(!$inArray){
+            $string = wordwrap(implode(", ", $list), 30, "\n", true);
+            $string = substr($string, -3);
+            return $string;
+        }
+        return $list;*/
     }
 
     /**  __  __       _
