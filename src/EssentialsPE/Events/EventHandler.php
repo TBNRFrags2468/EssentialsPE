@@ -11,6 +11,7 @@ use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
+use pocketmine\event\player\PlayerBedEnterEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
@@ -157,6 +158,16 @@ class EventHandler implements Listener{
         $target = $event->getTarget();
         if($entity instanceof Player){
             $this->plugin->switchLevelVanish($entity, $origin, $target);
+        }
+    }
+
+    /**
+     * @param PlayerBedEnterEvent $event
+     */
+    public function onPlayerSleep(PlayerBedEnterEvent $event){
+        $player = $event->getPlayer();
+        if($player->hasPermission("essentials.home.bed")){
+            $this->plugin->setHome($player, "bed", $player->getFloorX(), $player->getFloorY(), $player->getFloorZ(), $player->getLevel()->getName());
         }
     }
 

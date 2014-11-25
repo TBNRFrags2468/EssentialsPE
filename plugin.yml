@@ -62,6 +62,9 @@ permissions:
             essentials.compass:
                 default: true
                 description: "Display your current bearing direction"
+            essentials.delhome:
+                default: true
+                description: "Remove one of your homes"
             essentials.delwarp:
                 default: op
                 description: "Remove a warp"
@@ -125,6 +128,13 @@ permissions:
                     essentials.heal.other:
                         default: op
                         description: "Heal other players"
+            essentials.home:
+                default: true
+                description: "Get to your home!"
+                children:
+                    essentials.home.bed:
+                        default: true
+                        description: "Set a home where you last sleep"
             essentials.item:
                 default: op
                 description: "Gives yourself an item"
@@ -213,6 +223,9 @@ permissions:
             essentials.seen:
                 default: op
                 description: "Check player's last online time"
+            essentials.sethome:
+                default: true
+                description: "Create/update a home"
             essentials.setspawn:
                 default: op
                 description: "Change your server's general spawn"

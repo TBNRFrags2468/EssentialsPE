@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class DelWarp extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "delwarp", "Delete a warp", "/delwarp <name>", ["remwarp", "closewarp"]);
+        parent::__construct($plugin, "delwarp", "Delete a warp", "/delwarp <name>", ["remwarp", "removewarp", "closewarp"]);
         $this->setPermission("essentials.delwarp");
     }
 

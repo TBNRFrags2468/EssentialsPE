@@ -9,6 +9,10 @@ use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Home\DelHome;
+use EssentialsPE\Commands\Home\Home;
+use EssentialsPE\Commands\Home\SetHome;
+use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
@@ -18,7 +22,6 @@ use EssentialsPE\Commands\God;
 use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
-use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute;
@@ -145,8 +148,8 @@ class Loader extends PluginBase{
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
             new Back($this),
-            //new BigTreeCommand($this),
-            //new BreakCommand($this), //TODO (Unhandled exception?)
+            //new BigTreeCommand($this), //TODO
+            //new BreakCommand($this), //TODO
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -160,7 +163,7 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), //TODO (Unhandled exception?)
+            //new Jump($this), //TODO
             new KickAll($this),
             new Kill($this),
             new More($this),
@@ -178,10 +181,15 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            //new TreeCommand($this),
+            //new TreeCommand($this), //TODO
             new Unlimited($this),
             new Vanish($this),
             new World($this),
+
+            //Home
+            //new DelHome($this), //TODO
+            //new Home($this), //TODO
+            //new SetHome($this), //TODO
 
             //PowerTool
             new PowerTool($this),
@@ -247,7 +255,7 @@ class Loader extends PluginBase{
     /**
      * Let you search for a player using his Display name(Nick) or Real name
      *
-     * @param $player
+     * @param string $player
      * @return bool|Player
      */
     public function getPlayer($player){
@@ -343,6 +351,11 @@ class Loader extends PluginBase{
         return $players;
     }
 
+    /**
+     * Spawn a carpet of bomb!
+     *
+     * @param Player $player
+     */
     public function nuke(Player $player){
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
@@ -422,7 +435,7 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Removes a player's session (if active and available)
+     * Remove player's session (if active and available)
      *
      * @param Player $player
      */
@@ -437,7 +450,7 @@ class Loader extends PluginBase{
      * Modify the value of a session key (See "Mute" for example)
      *
      * @param Player $player
-     * @param $key
+     * @param string $key
      * @param $value
      * @return bool
      */
@@ -453,7 +466,7 @@ class Loader extends PluginBase{
      * Return the value of a session key
      *
      * @param Player $player
-     * @param $key
+     * @param string $key
      * @return bool
      */
     public function getSession(Player $player, $key){
@@ -586,8 +599,8 @@ class Loader extends PluginBase{
     /**
      * @param Player $player
      * @param Position $pos
-     * @param $yaw
-     * @param $pitch
+     * @param int $yaw
+     * @param int $pitch
      */
     public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
         $this->sessions[$player->getName()]["back"]["position"] = $pos;
@@ -669,32 +682,125 @@ class Loader extends PluginBase{
      *  |_|  |_|\___/|_| |_| |_|\___|___/
      */
 
+    /**
+     * Tell is a player have a specific home by its name
+     *
+     * @param Player $player
+     * @param string $home
+     * @return bool
+     */
+    public function homeExists(Player $player, $home){
+        $list = $this->homes->get($player->getName());
+        if(!$list){
+            return false;
+        }
+        $list = explode(";", $list);
+        foreach($list as $h){
+            $h = explode(",", $h);
+            if($h[0] === strtolower($home)){
+                return true;
+                break;
+            }
+        }
+        return false;
+    }
 
+    /**
+     * Return the home information (Position and Rotation)
+     *
+     * @param Player $player
+     * @param string $home
+     * @return bool
+     */
     public function getHome(Player $player, $home){
-        //TODO
+        if(!$this->homeExists($player, $home)){
+            return false;
+        }
+        $list = explode(";", $this->homes->get($player->getName()));
+        foreach($list as $h){
+            $h = explode(",", $h);
+            if($h[0] === strtolower($home)){
+                unset($h[0]);
+                $home = $h;
+                break;
+            }
+        }
+        return $home;
     }
 
+    /**
+     * Create or update a home
+     *
+     * @param Player $player
+     * @param string $home
+     * @param $x
+     * @param $y
+     * @param $z
+     * @param string $level
+     * @param int $yaw
+     * @param int $pitch
+     */
     public function setHome(Player $player, $home, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
-        //TODO
-
-        //Idea:
-        //Each home will be separated with a ";", and the home info with a ","
+        $homestring = "$home,$x,$y,$z,$level,$yaw,$pitch";
+        if($this->homeExists($player, $home)){
+            $homes = explode(";", $this->homes->get($player->getName()));
+            foreach($homes as $h){
+                $name = explode(",", $h);
+                if($name[0] === strtolower($home)){
+                    unset($homes[$h]);
+                    break;
+                }
+            }
+        }
+        $this->homes->set($player->getName(), ($this->homes->get($player->getName() === false ? "" : $this->homes->get($player->getName())) . ";" ) . $homestring);
+        $this->homes->save();
     }
 
+    /**
+     * Removes a home
+     *
+     * @param Player $player
+     * @param string $home
+     */
     public function removeHome(Player $player, $home){
-        //TODO
+        if($this->homeExists($player, $home)){
+            $homes = explode(";", $this->homes->get($player->getName()));
+            foreach($homes as $h){
+                $name = explode(",", $h);
+                if($name[0] === strtolower($home)){
+                    unset($homes[$h]);
+                    break;
+                }
+            }
+            $this->homes->set($player->getName(), implode(";", $homes));
+            $this->homes->save();
+        }
     }
 
-    public function homesList($inArray = false){
-        //TODO
-
-        /*$list = $this->homes->getAll(true);
+    /**
+     * Return a list of all the available homes of a certain player
+     *
+     * @param Player $player
+     * @param bool $inArray
+     * @return array|bool|string
+     */
+    public function homesList(Player $player, $inArray = false){
+        $list = $this->homes->get($player->getName());
+        if(!$list){
+            return false;
+        }
+        $homes = explode(";", $list);
+        $list = [];
+        foreach($homes as $home){
+            $home = explode(",", $home);
+            $list[] = $home[0];
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
             $string = substr($string, -3);
             return $string;
         }
-        return $list;*/
+        return $list;
     }
 
     /**  __  __       _
@@ -1205,7 +1311,7 @@ class Loader extends PluginBase{
     /**
      * Tell if a warp exists
      *
-     * @param $warp
+     * @param string $warp
      * @return bool
      */
     public function warpExists($warp){
@@ -1216,7 +1322,7 @@ class Loader extends PluginBase{
      * Get an array with all the warp information
      * If the function returns "false", it means that the warp doesn't exists
      *
-     * @param $warp
+     * @param string $warp
      * @return array
      */
     public function getWarp($warp){
@@ -1229,11 +1335,11 @@ class Loader extends PluginBase{
     /**
      * Create a warp or override its position
      *
-     * @param $warp
+     * @param string $warp
      * @param $x
      * @param $y
      * @param $z
-     * @param $level
+     * @param string $level
      * @param int $yaw
      * @param int $pitch
      */
@@ -1247,7 +1353,7 @@ class Loader extends PluginBase{
      * Removes a warp!
      * If the function return "false", it means that the warp doesn't exists
      *
-     * @param $warp
+     * @param string $warp
      * @return bool
      */
     public function removeWarp($warp){
@@ -1262,11 +1368,14 @@ class Loader extends PluginBase{
     /**
      * Return a list of all the available warps
      *
-     * @param bool $inArray Tell if return the list inside an array or a string
-     * @return array|string
+     * @param bool $inArray
+     * @return array|bool|string
      */
     public function warpList($inArray = false){
         $list = $this->warps->getAll(true);
+        if(!$list){
+            return false;
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
             $string = substr($string, -3);
