@@ -1,5 +1,5 @@
 <?php
-namespace EssentialsPE\Events;
+namespace EssentialsPE;
 
 use EssentialsPE\Loader;
 use pocketmine\event\block\BlockBreakEvent;

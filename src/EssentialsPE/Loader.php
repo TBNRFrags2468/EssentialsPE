@@ -50,7 +50,6 @@ use EssentialsPE\Commands\Warp\DelWarp;
 use EssentialsPE\Commands\Warp\Setwarp;
 use EssentialsPE\Commands\Warp\Warp;
 use EssentialsPE\Commands\World;
-use EssentialsPE\Events\EventHandler;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
@@ -1377,8 +1376,9 @@ class Loader extends PluginBase{
             return false;
         }
         if(!$inArray){
+            $count = count($list) - 2;
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, -3);
+            $string = substr($string, 0, $count);
             return $string;
         }
         return $list;
