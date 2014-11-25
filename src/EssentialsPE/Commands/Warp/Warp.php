@@ -19,18 +19,18 @@ class Warp extends BaseCommand{
             return false;
         }
         if($alias === "warps"){
-            $message = TextFormat::AQUA . "Available warps:\n" . $this->getPlugin()->warpList(false);
-            return $message;
+            $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $this->getPlugin()->warpList(false));
+            return true;
         }
         $warp = $this->getPlugin()->getWarp($args[0]);
+        if(!$warp){
+            $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
+            return false;
+        }
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
                     $sender->sendMessage(TextFormat::RED . "Usage: /warp <name> [player]");
-                    return false;
-                }
-                if(!$warp){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
                     return false;
                 }
                 if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps.$args[0]")){
@@ -41,18 +41,14 @@ class Warp extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Warping to $args[0]...");
                 break;
             case 2:
-                if(!$warp){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
-                    return false;
-                }
                 $player = $this->getPlugin()->getPlayer($args[1]);
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
                 $player->teleport(new Position($warp[0], $warp[1], $warp[2], $sender->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]);
-                $player->sendMessage(TextFormat::GREEN . "Warping to $args[0]...");
-                $sender->sendMessage(TextFormat::GREEN . "Warping $args[1] to $args[0]...");
+                $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
+                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $args[1] . TextFormat::GREEN . " to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /warp <name> <player>"));
