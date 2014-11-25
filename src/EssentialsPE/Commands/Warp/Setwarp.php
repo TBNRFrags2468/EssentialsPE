@@ -25,12 +25,13 @@ class Setwarp extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        if($this->getPlugin()->warpExists($args[0]) && !$sender->hasPermission("essentials.warp.override.*") && !$sender->hasPermission("essentials.warp.override.$args[0]")){
+        $existed = $this->getPlugin()->warpExists($args[0]);
+        if($existed && !$sender->hasPermission("essentials.warp.override.*") && !$sender->hasPermission("essentials.warp.override.$args[0]")){
             $sender->sendMessage(TextFormat::RED . "[Error] You can't modify this warp position");
             return false;
         }
-        $sender->sendMessage(TextFormat::GREEN . "Warp successfully " . ($this->getPlugin()->warpExists($args[0]) ? "updated!" : "created!"));
         $this->getPlugin()->setWarp($args[0], $sender->getX(), $sender->getY(), $sender->getZ(), $sender->getLevel()->getName(), $sender->getYaw(), $sender->getPitch());
+        $sender->sendMessage(TextFormat::GREEN . "Warp successfully " . ($existed ? "updated!" : "created!"));
         return true;
     }
 } 

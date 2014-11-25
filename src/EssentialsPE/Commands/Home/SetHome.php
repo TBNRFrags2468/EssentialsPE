@@ -25,7 +25,13 @@ class SetHome extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-
+        if(strtolower($args[0]) === "bed"){
+            $sender->sendMessage($sender->hasPermission("essentials.home.bed") ? "[Error] You can only set a \"bed\" home by sleeping on one" : "[Error] You don't have permissions to do this");
+            return false;
+        }
+        $existed = $this->getPlugin()->homeExists($sender, $args[0]);
+        $this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getX(), $sender->getY(), $sender->getZ(), $sender->getLevel()->getName(), $sender->getYaw(), $sender->getPitch());
+        $sender->sendMessage(TextFormat::GREEN . "Home successfuly " . ($existed ? "updated" : "created"));
         return true;
     }
 } 
