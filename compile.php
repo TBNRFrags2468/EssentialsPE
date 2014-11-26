@@ -19,7 +19,7 @@ startTiming("addFiles");
 addDir($phar, "src/", "src");
 addDir($phar, "resources/", "resources");
 $phar->addFile("plugin.yml", "plugin.yml");
-echo "\nDone adding files! (" . stopTiming("addFiles") . "s)\n";
+echo "Done adding files! (" . stopTiming("addFiles") . "s)\n";
 
 echo "Compressing... ";
 startTiming("compressPhar");
