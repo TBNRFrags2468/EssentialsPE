@@ -429,8 +429,8 @@ class Loader extends PluginBase{
     public function createSession(Player $player){
         $this->sessions[$player->getName()] = $this->default;
 
-        //Enable Colored Chat
-        $player->setRemoveFormat(false);
+        //Enable Colored Chat (Temp disabled)
+        //$player->setRemoveFormat(false);
     }
 
     /**
@@ -441,8 +441,8 @@ class Loader extends PluginBase{
     public function removeSession(Player $player){
         unset($this->sessions[$player->getName()]);
 
-        //Disable Colored Chat
-        $player->setRemoveFormat(true);
+        //Disable Colored Chat (Temp Disabled)
+        //$player->setRemoveFormat(true);
     }
 
     /**
