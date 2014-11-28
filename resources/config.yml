@@ -14,3 +14,6 @@ oversized-stacks: 64
 near-radius-limit: 200
 # Let you set a default value to search for players (it can't be higher than the default limit)
 near-default-radius: 200
+
+# This option let you enable color codes in the server, but keep in mind that the client may not support them
+enable-custom-colors: false

@@ -227,6 +227,10 @@ class Loader extends PluginBase{
             $cfg->set("near-default-radius", $rl);
         }
 
+        if(!is_bool($cfg->get("enable-custom-colors"))){
+            $cfg->set("enable-custom-colors", false);
+        }
+
         $cfg->save();
         $cfg->reload();
     }
