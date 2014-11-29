@@ -209,7 +209,7 @@ class Loader extends PluginBase{
         $this->saveDefaultConfig();
         $cfg = $this->getConfig();
 
-        if(!is_bool($cfg->get("safe-afk"))){
+        if(!$cfg->exists("safe-afk") || !is_bool($cfg->get("safe-afk"))){
             $cfg->set("safe-afk", true);
         }if(!is_numeric($cfg->get("auto-afk-kick"))){
             $cfg->set("auto-afk-kick", 300);
@@ -227,7 +227,7 @@ class Loader extends PluginBase{
             $cfg->set("near-default-radius", $rl);
         }
 
-        if(!is_bool($cfg->get("enable-custom-colors"))){
+        if(!$cfg->exists("enable-custom-colors") || !is_bool($cfg->get("enable-custom-colors"))){
             $cfg->set("enable-custom-colors", false);
         }
 
@@ -433,8 +433,10 @@ class Loader extends PluginBase{
     public function createSession(Player $player){
         $this->sessions[$player->getName()] = $this->default;
 
-        //Enable Colored Chat (Temp disabled)
-        //$player->setRemoveFormat(false);
+        //Enable Custom Colored Chat
+        if($this->getConfig()->get("enable-custom-colors") === true){
+            $player->setRemoveFormat(false);
+        }
     }
 
     /**
@@ -445,8 +447,10 @@ class Loader extends PluginBase{
     public function removeSession(Player $player){
         unset($this->sessions[$player->getName()]);
 
-        //Disable Colored Chat (Temp Disabled)
-        //$player->setRemoveFormat(true);
+        //Disable Custom Colored Chat
+        if($this->getConfig()->get("enable-custom-colors") === true){
+            $player->setRemoveFormat(true);
+        }
     }
 
     /**

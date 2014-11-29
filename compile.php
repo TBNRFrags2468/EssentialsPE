@@ -6,7 +6,7 @@ echo "Creating $pharName...\n";
 startTiming("makePhar");
 
 if(is_file($pharName)){
-	unlink($pharName);
+	unlink($pharName); // "Warning: unlink(build/EssentialsPE.phar): Permission denied in plugins\EssentialsPE\compile.php on line 9"
 }
 
 $phar = new Phar($pharName);
@@ -19,6 +19,7 @@ startTiming("addFiles");
 addDir($phar, "src/", "src");
 addDir($phar, "resources/", "resources");
 $phar->addFile("plugin.yml", "plugin.yml");
+$phar->addFile("LICENSE", "LICENSE");
 echo "Done adding files! (" . stopTiming("addFiles") . "s)\n";
 
 echo "Compressing... ";
@@ -58,7 +59,7 @@ function startTiming($key){
 }
 function stopTiming($key){
 	global $timings;
-	$timings[$key] += microtime(true);
+	$timings[$key] += microtime(true); // Notice: Undefined index: process in plugins\EssentialsPE\compile.php on line 62
 	$ret = $timings[$key];
 	unset($timings[$key]);
 	return $ret;
