@@ -746,7 +746,7 @@ class Loader extends PluginBase{
                 break;
             }
         }
-        return $home;
+        return [new Position($home[0], $home[1], $home[2], $this->getServer()->getLevelByName($home[3])), $home[4], $home[5]];
     }
 
     /**
@@ -754,15 +754,12 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param string $home
-     * @param $x
-     * @param $y
-     * @param $z
-     * @param string $level
+     * @param Position $pos
      * @param int $yaw
      * @param int $pitch
      */
-    public function setHome(Player $player, $home, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
-        $homestring = "$home,$x,$y,$z,$level,$yaw,$pitch";
+    public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
+        $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         if($this->homeExists($player, $home)){
             $homes = explode(";", $this->homes->get($player->getName()));
             foreach($homes as $h){
@@ -1350,22 +1347,20 @@ class Loader extends PluginBase{
         if(!$this->warpExists(strtolower($warp))){
             return false;
         }
-        return explode(",", $this->warps->get(strtolower($warp)));
+        $warp = explode(",", $this->warps->get(strtolower($warp)));
+        return [new Position($warp[0], $warp[1], $warp[2], $this->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]];
     }
 
     /**
      * Create a warp or override its position
      *
      * @param string $warp
-     * @param $x
-     * @param $y
-     * @param $z
-     * @param string $level
+     * @param Position $pos
      * @param int $yaw
      * @param int $pitch
      */
-    public function setWarp($warp, $x, $y, $z, $level, $yaw = 0, $pitch = 0){
-        $value = "$x,$y,$z,$level,$yaw,$pitch";
+    public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
+        $value = $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         $this->warps->set(strtolower($warp), $value);
         $this->warps->save();
     }

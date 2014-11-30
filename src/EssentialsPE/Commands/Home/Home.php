@@ -35,7 +35,7 @@ class Home extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists");
             return false;
         }
-        $sender->teleport(new Position($home[0], $home[1], $home[2], $sender->getServer()->getLevelByName($home[3])), $home[4], $home[5]);
+        $sender->teleport($home[0], $home[1], $home[2]);
         $sender->sendMessage(TextFormat::GREEN . "Teleporting to home " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
         return true;
     }

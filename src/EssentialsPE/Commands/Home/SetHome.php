@@ -30,7 +30,7 @@ class SetHome extends BaseCommand{
             return false;
         }
         $existed = $this->getPlugin()->homeExists($sender, $args[0]);
-        $this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getX(), $sender->getY(), $sender->getZ(), $sender->getLevel()->getName(), $sender->getYaw(), $sender->getPitch());
+        $this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getPosition(), $sender->getYaw(), $sender->getPitch());
         $sender->sendMessage(TextFormat::GREEN . "Home successfuly " . ($existed ? "updated" : "created"));
         return true;
     }
