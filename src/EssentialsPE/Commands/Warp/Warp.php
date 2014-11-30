@@ -19,15 +19,7 @@ class Warp extends BaseCommand{
             return false;
         }
         if($alias === "warps"){
-            $list = $this->getPlugin()->warpList(true);
-            foreach($list as $warp){
-                if(!$sender->hasPermission("essentials.warps." . strtolower($warp))){
-                    unset($list[$warp]);
-                }
-            }
-            $count = count($list) - 2;
-            $list = wordwrap(implode(", ", $list), 30, "\n", true);
-            $list = substr($list, 0, $count);
+            $list = $this->getPlugin()->warpList(false);
             $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $list);
             return true;
         }

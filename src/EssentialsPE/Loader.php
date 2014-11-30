@@ -188,9 +188,9 @@ class Loader extends PluginBase{
             new World($this),
 
             //Home
-            //new DelHome($this), //TODO
-            //new Home($this), //TODO
-            //new SetHome($this), //TODO
+            new DelHome($this),
+            new Home($this),
+            new SetHome($this),
 
             //PowerTool
             new PowerTool($this),
@@ -730,7 +730,7 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param string $home
-     * @return bool
+     * @return bool|array
      */
     public function getHome(Player $player, $home){
         if(!$this->homeExists($player, $home)){
@@ -745,7 +745,7 @@ class Loader extends PluginBase{
                 break;
             }
         }
-        return [new Position($home[0], $home[1], $home[2], $player->getServer()->getLevelByName($home[3])), $home[4], $home[5]];
+        return [new Position($home[1], $home[2], $home[3], $player->getServer()->getLevelByName($home[4])), $home[5], $home[6]];
     }
 
     /**
@@ -769,7 +769,7 @@ class Loader extends PluginBase{
                 }
             }
         }
-        $this->homes->set($player->getName(), ($this->homes->get($player->getName() === false ? "" : $this->homes->get($player->getName())) . ";" ) . $homestring);
+        $this->homes->set($player->getName(), ($this->homes->get($player->getName()) === false ? "" : $this->homes->get($player->getName()) . ";" ) . $homestring);
         $this->homes->save();
     }
 
@@ -814,7 +814,7 @@ class Loader extends PluginBase{
         }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, -3);
+            $string = substr($string, 0);
             return $string;
         }
         return $list;
@@ -1344,7 +1344,7 @@ class Loader extends PluginBase{
      * If the function returns "false", it means that the warp doesn't exists
      *
      * @param string $warp
-     * @return array
+     * @return bool|array
      */
     public function getWarp($warp){
         if(!$this->warpExists(strtolower($warp))){
@@ -1396,9 +1396,8 @@ class Loader extends PluginBase{
             return false;
         }
         if(!$inArray){
-            $count = count($list) - 2;
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0, $count);
+            $string = substr($string, 0);
             return $string;
         }
         return $list;

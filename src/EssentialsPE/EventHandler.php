@@ -1,7 +1,6 @@
 <?php
 namespace EssentialsPE;
 
-use EssentialsPE\Loader;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
@@ -359,7 +358,7 @@ class EventHandler implements Listener{
                         $player->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
                         return false;
                     }
-                    $player->teleport(new Position($warp[0], $warp[1], $warp[2], $player->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]);
+                    $player->teleport($warp[0], $warp[1], $warp[2]);
                     $player->sendMessage(TextFormat::GREEN . "Warping to $text[1]...");
                 }
             }

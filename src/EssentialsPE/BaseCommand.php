@@ -6,7 +6,7 @@ use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\event\Listener;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand, Listener{
-    /** @var \EssentialsPE\Loader  */
+    /** @var Loader  */
     private $plugin;
 
     public function __construct(Loader $plugin, $name, $description = "", $usageMessage = null, array $aliases = []){
