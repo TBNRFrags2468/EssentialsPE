@@ -77,7 +77,7 @@ use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
-    /** @var  Config */
+    /** @var Config */
     public  $homes;
 
     /** @var Config */
