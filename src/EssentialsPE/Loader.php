@@ -1314,7 +1314,7 @@ class Loader extends PluginBase{
                 $p->showPlayer($player);
             }
             foreach($target->getPlayers() as $p){
-                $p->hidePlayer($p);
+                $p->hidePlayer($player);
             }
         }
     }
