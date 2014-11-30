@@ -209,26 +209,40 @@ class Loader extends PluginBase{
         $this->saveDefaultConfig();
         $cfg = $this->getConfig();
 
-        if(!$cfg->exists("safe-afk") || !is_bool($cfg->get("safe-afk"))){
-            $cfg->set("safe-afk", true);
-        }if(!is_numeric($cfg->get("auto-afk-kick"))){
-            $cfg->set("auto-afk-kick", 300);
+        $booleans = ["safe-afk", "enable-custom-colors"];
+        foreach($booleans as $key){
+            if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
+                switch($key){
+                    // Properties to auto set true
+                    case "safe-afk":
+                        $cfg->set($key, false);
+                        break;
+                    // Properties to auto set false
+                    case "enable-custom-colors":
+                        $cfg->set($key, true);
+                        break;
+                }
+            }
         }
 
-        if(!is_numeric($cfg->get("oversized-stacks"))){
-            $cfg->set("oversized-stacks", 64);
-        }
-
-        if(!is_numeric($rl = $cfg->get("near-radius-limit"))){
-            $cfg->set("near-radius-limit", 200);
-        }if(!is_numeric($dr = $cfg->get("near-default-radius"))){
-            $cfg->set("near-default-radius", 100);
-        }if($dr > $rl){
-            $cfg->set("near-default-radius", $rl);
-        }
-
-        if(!$cfg->exists("enable-custom-colors") || !is_bool($cfg->get("enable-custom-colors"))){
-            $cfg->set("enable-custom-colors", false);
+        $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
+        foreach($booleans as $key){
+            if(!is_numeric($cfg->get($key))){
+                switch($key){
+                    case "auto-afk-kick":
+                        $cfg->set($key, 300);
+                        break;
+                    case "oversized-stacks":
+                        $cfg->set($key, 64);
+                        break;
+                    case "near-radius-limit":
+                        $cfg->set($key, 200);
+                        break;
+                    case "near-default-radius":
+                        $cfg->set($key, 100);
+                        break;
+                }
+            }
         }
 
         $cfg->save();
