@@ -205,7 +205,7 @@ class Loader extends PluginBase{
         ]);
     }
 
-    public function checkConfig(){
+    private function checkConfig(){
         $this->saveDefaultConfig();
         $cfg = $this->getConfig();
 
@@ -215,11 +215,11 @@ class Loader extends PluginBase{
                 switch($key){
                     // Properties to auto set true
                     case "safe-afk":
-                        $cfg->set($key, false);
+                        $cfg->set($key, true);
                         break;
                     // Properties to auto set false
                     case "enable-custom-colors":
-                        $cfg->set($key, true);
+                        $cfg->set($key, false);
                         break;
                 }
             }
