@@ -16,6 +16,7 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
+use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -28,7 +29,7 @@ use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
 class EventHandler implements Listener{
-    /** @var \EssentialsPE\Loader  */
+    /** @var Loader */
     public $plugin;
 
     public function __construct(Loader $plugin){
@@ -50,14 +51,21 @@ class EventHandler implements Listener{
     }
 
     /**
+     * @param PlayerLoginEvent $event
+     */
+    public function onPlayerLogin(PlayerLoginEvent $event){
+        $player = $event->getPlayer();
+        //Session configure:
+        $this->plugin->muteSessionCreate($player);
+        $this->plugin->createSession($player);
+    }
+
+    /**
      * @param PlayerJoinEvent $event
      */
     public function onPlayerJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer();
 
-        //Session configure:
-        $this->plugin->muteSessionCreate($player);
-        $this->plugin->createSession($player);
         //Nick and NameTag set:
         $event->setJoinMessage($player->getDisplayName() . " joined the game");
         //Hide vanished players

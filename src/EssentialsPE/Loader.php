@@ -57,6 +57,7 @@ use EssentialsPE\Events\PlayerNickChangeEvent;
 use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
+use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFKKickTask;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
@@ -75,6 +76,7 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
+use raklib\server\Session;
 
 class Loader extends PluginBase{
     /** @var Config */
@@ -426,10 +428,6 @@ class Loader extends PluginBase{
             "rotation" => false,
         ],
         "god" => false,
-        "invsee" => [
-            "user" => null,
-            "other" => false
-        ],
         "powertool" => [
             "commands" => false,
             "chat-macro" => false,
@@ -445,7 +443,8 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function createSession(Player $player){
-        $this->sessions[$player->getName()] = $this->default;
+        $player->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $this->default));
+        $this->sessions[$player->getName()] = $ev->getValues();
 
         //Enable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -518,17 +517,17 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->getAFKMode();
         $this->sessions[$player->getName()]["afk"]["mode"] = $state;
         if($state === false && ($id = $this->getAFKAutoKickTaskID($player)) !== false){
-            $this->getServer()->getScheduler()->cancelTask($id);
+            $player->getServer()->getScheduler()->cancelTask($id);
             $this->sessions[$player->getName()]["afk"]["kick-taskID"] = false;
         }elseif($state === true && ($time = $this->getAFKAutoKickTime()) >= 0 && !$player->hasPermission("essentials.afk.kickexempt")){
-            $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
+            $task = $player->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->setAFKAutoKickTaskID($player, $task->getTaskId());
         }
         return true;
@@ -663,7 +662,7 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerGodModeChangeEvent($this, $player, $state));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerGodModeChangeEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
@@ -746,7 +745,7 @@ class Loader extends PluginBase{
                 break;
             }
         }
-        return [new Position($home[0], $home[1], $home[2], $this->getServer()->getLevelByName($home[3])), $home[4], $home[5]];
+        return [new Position($home[0], $home[1], $home[2], $player->getServer()->getLevelByName($home[3])), $home[4], $home[5]];
     }
 
     /**
@@ -854,7 +853,7 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerMuteEvent($this, $player, $state));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerMuteEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
@@ -903,7 +902,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setNick(Player $player, $nick, $save = true){
-        $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $nick));
+        $player->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $nick));
         if($event->isCancelled()){
             return false;
         }
@@ -926,7 +925,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function removeNick(Player $player, $save = true){
-        $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $player->getName()));
+        $player->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $player->getName()));
         if($event->isCancelled()){
             return false;
         }
@@ -993,15 +992,15 @@ class Loader extends PluginBase{
         }
         if($command !== false){
             if(!is_array($command)){
-                $this->getServer()->dispatchCommand($player, $command);
+                $player->getServer()->dispatchCommand($player, $command);
             }else{
                 foreach($command as $c){
-                    $this->getServer()->dispatchCommand($player, $c);
+                    $player->getServer()->dispatchCommand($player, $c);
                 }
             }
         }
         if($chat = $this->getPowerToolItemChatMacro($player, $item) !== false){
-            $this->getServer()->broadcast("<" . $player->getDisplayName() . "> " . TextFormat::RESET . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
+            $player->getServer()->broadcast("<" . $player->getDisplayName() . "> " . TextFormat::RESET . $this->getPowerToolItemChatMacro($player, $item), Server::BROADCAST_CHANNEL_USERS);
         }
         if($command === false && $chat === false){
             return false;
@@ -1157,7 +1156,7 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerPvPModeChangeEvent($this, $player, $state));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerPvPModeChangeEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
@@ -1208,7 +1207,7 @@ class Loader extends PluginBase{
         if(!is_bool($mode)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerUnlimitedModeChangeEvent($this, $player, $mode));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerUnlimitedModeChangeEvent($this, $player, $mode));
         if($ev->isCancelled()){
             return false;
         }
@@ -1255,19 +1254,23 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
+        $player->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->willVanish();
         $this->setSession($player, "vanish", $state);
         if($state === false){
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                $p->showPlayer($player);
+            foreach($player->getServer()->getOnlinePlayers() as $p){
+                if($p->getName() !== $player->getName()){
+                    $p->showPlayer($player);
+                }
             }
         }else{
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                $p->hidePlayer($player);
+            foreach($player->getServer()->getOnlinePlayers() as $p){
+                if($p->getName() !== $player->getName()){
+                    $p->hidePlayer($player);
+                }
             }
         }
         return true;

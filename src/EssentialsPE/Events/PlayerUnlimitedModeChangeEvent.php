@@ -9,9 +9,7 @@ use pocketmine\Player;
 class PlayerUnlimitedModeChangeEvent extends PluginEvent implements Cancellable{
     public static $handlerList = null;
 
-    /**
-     * @var \pocketmine\Player
-     */
+    /** @var Player  */
     protected $player;
     /** @var bool  */
     protected $isEnabled;

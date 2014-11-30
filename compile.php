@@ -3,10 +3,11 @@
 $pharName = "build/EssentialsPE.phar";
 
 echo "Creating $pharName...\n";
+startTiming("process");
 startTiming("makePhar");
 
 if(is_file($pharName)){
-	unlink($pharName); // "Warning: unlink(build/EssentialsPE.phar): Permission denied in plugins\EssentialsPE\compile.php on line 9"
+	unlink($pharName);
 }
 
 $phar = new Phar($pharName);
@@ -20,27 +21,23 @@ addDir($phar, "src/", "src");
 addDir($phar, "resources/", "resources");
 $phar->addFile("plugin.yml", "plugin.yml");
 $phar->addFile("LICENSE", "LICENSE");
-echo "Done adding files! (" . stopTiming("addFiles") . "s)\n";
+echo "Done adding files! (" . stopTiming("addFiles") . " s)\n";
 
 echo "Compressing... ";
 startTiming("compressPhar");
 $phar->compressFiles(\Phar::GZ);
-echo "Done! (" . stopTiming("compressPhar") . "s)\n";
+echo "Done! (" . stopTiming("compressPhar") . " s)\n";
 
 $phar->stopBuffering();
-echo "Phar creation completed! (" . stopTiming("makePhar") . "s)\n";
+echo "Phar creation completed! (" . stopTiming("makePhar") . " s)\n";
 
 echo "Staging phar to Git index... ";
 startTiming("stagePhar");
 exec("git add $pharName");
-echo "Done! (" . stopTiming("stagePhar") . "s)\n";
+echo "Done! (" . stopTiming("stagePhar") . " s)\n";
 
-if(is_file("export_dont_stage.php")){
-	include "export_dont_stage.php";
-}
-
-echo "Phar export process completed! (" . stopTiming("process") . "s)\n";
-exec("pause");
+echo "Phar export process completed! (" . stopTiming("process") . " s)";
+exec("exit");
 
 function addDir(\Phar $phar, $rel, $dir){
 	$dirCanon = rtrim(str_replace("\\", "/", realpath($dir)), "/\\");
@@ -59,7 +56,7 @@ function startTiming($key){
 }
 function stopTiming($key){
 	global $timings;
-	$timings[$key] += microtime(true); // Notice: Undefined index: process in plugins\EssentialsPE\compile.php on line 62
+	$timings[$key] += microtime(true);
 	$ret = $timings[$key];
 	unset($timings[$key]);
 	return $ret;

@@ -9,7 +9,7 @@ use pocketmine\Player;
 class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
     public static $handlerList = null;
 
-    /** @var \pocketmine\Player  */
+    /** @var Player  */
     protected $player;
     /** @var bool  */
     protected $isEnabled;

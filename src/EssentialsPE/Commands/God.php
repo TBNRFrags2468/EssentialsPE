@@ -24,7 +24,7 @@ class God extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->switchGodMode($sender);
-                $sender->sendMessage(TextFormat::AQUA . "God mode " . $this->getPlugin()->isGod($sender) ? "enabled!" : "disabled");
+                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($sender) ? "enabled!" : "disabled"));
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.god.other")){
@@ -38,7 +38,7 @@ class God extends BaseCommand{
                 }
                 $this->getPlugin()->switchGodMode($player);
                 $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled" : "disabled") . "for $args[0]");
-                $player->sendMessage(TextFormat::AQUA . "God mode " . $this->getPlugin()->isGod($player) ? "enabled!" : "disabled");
+                $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled!" : "disabled"));
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /god <player>");
