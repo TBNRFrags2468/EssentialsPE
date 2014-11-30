@@ -91,7 +91,6 @@ class Loader extends PluginBase{
         $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
-        //$this->overrideDefaultCommands();
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){

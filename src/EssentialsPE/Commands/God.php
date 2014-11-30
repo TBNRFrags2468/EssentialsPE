@@ -37,7 +37,7 @@ class God extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->switchGodMode($player);
-                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled" : "disabled") . "for $args[0]");
+                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled" : "disabled") . " for $args[0]");
                 $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled!" : "disabled"));
                 break;
             default:
