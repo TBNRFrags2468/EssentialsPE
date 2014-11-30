@@ -139,7 +139,7 @@ class Loader extends PluginBase{
     private function registerCommands(){
         //Unregister commands to override
         $this->unregisterCommands([
-           //"gamemode",
+           "gamemode",
             "kill"
         ]);
 
@@ -157,7 +157,7 @@ class Loader extends PluginBase{
             new Depth($this),
             new Essentials($this),
             new Extinguish($this),
-            //new Gamemode($this), //TODO
+            new Gamemode($this),
             new GetPos($this),
             new God($this),
             new Heal($this),

@@ -40,11 +40,11 @@ class Nick extends BaseCommand{
                 $nickname = $args[0];
                 if($nickname === "off"){
                     $this->getPlugin()->removeNick($player, true);
-                    $sender->sendMessage(TextFormat::GREEN . "$args[1]'" . (substr($args[1], -1, 1) === "s" ? "" : "s") . " nick has been disabled");
+                    $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick has been disabled");
                     $player->sendMessage(TextFormat::GREEN . "Your nick has been disabled");
                 }else{
                     $this->getPlugin()->setNick($player, $nickname, true);
-                    $sender->sendMessage(TextFormat::GREEN . "$args[1]'" . (substr($args[1], -1, 1) === "s" ? "" : "s") . " nick is now " . TextFormat::RED . $nickname);
+                    $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick is now " . TextFormat::RED . $nickname);
                     $player->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . $nickname);
                 }
                 break;
