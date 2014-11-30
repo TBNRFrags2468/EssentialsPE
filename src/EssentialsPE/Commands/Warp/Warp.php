@@ -19,8 +19,7 @@ class Warp extends BaseCommand{
             return false;
         }
         if($alias === "warps"){
-            $list = $this->getPlugin()->warpList(false);
-            $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $list);
+            $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $this->getPlugin()->warpList(false));
             return true;
         }
         $warp = $this->getPlugin()->getWarp($args[0]);
