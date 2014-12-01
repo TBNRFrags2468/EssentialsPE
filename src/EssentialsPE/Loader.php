@@ -760,10 +760,10 @@ class Loader extends PluginBase{
         $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         if($this->homeExists($player, $home)){
             $homes = explode(";", $this->homes->get($player->getName()));
-            foreach($homes as $h){
+            foreach($homes as $k => $h){
                 $name = explode(",", $h);
                 if($name[0] === strtolower($home)){
-                    unset($homes[$h]);
+                    array_splice($homes, $k, 1);
                     break;
                 }
             }
