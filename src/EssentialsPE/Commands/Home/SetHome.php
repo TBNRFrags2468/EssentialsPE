@@ -26,7 +26,7 @@ class SetHome extends BaseCommand{
             return false;
         }
         if(strtolower($args[0]) === "bed"){
-            $sender->sendMessage($sender->hasPermission("essentials.home.bed") ? "[Error] You can only set a \"bed\" home by sleeping on one" : "[Error] You don't have permissions to do this");
+            $sender->sendMessage($sender->hasPermission("essentials.home.bed") ? "[Error] You can only set a \"bed\" home by sleeping in a bed" : "[Error] You don't have permission to do this");
             return false;
         }
         $existed = $this->getPlugin()->homeExists($sender, $args[0]);
