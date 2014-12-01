@@ -26,7 +26,7 @@ class DelHome extends BaseCommand{
             return false;
         }
         if(!$this->getPlugin()->homeExists($sender, $args[0])){
-            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists");
+            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exist");
             return false;
         }
         $this->getPlugin()->removeHome($sender, $args[0]);
