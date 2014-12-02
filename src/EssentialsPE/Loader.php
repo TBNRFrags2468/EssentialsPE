@@ -76,7 +76,6 @@ use pocketmine\Server;
 use pocketmine\utils\Config;
 use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
-use raklib\server\Session;
 
 class Loader extends PluginBase{
     /** @var Config */
