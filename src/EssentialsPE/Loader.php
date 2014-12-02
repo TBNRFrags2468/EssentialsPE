@@ -759,18 +759,14 @@ class Loader extends PluginBase{
         if($home === null || $home === "" || $home === " "){
             return;
         }
-        $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
+        $homestring = strtolower($home) . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         if($this->homeExists($player, $home)){
-            $homes = explode(";", $this->homes->get($player->getName()));
-            foreach($homes as $k => $h){
-                $name = explode(",", $h);
-                if($name[0] === strtolower($home)){
-                    array_splice($homes, $k, 1);
-                    break;
-                }
-            }
+            $this->removeHome($player, $home);
         }
-        $this->homes->set($player->getName(), ($this->homes->get($player->getName()) === false ? "" : $this->homes->get($player->getName()) . ";" ) . $homestring);
+        if(($homes = $this->homes->get($player->getName())) !== false && $homes !== ""){
+            $homestring = ";" . $homestring;
+        }
+        $this->homes->set($player->getName(), $homestring);
         $this->homes->save();
     }
 
@@ -815,7 +811,6 @@ class Loader extends PluginBase{
         }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;
@@ -1401,7 +1396,6 @@ class Loader extends PluginBase{
         }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;
