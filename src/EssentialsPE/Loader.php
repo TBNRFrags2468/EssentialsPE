@@ -756,7 +756,7 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        if($home === null){
+        if($home === null || $home === "" || $home === " "){
             return;
         }
         $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
@@ -1364,6 +1364,9 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
+        if($warp === null || $warp === "" || $warp === " "){
+            return;
+        }
         $value = $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         $this->warps->set(strtolower($warp), $value);
         $this->warps->save();
