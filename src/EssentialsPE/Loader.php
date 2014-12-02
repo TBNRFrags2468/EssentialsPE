@@ -488,7 +488,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function getSession(Player $player, $key){
-        if(!(isset($this->sessions[$player->getName()]) || isset($this->sessions[$player->getName()][$key]))){
+        if(!isset($this->sessions[$player->getName()]) or !isset($this->sessions[$player->getName()][$key])){
             return false;
         }
         return $this->sessions[$player->getName()][$key];
