@@ -787,6 +787,9 @@ class Loader extends PluginBase{
                 }
             }
             $this->homes->set($player->getName(), implode(";", $homes));
+            if(($homes = $this->homes->get($player->getName())) === "" || $homes === null || $homes === " "){
+                $this->homes->remove($player->getName());
+            }
             $this->homes->save();
         }
     }
@@ -808,6 +811,9 @@ class Loader extends PluginBase{
         foreach($homes as $home){
             $home = explode(",", $home);
             $list[] = $home[0];
+        }
+        if($list === []){
+            return false;
         }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
@@ -1392,6 +1398,9 @@ class Loader extends PluginBase{
     public function warpList($inArray = false){
         $list = $this->warps->getAll(true);
         if(!$list){
+            return false;
+        }
+        if($list === []){
             return false;
         }
         if(!$inArray){
