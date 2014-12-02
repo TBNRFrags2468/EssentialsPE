@@ -756,6 +756,9 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
+        if($home === null){
+            return;
+        }
         $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         if($this->homeExists($player, $home)){
             $homes = explode(";", $this->homes->get($player->getName()));
