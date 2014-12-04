@@ -23,11 +23,11 @@ class Kill extends BaseCommand{
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);
-        if(!$player){
+        if(!($player instanceof Player)){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, 1000));
+        $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($player, EntityDamageEvent::CAUSE_SUICIDE, 1000));
         if($ev->isCancelled()){
             return true;
         }
