@@ -4,7 +4,6 @@ namespace EssentialsPE\Tasks;
 use EssentialsPE\Loader;
 use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
-use pocketmine\utils\TextFormat;
 
 class AFKKickTask extends PluginTask{
     /** @var \pocketmine\Player  */

@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 

@@ -3,23 +3,19 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
-use EssentialsPE\Commands\BigTreeCommand;
-use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
-use EssentialsPE\Commands\Home\DelHome;
-use EssentialsPE\Commands\Home\Home;
-use EssentialsPE\Commands\Home\SetHome;
-use EssentialsPE\Commands\Jump;
-use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
 use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God;
 use EssentialsPE\Commands\Heal;
+use EssentialsPE\Commands\Home\DelHome;
+use EssentialsPE\Commands\Home\Home;
+use EssentialsPE\Commands\Home\SetHome;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\KickAll;
@@ -28,6 +24,7 @@ use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
+use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
@@ -43,7 +40,6 @@ use EssentialsPE\Commands\Teleport\TPAll;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
-use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -205,7 +201,7 @@ class Loader extends PluginBase{
         ]);
     }
 
-    private function checkConfig(){
+    public function checkConfig(){
         $this->saveDefaultConfig();
         $cfg = $this->getConfig();
 
@@ -226,7 +222,7 @@ class Loader extends PluginBase{
         }
 
         $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
-        foreach($booleans as $key){
+        foreach($numerics as $key){
             if(!is_numeric($cfg->get($key))){
                 switch($key){
                     case "auto-afk-kick":
