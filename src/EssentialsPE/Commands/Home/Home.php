@@ -22,13 +22,17 @@ class Home extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please use this command in-game");
             return false;
         }
-        if($alias === "homes"){
-            $sender->sendMessage(TextFormat::AQUA . "Available homes:\n" . $this->getPlugin()->homesList($sender));
-            return true;
-        }
-        if(count($args) !== 1){
+        if(count($args) > 1){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
+        }
+        if($alias === "homes" || count($args) === 0){
+            if(($list = $this->getPlugin()->homesList($sender, false)) === false){
+                $sender->sendMessage(TextFormat::AQUA . "You don't have any home yet");
+                return false;
+            }
+            $sender->sendMessage(TextFormat::AQUA . "Available homes:\n" . $list);
+            return true;
         }
         $home = $this->getPlugin()->getHome($sender, $args[0]);
         if(!$home){

@@ -473,7 +473,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setSession(Player $player, $key, $value){
-        if(!isset($this->sessions[$player->getName()]) || !isset($this->sessions[$player->getName()][$key])){
+        if(!isset($this->sessions[$player->getName()])){
             return false;
         }
         $this->sessions[$player->getName()][$key] = $value;
@@ -756,18 +756,17 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
-        if($this->homeExists($player, $home)){
-            $homes = explode(";", $this->homes->get($player->getName()));
-            foreach($homes as $k => $h){
-                $name = explode(",", $h);
-                if($name[0] === strtolower($home)){
-                    array_splice($homes, $k, 1);
-                    break;
-                }
-            }
+        if($home === null || $home === "" || $home === " "){
+            return;
         }
-        $this->homes->set($player->getName(), ($this->homes->get($player->getName()) === false ? "" : $this->homes->get($player->getName()) . ";" ) . $homestring);
+        $homestring = strtolower($home) . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
+        if($this->homeExists($player, $home)){
+            $this->removeHome($player, $home);
+        }
+        if(($homes = $this->homes->get($player->getName())) !== false && $homes !== ""){
+            $homestring = ";" . $homestring;
+        }
+        $this->homes->set($player->getName(), $homestring);
         $this->homes->save();
     }
 
@@ -788,6 +787,9 @@ class Loader extends PluginBase{
                 }
             }
             $this->homes->set($player->getName(), implode(";", $homes));
+            if(($homes = $this->homes->get($player->getName())) === "" || $homes === null || $homes === " "){
+                $this->homes->remove($player->getName());
+            }
             $this->homes->save();
         }
     }
@@ -810,9 +812,11 @@ class Loader extends PluginBase{
             $home = explode(",", $home);
             $list[] = $home[0];
         }
+        if($list === []){
+            return false;
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;
@@ -1361,6 +1365,9 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
+        if($warp === null || $warp === "" || $warp === " "){
+            return;
+        }
         $value = $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         $this->warps->set(strtolower($warp), $value);
         $this->warps->save();
@@ -1393,9 +1400,11 @@ class Loader extends PluginBase{
         if(!$list){
             return false;
         }
+        if($list === []){
+            return false;
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;
