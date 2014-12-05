@@ -3,23 +3,19 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
-use EssentialsPE\Commands\BigTreeCommand;
-use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
-use EssentialsPE\Commands\Home\DelHome;
-use EssentialsPE\Commands\Home\Home;
-use EssentialsPE\Commands\Home\SetHome;
-use EssentialsPE\Commands\Jump;
-use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Depth;
 use EssentialsPE\Commands\Essentials;
 use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God;
 use EssentialsPE\Commands\Heal;
+use EssentialsPE\Commands\Home\DelHome;
+use EssentialsPE\Commands\Home\Home;
+use EssentialsPE\Commands\Home\SetHome;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\KickAll;
@@ -28,6 +24,7 @@ use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
+use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
@@ -43,7 +40,6 @@ use EssentialsPE\Commands\Teleport\TPAll;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
-use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -205,7 +201,7 @@ class Loader extends PluginBase{
         ]);
     }
 
-    private function checkConfig(){
+    public function checkConfig(){
         $this->saveDefaultConfig();
         $cfg = $this->getConfig();
 
@@ -226,7 +222,7 @@ class Loader extends PluginBase{
         }
 
         $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
-        foreach($booleans as $key){
+        foreach($numerics as $key){
             if(!is_numeric($cfg->get($key))){
                 switch($key){
                     case "auto-afk-kick":
@@ -419,18 +415,28 @@ class Loader extends PluginBase{
         "afk" => [
             "mode" => false,
             "kick-taskID" => false,
-            "auto-taskID" => false,
+            "auto-taskID" => false
         ],
         "back" => [
             "position" => false,
-            "rotation" => false,
+            "rotation" => false
         ],
         "god" => false,
         "powertool" => [
             "commands" => false,
-            "chat-macro" => false,
+            "chat-macro" => false
         ],
         "pvp" => false,
+        "tprequests" => [
+            "request_to" => [
+                "player" => false,
+                "action" => false,
+            ],
+            "request_from" => [
+                "player" => false,
+                "action" => false
+            ]
+        ],
         "unlimited" => false,
         "vanish" => false
     ];
@@ -473,7 +479,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setSession(Player $player, $key, $value){
-        if(!(isset($this->sessions[$player->getName()]) || isset($this->sessions[$player->getName()][$key]))){
+        if(!isset($this->sessions[$player->getName()])){
             return false;
         }
         $this->sessions[$player->getName()][$key] = $value;
@@ -488,7 +494,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function getSession(Player $player, $key){
-        if(!isset($this->sessions[$player->getName()]) or !isset($this->sessions[$player->getName()][$key])){
+        if(!isset($this->sessions[$player->getName()]) || !isset($this->sessions[$player->getName()][$key])){
             return false;
         }
         return $this->sessions[$player->getName()][$key];
@@ -756,18 +762,17 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        $homestring = $home . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
-        if($this->homeExists($player, $home)){
-            $homes = explode(";", $this->homes->get($player->getName()));
-            foreach($homes as $k => $h){
-                $name = explode(",", $h);
-                if($name[0] === strtolower($home)){
-                    array_splice($homes, $k, 1);
-                    break;
-                }
-            }
+        if($home === null || $home === "" || $home === " "){
+            return;
         }
-        $this->homes->set($player->getName(), ($this->homes->get($player->getName()) === false ? "" : $this->homes->get($player->getName()) . ";" ) . $homestring);
+        $homestring = strtolower($home) . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
+        if($this->homeExists($player, $home)){
+            $this->removeHome($player, $home);
+        }
+        if(($homes = $this->homes->get($player->getName())) !== false && $homes !== ""){
+            $homestring = ";" . $homestring;
+        }
+        $this->homes->set($player->getName(), $homestring);
         $this->homes->save();
     }
 
@@ -788,6 +793,9 @@ class Loader extends PluginBase{
                 }
             }
             $this->homes->set($player->getName(), implode(";", $homes));
+            if(($homes = $this->homes->get($player->getName())) === "" || $homes === null || $homes === " "){
+                $this->homes->remove($player->getName());
+            }
             $this->homes->save();
         }
     }
@@ -810,9 +818,11 @@ class Loader extends PluginBase{
             $home = explode(",", $home);
             $list[] = $home[0];
         }
+        if($list === []){
+            return false;
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;
@@ -1186,6 +1196,35 @@ class Loader extends PluginBase{
         return $this->getSession($player, "pvp");
     }
 
+    /**  _______ _____  _____                           _
+     *  |__   __|  __ \|  __ \                         | |
+     *     | |  | |__) | |__) |___  __ _ _   _  ___ ___| |_ ___
+     *     | |  |  ___/|  _  // _ \/ _` | | | |/ _ / __| __/ __|
+     *     | |  | |    | | \ |  __| (_| | |_| |  __\__ | |_\__ \
+     *     |_|  |_|    |_|  \_\___|\__, |\__,_|\___|___/\__|___/
+     *                                | |
+     *                                |_|
+     */
+
+    public function hasARequest(Player $player){
+        //Return the name of the requester
+        //Ex: $name -> $player
+    }
+
+    public function madeARequest(Player $player){
+        //Return the name of the player that requested to
+        //Ex: $player -> $name
+    }
+
+    public function requestTPTo(Player $requester, Player $target){
+        //Make a tp request to bring $requester to the position of $target
+    }
+
+    public function requestTPHere(Player $requester, Player $target){
+        //Make a tp request to bring $target to the position of $requester
+    }
+
+
     /**  _    _       _ _           _ _           _   _____ _
      *  | |  | |     | (_)         (_| |         | | |_   _| |
      *  | |  | |_ __ | |_ _ __ ___  _| |_ ___  __| |   | | | |_ ___ _ __ ___  ___
@@ -1361,6 +1400,9 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
+        if($warp === null || $warp === "" || $warp === " "){
+            return;
+        }
         $value = $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
         $this->warps->set(strtolower($warp), $value);
         $this->warps->save();
@@ -1393,9 +1435,11 @@ class Loader extends PluginBase{
         if(!$list){
             return false;
         }
+        if($list === []){
+            return false;
+        }
         if(!$inArray){
             $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            $string = substr($string, 0);
             return $string;
         }
         return $list;

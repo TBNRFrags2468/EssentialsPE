@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands\Warp;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -18,8 +17,12 @@ class Warp extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if($alias === "warps"){
-            $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $this->getPlugin()->warpList(false));
+        if($alias === "warps" || count($args) === 0){
+            if(($list = $this->getPlugin()->warpList(false)) === false){
+                $sender->sendMessage(TextFormat::AQUA . "There are no Warps currently available");
+                return false;
+            }
+            $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $list);
             return true;
         }
         $warp = $this->getPlugin()->getWarp($args[0]);

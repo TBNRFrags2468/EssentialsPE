@@ -33,8 +33,9 @@ class Vanish extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->switchVanish($player);
-                $sender->sendMessage(TextFormat::GRAY . "$args[0] is now " . ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!"));
-                $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getPlugin()->isVanished($sender) ? "vanished!" : "visible!"));
+				$status = ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!");
+                $sender->sendMessage(TextFormat::GRAY . "$args[0] is now $status");
+                $player->sendMessage(TextFormat::GRAY . "You're now $status");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
