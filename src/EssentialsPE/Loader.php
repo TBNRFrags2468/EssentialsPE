@@ -1209,11 +1209,13 @@ class Loader extends PluginBase{
     public function hasARequest(Player $player){
         //Return the name of the requester
         //Ex: $name -> $player
+        //Remember to return what type of request (TPTo or TPHere)
     }
 
     public function madeARequest(Player $player){
         //Return the name of the player that requested to
         //Ex: $player -> $name
+        //Remember to return what type of request (TPTo or TPHere)
     }
 
     public function requestTPTo(Player $requester, Player $target){
