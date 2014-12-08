@@ -55,6 +55,7 @@ use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFKKickTask;
+use EssentialsPE\Tasks\TPRequestTask;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -415,7 +416,7 @@ class Loader extends PluginBase{
         "afk" => [
             "mode" => false,
             "kick-taskID" => false,
-            "auto-taskID" => false
+            //"auto-taskID" => false
         ],
         "back" => [
             "position" => false,
@@ -431,6 +432,7 @@ class Loader extends PluginBase{
             "request_to" => [
                 "player" => false,
                 "action" => false,
+                "task-ID" => false
             ],
             "request_from" => [
                 "player" => false,
@@ -530,7 +532,7 @@ class Loader extends PluginBase{
         if($state === false && ($id = $this->getAFKAutoKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->sessions[$player->getName()]["afk"]["kick-taskID"] = false;
-        }elseif($state === true && ($time = $this->getAFKAutoKickTime()) >= 0 && !$player->hasPermission("essentials.afk.kickexempt")){
+        }elseif($state === true && ($time = $this->getAFKAutoKickTime()) > 0 && !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->setAFKAutoKickTaskID($player, $task->getTaskId());
         }
@@ -570,7 +572,7 @@ class Loader extends PluginBase{
      * @param Player $player
      * @param int $taskID
      */
-    public function setAFKAutoKickTaskID(Player $player, $taskID){
+    private function setAFKAutoKickTaskID(Player $player, $taskID){
         $this->sessions[$player->getName()]["afk"]["kick-taskID"] = $taskID;
     }
 
@@ -581,7 +583,7 @@ class Loader extends PluginBase{
      * @param Player $player
      * @return mixed
      */
-    public function getAFKAutoKickTaskID(Player $player){
+    private function getAFKAutoKickTaskID(Player $player){
         if(!$this->isAFK($player)){
             return false;
         }
@@ -1206,24 +1208,139 @@ class Loader extends PluginBase{
      *                                |_|
      */
 
+    /**
+     * Tell if a player has a pending request
+     * Return false if not
+     * Return array with the name of the requester and the action to perform:
+     *      "tpto" means that the requester wants to tp to the target position
+     *      "tphere" means that the requester wants to tp the target to its position
+     *
+     * @param Player $player
+     * @return bool|array
+     */
     public function hasARequest(Player $player){
-        //Return the name of the requester
-        //Ex: $name -> $player
-        //Remember to return what type of request (TPTo or TPHere)
+        $session = $this->sessions[$player->getName()]["tprequests"]["request_from"];
+        if($session["player"] === false){
+            return false;
+        }
+        return $session;
     }
 
+    /**
+     * Tell if a player made a request
+     * Return false if not
+     * Return array with the name of the target and the action to perform:
+     *      "tpto" means that the requester wants to tp to the target position
+     *      "tphere" means that the requester wants to tp the target to its position
+     *
+     * @param Player $player
+     * @return bool|array
+     */
     public function madeARequest(Player $player){
-        //Return the name of the player that requested to
-        //Ex: $player -> $name
-        //Remember to return what type of request (TPTo or TPHere)
+        $session = $this->sessions[$player->getName()]["tprequests"]["request_to"];
+        if($session["player"] === false){
+            return false;
+        }
+        return $session;
     }
 
+    /**
+     * Schedule a Request to move $requester to $target's position
+     *
+     * @param Player $requester
+     * @param Player $target
+     */
     public function requestTPTo(Player $requester, Player $target){
-        //Make a tp request to bring $requester to the position of $target
+        $r = $this->sessions[$requester->getName()]["tprequests"]["request_to"];
+        $r["player"] = $target->getName();
+        $r["action"] = "tpto";
+
+        $t = $this->sessions[$target->getName()]["tprequests"]["request_from"];
+        $t["player"] = $requester->getName();
+        $t["action"] = "tpto";
+
+        $this->scheduleTPRequestTask($requester);
     }
 
+    /**
+     * Schedule a Request to mode $target to $requester's position
+     *
+     * @param Player $requester
+     * @param Player $target
+     */
     public function requestTPHere(Player $requester, Player $target){
-        //Make a tp request to bring $target to the position of $requester
+        $r = $this->sessions[$requester->getName()]["tprequests"]["request_to"];
+        $r["player"] = $target->getName();
+        $r["action"] = "tphere";
+
+        $t = $this->sessions[$target->getName()]["tprequests"]["request_from"];
+        $t["player"] = $requester->getName();
+        $t["action"] = "tphere";
+
+        $this->scheduleTPRequestTask($requester);
+    }
+
+    /**
+     * Cancel the Request made by a player
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function cancelTPRequest(Player $player){
+        $session = $this->sessions[$player->getName()]["tprequests"]["request_to"];
+        if($session["player"] === false){
+            return false;
+        }
+        $target = $this->sessions[$session["player"]]["tprequests"]["request_from"];
+
+        $session["player"] = false;
+        $session["action"] = false;
+        $target["player"] = false;
+        $target["action"] = false;
+
+        $this->cancelTPRequestTask($player, $this->getTPRequestTaskID($player));
+        return true;
+    }
+
+    /**
+     * Schedule the Request auto-remover task (Internal use ONLY!)
+     *
+     * @param Player $player
+     */
+    private function scheduleTPRequestTask(Player $player){
+        $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new TPRequestTask($this, $player), 20 * 60 * 5);
+        $this->setTPRequestTaskID($player, $task->getTaskId());
+    }
+
+    /**
+     * Return the Task ID (Internal use ONLY!)
+     *
+     * @param Player $player
+     * @return mixed
+     */
+    private function getTPRequestTaskID(Player $player){
+        return $this->sessions[$player->getName()]["tprequests"]["request_to"]["task-ID"];
+    }
+
+    /**
+     * Modify the Task ID (Internal use ONLY!)
+     *
+     * @param Player $player
+     * @param $id
+     */
+    private function setTPRequestTaskID(Player $player, $id){
+        $this->sessions[$player->getName()]["tprequests"]["request_to"]["task-ID"] = $id;
+    }
+
+    /**
+     * Cancel the Task (Internal use ONLY!)
+     *
+     * @param Player $player
+     * @param $id
+     */
+    private function cancelTPRequestTask(Player $player, $id){
+        $this->getServer()->getScheduler()->cancelTask($id);
+        $this->sessions[$player->getName()]["tprequests"]["request_to"]["task-ID"] = false;
     }
 
 

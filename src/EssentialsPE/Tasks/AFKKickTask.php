@@ -6,9 +6,9 @@ use pocketmine\Player;
 use pocketmine\scheduler\PluginTask;
 
 class AFKKickTask extends PluginTask{
-    /** @var \pocketmine\Player  */
+    /** @var Player  */
     protected $player;
-    /** @var \EssentialsPE\Loader  */
+    /** @var Loader  */
     protected $plugin;
 
     public function __construct(Loader $plugin, Player $player){
