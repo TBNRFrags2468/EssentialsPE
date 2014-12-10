@@ -1248,7 +1248,7 @@ class Loader extends PluginBase{
      *
      * @param Player $target
      * @param Player $requester
-     * @return bool|string
+     * @return bool|array
      */
     public function hasARequestFrom(Player $target, Player $requester){
         $session = $this->sessions[$target->getName()]["tprequests"]["requests_from"];
