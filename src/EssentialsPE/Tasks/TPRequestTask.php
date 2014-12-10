@@ -17,6 +17,6 @@ class TPRequestTask extends PluginTask{
     }
 
     public function onRun($currentTick){
-        $this->plugin->cancelTPRequest($this->requester);
+        $this->plugin->removeTPRequest($this->requester);
     }
 } 

@@ -1286,7 +1286,7 @@ class Loader extends PluginBase{
      * @param Player $player
      * @return bool
      */
-    public function cancelTPRequest(Player $player){
+    public function removeTPRequest(Player $player){
         $session = $this->sessions[$player->getName()]["tprequests"]["request_to"];
         if($session["player"] === false){
             return false;

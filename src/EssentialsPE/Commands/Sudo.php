@@ -22,7 +22,7 @@ class Sudo extends BaseCommand{
             return false;
         }
         $player = $this->getPlugin()->getPlayer($name = array_shift($args));
-        if($player === false){
+        if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }

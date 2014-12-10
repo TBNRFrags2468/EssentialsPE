@@ -315,9 +315,21 @@ permissions:
             essentials.suicide:
                 default: op
                 description: "Kill yourself"
+            essentials.tpa:
+                default: true
+                description: "Request a player to teleport to its position"
+            essentials.tpaccept:
+                default: true
+                description: "Accept a Teleport Request"
+            essentials.tpahere:
+                default: true
+                description: "Request a player to teleport to your position"
             essentials.tpall:
                 default: op
                 description: "Teleport all the online players to you"
+            essentials.tpdeny:
+                default: true
+                description: "Decline a Teleport Request"
             essentials.tphere:
                 default: op
                 description: "Teleport another player to you"

@@ -21,7 +21,6 @@ use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\item\Item;
-use pocketmine\level\Position;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
@@ -85,6 +84,8 @@ class EventHandler implements Listener{
         $event->setQuitMessage($player->getDisplayName() . " left the game");
         //Nick and NameTag restore:
         $this->plugin->setNick($player, $player->getName(), false);
+        //Remove teleport requests
+        $this->plugin->removeTPRequest($player);
         //Session destroy:
         $this->plugin->removeSession($player);
     }
