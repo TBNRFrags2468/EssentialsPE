@@ -15,7 +15,7 @@ class TPRequestTask extends PluginTask{
     public function __construct(Loader $plugin, Player $requester){
         parent::__construct($plugin);
         $this->plugin = $plugin;
-        $this->$requester = $requester;
+        $this->requester = $requester;
     }
 
     public function onRun($currentTick){

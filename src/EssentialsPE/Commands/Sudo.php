@@ -26,9 +26,8 @@ class Sudo extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        if($this->getPlugin()->getServer()->dispatchCommand($player, implode(" ", $args))){
-            $sender->sendMessage(TextFormat::AQUA . "Command ran has $name");
-        }
+        $sender->sendMessage(TextFormat::AQUA . "Command ran has " . $name);
+        $this->getPlugin()->getServer()->dispatchCommand($player, implode(" ", $args));
         return true;
     }
 } 

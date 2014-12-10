@@ -60,7 +60,7 @@ class TPAccept extends BaseCommand{
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;
             default:
-
+                $sender->sendMessage(TextFormat::RED . $this->getUsage());
                 return false;
                 break;
         }
