@@ -36,9 +36,9 @@ class TPAccept extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::GREEN . " accepted your teleport request! Teleporting...");
                 $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
                 if($request[$name] === "tpto"){
-                    $sender->teleport($player->getPosition(), $player->getYaw(), $player->getPitch());
-                }else{
                     $player->teleport($sender->getPosition(), $sender->getYaw(), $sender->getPitch());
+                }else{
+                    $sender->teleport($player->getPosition(), $player->getYaw(), $player->getPitch());
                 }
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;
@@ -53,9 +53,9 @@ class TPAccept extends BaseCommand{
                     return false;
                 }
                 if($request === "tpto"){
-                    $sender->teleport($player->getPosition(), $player->getYaw(), $player->getPitch());
-                }else{
                     $player->teleport($sender->getPosition(), $sender->getYaw(), $sender->getPitch());
+                }else{
+                    $sender->teleport($player->getPosition(), $player->getYaw(), $player->getPitch());
                 }
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;

@@ -15,7 +15,6 @@ use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerLoginEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
@@ -44,18 +43,11 @@ class EventHandler implements Listener{
         if($player->isBanned() && $player->hasPermission("essentials.ban.exempt")){
             $player->setBanned(false);
         }
-        //Nick and NameTag set:
-        $this->plugin->setNick($player, $this->plugin->getNick($player), false);
-    }
-
-    /**
-     * @param PlayerLoginEvent $event
-     */
-    public function onPlayerLogin(PlayerLoginEvent $event){
-        $player = $event->getPlayer();
         //Session configure:
         $this->plugin->muteSessionCreate($player);
         $this->plugin->createSession($player);
+        //Nick and NameTag set:
+        $this->plugin->setNick($player, $this->plugin->getNick($player), false);
     }
 
     /**
