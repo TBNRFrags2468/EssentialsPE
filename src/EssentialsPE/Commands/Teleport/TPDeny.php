@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class TPDeny extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpdeny", "Decline a Teleport Request", "/tpdeny", ["tpno"]);
+        parent::__construct($plugin, "tpdeny", "Decline a Teleport Request", "/tpdeny [player]", ["tpno"]);
         $this->setPermission("essentials.tpdeny");
     }
 
@@ -25,7 +25,8 @@ class TPDeny extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        if(!($request = $this->getPlugin()->hasARequest($sender))){
+        $request = $this->getPlugin()->hasARequest($sender);
+        if(!$request){
             $sender->sendMessage(TextFormat::RED . "[Error] You don't have any request yet");
             return false;
         }
@@ -36,7 +37,7 @@ class TPDeny extends BaseCommand{
         }
         $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::RED . " denied your teleport request");
         $sender->sendMessage(TextFormat::GREEN . "Denied " . TextFormat::AQUA . $player->getName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . TextFormat::RED . " teleport request");
-        $this->getPlugin()->removeTPRequest($player);
+        $this->getPlugin()->removeTPRequest($player, $sender);
         return true;
     }
 } 

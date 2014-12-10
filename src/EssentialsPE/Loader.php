@@ -36,7 +36,11 @@ use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\Spawn;
 use EssentialsPE\Commands\Sudo;
 use EssentialsPE\Commands\Suicide;
+use EssentialsPE\Commands\Teleport\TPA;
+use EssentialsPE\Commands\Teleport\TPAccept;
+use EssentialsPE\Commands\Teleport\TPAHere;
 use EssentialsPE\Commands\Teleport\TPAll;
+use EssentialsPE\Commands\Teleport\TPDeny;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
@@ -192,7 +196,11 @@ class Loader extends PluginBase{
             new PowerToolToggle($this),
 
             //Teleport
+            new TPA($this),
+            new TPAccept($this),
+            new TPAHere($this),
             new TPAll($this),
+            new TPDeny($this),
             new TPHere($this),
 
             //Warp
@@ -430,13 +438,18 @@ class Loader extends PluginBase{
         "pvp" => false,
         "tprequests" => [
             "request_to" => [
-                "player" => false,
-                "action" => false,
-                "task-ID" => false
+                "player" => false, // The player that you make a request to
+                "action" => false, // The type of request made
+                "task-ID" => false // The ID of the scheduled task to cancel the request after a period of time
             ],
-            "request_from" => [
-                "player" => false,
-                "action" => false
+            "requests_from" => [
+                "latest" => false // This point to the latest player to make a request
+                /** This is how it works per player:
+                 *
+                 * "iksaku" => "tpto"  <--- Type of request
+                 *    ^^^
+                 * Player Name
+                 */
             ]
         ],
         "unlimited" => false,
@@ -1211,7 +1224,7 @@ class Loader extends PluginBase{
     /**
      * Tell if a player has a pending request
      * Return false if not
-     * Return array with the name of the requester and the action to perform:
+     * Return array with all the names of the requesters and the actions to perform of each:
      *      "tpto" means that the requester wants to tp to the target position
      *      "tphere" means that the requester wants to tp the target to its position
      *
@@ -1219,15 +1232,34 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function hasARequest(Player $player){
-        $session = $this->sessions[$player->getName()]["tprequests"]["request_from"];
-        if($session["player"] === false){
+        $session = $this->sessions[$player->getName()]["tprequests"]["requests_from"];
+        if($session["latest"] === false){
             return false;
         }
         return $session;
     }
 
     /**
-     * Tell if a player made a request
+     * Tell if a player ($target) as a request from a specific player ($requester)
+     * Return false if not
+     * Return the type of request made:
+     *      "tpto" means that the requester wants to tp to the target position
+     *      "tphere" means that the requester wants to tp the target to its position
+     *
+     * @param Player $target
+     * @param Player $requester
+     * @return bool|string
+     */
+    public function hasARequestFrom(Player $target, Player $requester){
+        $session = $this->sessions[$target->getName()]["tprequests"]["requests_from"];
+        if(!isset($session[$requester->getName()])){
+            return false;
+        }
+        return $session[$requester->getName()];
+    }
+
+    /**
+     * Tell if a player made a request to another player
      * Return false if not
      * Return array with the name of the target and the action to perform:
      *      "tpto" means that the requester wants to tp to the target position
@@ -1255,9 +1287,9 @@ class Loader extends PluginBase{
         $r["player"] = $target->getName();
         $r["action"] = "tpto";
 
-        $t = $this->sessions[$target->getName()]["tprequests"]["request_from"];
-        $t["player"] = $requester->getName();
-        $t["action"] = "tpto";
+        $t = $this->sessions[$target->getName()]["tprequests"]["requests_from"];
+        $t["latest"] = $requester->getName();
+        $t[$requester->getName()] = "tpto";
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1273,9 +1305,9 @@ class Loader extends PluginBase{
         $r["player"] = $target->getName();
         $r["action"] = "tphere";
 
-        $t = $this->sessions[$target->getName()]["tprequests"]["request_from"];
-        $t["player"] = $requester->getName();
-        $t["action"] = "tphere";
+        $t = $this->sessions[$target->getName()]["tprequests"]["requests_from"];
+        $t["latest"] = $requester->getName();
+        $t[$requester->getName()] = "tphere";
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1283,22 +1315,27 @@ class Loader extends PluginBase{
     /**
      * Cancel the Request made by a player
      *
-     * @param Player $player
+     * @param Player $requester
+     * @param Player $target
      * @return bool
      */
-    public function removeTPRequest(Player $player){
-        $session = $this->sessions[$player->getName()]["tprequests"]["request_to"];
-        if($session["player"] === false){
+    public function removeTPRequest(Player $requester, Player $target = null){
+        $r = $this->sessions[$requester->getName()]["tprequests"]["request_to"];
+        if($r["player"] === false){
             return false;
         }
-        $target = $this->sessions[$session["player"]]["tprequests"]["request_from"];
+        $t = $this->sessions[($target === null ? $r["player"] : $target->getName())]["tprequests"]["requests_from"];
 
-        $session["player"] = false;
-        $session["action"] = false;
-        $target["player"] = false;
-        $target["action"] = false;
+        if($target !== null && $r["player"] === $target->getName()){
+            $r["player"] = false;
+            $r["action"] = false;
+            unset($t[$requester->getName()]);
+        }elseif($target === null){
+            $r["player"] = false;
+            $r["action"] = false;
+        }
 
-        $this->cancelTPRequestTask($player, $this->getTPRequestTaskID($player));
+        $this->cancelTPRequestTask($requester, $this->getTPRequestTaskID($requester));
         return true;
     }
 
