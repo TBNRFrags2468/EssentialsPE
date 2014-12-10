@@ -157,7 +157,6 @@ class Loader extends PluginBase{
             new Depth($this),
             new Essentials($this),
             new Extinguish($this),
-            new Gamemode($this),
             new GetPos($this),
             new God($this),
             new Heal($this),
@@ -165,7 +164,6 @@ class Loader extends PluginBase{
             new ItemDB($this),
             //new Jump($this), //TODO
             new KickAll($this),
-            new Kill($this),
             new More($this),
             new Mute($this),
             new Near($this),
@@ -207,6 +205,10 @@ class Loader extends PluginBase{
             new DelWarp($this),
             new Setwarp($this),
             new Warp($this),
+
+            //Override
+            new Gamemode($this),
+            new Kill($this)
         ]);
     }
 
@@ -443,7 +445,7 @@ class Loader extends PluginBase{
                 "task-ID" => false // The ID of the scheduled task to cancel the request after a period of time
             ],
             "requests_from" => [
-                "latest" => false, // This point to the latest player to make a request
+                "latest" => false // This point to the latest player to make a request
                 /** This is how it works per player:
                  *
                  * "iksaku" => "tpto"  <--- Type of request
