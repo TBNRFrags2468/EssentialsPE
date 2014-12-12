@@ -32,8 +32,24 @@ class Jump extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
         }
-        //TODO Check for secure teleport
-        $sender->teleport($block->add(0, 1));
+        if(!$sender->getLevel()->getBlock($block->add(0, 2))->isSolid()){
+            $sender->teleport($block->add(0, 1));
+            return true;
+        }
+
+        $side = $sender->getDirection();
+        if($side === 0){
+            $side = 3;
+        }elseif($side === 1){
+            $side = 4;
+        }elseif($side === 2){
+            $side = 2;
+        }elseif($side === 3){
+            $side = 5;
+        }
+        if(!$block->getSide($side)->isSolid()){
+            $sender->teleport($block->add(0));
+        }
         return true;
     }
 }

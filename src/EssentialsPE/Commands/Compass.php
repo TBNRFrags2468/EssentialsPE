@@ -25,13 +25,13 @@ class Compass extends BaseCommand{
         }
 
         $direction = "";
-        if($sender->getDirection() == 0){
+        if($sender->getDirection() === 0){
             $direction = "south";
-        }elseif($sender->getDirection() == 1){
+        }elseif($sender->getDirection() === 1){
             $direction = "west";
-        }elseif($sender->getDirection() == 2){
+        }elseif($sender->getDirection() === 2){
             $direction = "north";
-        }elseif($sender->getDirection() == 3){
+        }elseif($sender->getDirection() === 3){
             $direction = "east";
         }else{
             $sender->sendMessage(TextFormat::RED . "Oops, there was an error while getting your face direction");
