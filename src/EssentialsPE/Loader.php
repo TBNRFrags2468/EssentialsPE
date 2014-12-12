@@ -8,7 +8,7 @@ use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
 use EssentialsPE\Commands\Depth;
-use EssentialsPE\Commands\Essentials;
+use EssentialsPE\Commands\EssentialsPE;
 use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God;
@@ -24,7 +24,6 @@ use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
-use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
@@ -139,7 +138,7 @@ class Loader extends PluginBase{
     private function registerCommands(){
         //Unregister commands to override
         $this->unregisterCommands([
-           "gamemode",
+           //"gamemode", // TODO: ReWrite
             "kill"
         ]);
 
@@ -155,7 +154,7 @@ class Loader extends PluginBase{
             new ClearInventory($this),
             new Compass($this),
             new Depth($this),
-            new Essentials($this),
+            new EssentialsPE($this),
             new Extinguish($this),
             new GetPos($this),
             new God($this),
@@ -207,7 +206,7 @@ class Loader extends PluginBase{
             new Warp($this),
 
             //Override
-            new Gamemode($this),
+            //new Gamemode($this), // TODO: ReWrite
             new Kill($this)
         ]);
     }
@@ -459,6 +458,16 @@ class Loader extends PluginBase{
     ];
 
     /**
+     * Tell if a session exists for a specific player
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function sessionExists(Player $player){
+        return isset($this->sessions[$player->getName()]);
+    }
+
+    /**
      * Creates a new Sessions for the specified player
      *
      * @param Player $player
@@ -496,7 +505,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setSession(Player $player, $key, $value){
-        if(!isset($this->sessions[$player->getName()])){
+        if(!$this->sessionExists($player)){
             return false;
         }
         $this->sessions[$player->getName()][$key] = $value;
@@ -511,7 +520,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function getSession(Player $player, $key){
-        if(!isset($this->sessions[$player->getName()]) || !isset($this->sessions[$player->getName()][$key])){
+        if(!$this->sessionExists($player) || !isset($this->sessions[$player->getName()][$key])){
             return false;
         }
         return $this->sessions[$player->getName()][$key];
@@ -1318,7 +1327,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function removeTPRequest(Player $requester, Player $target = null){
-        if($this->sessions[$requester->getName()]["tprequests"]["request_to"]["player"] === false){
+        if($this->sessions[$requester->getName()]["tprequests"]["request_to"]["player"] === false && $target === null){
             return false;
         }
 

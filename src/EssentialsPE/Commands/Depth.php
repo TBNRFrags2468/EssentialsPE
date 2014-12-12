@@ -26,7 +26,11 @@ class Depth extends BaseCommand{
             return false;
         }
         $pos = $sender->getFloorY() - 63;
-        $sender->sendMessage(TextFormat::AQUA . "You're " . (substr($pos, 0, 1) === "-" ? substr($pos, 1) : $pos) . " meters " . ($pos > 0 ? "above" : "below") . " the sea.");
+        if($pos === 0){
+            $sender->sendMessage(TextFormat::AQUA . "You're at sea level");
+        }else{
+            $sender->sendMessage(TextFormat::AQUA . "You're " . (substr($pos, 0, 1) === "-" ? substr($pos, 1) : $pos) . " meters " . ($pos > 0 ? "above" : "below") . " the sea.");
+        }
         return true;
     }
 }

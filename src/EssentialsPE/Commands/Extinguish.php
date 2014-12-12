@@ -34,13 +34,13 @@ class Extinguish extends BaseCommand{
                 $player = $this->getPlugin()->getPlayer($args[0]);
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                }else{
-                    $player->extinguish();
-                    $sender->sendMessage(TextFormat::AQUA . "$args[0] has been extinguished!");
+                    return false;
                 }
+                $player->extinguish();
+                $sender->sendMessage(TextFormat::AQUA . $args[0] . " has been extinguished!");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /extinguish <player>");
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /extinguish <player>"));
                 return false;
                 break;
         }

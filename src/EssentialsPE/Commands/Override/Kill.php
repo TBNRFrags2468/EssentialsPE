@@ -27,7 +27,11 @@ class Kill extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($player, EntityDamageEvent::CAUSE_SUICIDE, 1000));
+        if($this->getPlugin()->isGod($player)){
+            $sender->sendMessage(TextFormat::RED . "You can't kill " . $args[0]);
+            return false;
+        }
+        $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($player, EntityDamageEvent::CAUSE_SUICIDE, ($player->getHealth())));
         if($ev->isCancelled()){
             return true;
         }

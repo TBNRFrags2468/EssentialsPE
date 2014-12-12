@@ -8,7 +8,7 @@ use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tempban", "Temporary bans the specified player", "/tempban <player> <time ...> [reason ...]");
+        parent::__construct($plugin, "tempban", "Temporary bans the specified player", "/tempban <player> <time...> [reason ...]");
         $this->setPermission("essentials.tempban");
     }
 
@@ -66,7 +66,7 @@ class TempBan extends BaseCommand{
         $date->setTimestamp($time = time() + $seconds);
         if($player !== false){
             if($player->hasPermission("essentials.banexempt")){
-                $sender->sendMessage(TextFormat::RED . "[Error] $name can't be banned");
+                $sender->sendMessage(TextFormat::RED . "[Error] ". $name . " can't be banned");
                 return false;
             }else{
                 $name = $player->getName();

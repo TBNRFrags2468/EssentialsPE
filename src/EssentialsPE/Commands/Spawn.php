@@ -28,7 +28,7 @@ class Spawn extends BaseCommand{
                 break;
             case 1:
                 $player = $this->getPlugin()->getPlayer($args[0]);
-                if($player === false){
+                if(!$player) {
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

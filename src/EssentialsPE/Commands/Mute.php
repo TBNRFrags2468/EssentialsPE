@@ -28,12 +28,12 @@ class Mute extends BaseCommand{
         }
         if($player->hasPermission("essentials.mute.exempt")){
             if(!$this->getPlugin()->isMuted($player)){
-                $sender->sendMessage(TextFormat::RED . "$args[0] can't be muted");
+                $sender->sendMessage(TextFormat::RED . $args[0] . " can't be muted");
                 return false;
             }
         }
         $this->getPlugin()->switchMute($player);
-        $sender->sendMessage(TextFormat::YELLOW . "$args[0] has been " . ($this->getPlugin()->isMuted($player) ? "muted!" : "unmuted!"));
+        $sender->sendMessage(TextFormat::YELLOW . $args[0] . " has been " . ($this->getPlugin()->isMuted($player) ? "muted!" : "unmuted!"));
         return true;
     }
 } 

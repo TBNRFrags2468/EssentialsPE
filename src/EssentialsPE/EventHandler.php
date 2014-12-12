@@ -39,14 +39,14 @@ class EventHandler implements Listener{
     public function onPlayerPreLogin(PlayerPreLoginEvent $event){
         $player = $event->getPlayer();
 
-        //Ban remove:
+        // Ban remove:
         if($player->isBanned() && $player->hasPermission("essentials.ban.exempt")){
             $player->setBanned(false);
         }
-        //Session configure:
+        // Session configure:
         $this->plugin->muteSessionCreate($player);
         $this->plugin->createSession($player);
-        //Nick and NameTag set:
+        // Nick and NameTag set:
         $this->plugin->setNick($player, $this->plugin->getNick($player), false);
     }
 
@@ -56,9 +56,9 @@ class EventHandler implements Listener{
     public function onPlayerJoin(PlayerJoinEvent $event){
         $player = $event->getPlayer();
 
-        //Nick and NameTag set:
+        // Nick and NameTag set:
         $event->setJoinMessage($player->getDisplayName() . " joined the game");
-        //Hide vanished players
+        // Hide vanished players
         foreach($player->getServer()->getOnlinePlayers() as $p){
             if($this->plugin->isVanished($p)){
                 $player->hidePlayer($p);
@@ -72,14 +72,18 @@ class EventHandler implements Listener{
     public function onPlayerQuit(PlayerQuitEvent $event){
         $player = $event->getPlayer();
 
-        //Quit message (nick):
+        // Quit message (nick):
         $event->setQuitMessage($player->getDisplayName() . " left the game");
-        //Nick and NameTag restore:
+        // Nick and NameTag restore:
         $this->plugin->setNick($player, $player->getName(), false);
-        //Remove teleport requests
-        $this->plugin->removeTPRequest($player);
-        //Session destroy:
-        $this->plugin->removeSession($player);
+
+        // Sessions
+        if($this->plugin->sessionExists($player)){
+            // Remove teleport requests
+            $this->plugin->removeTPRequest($player);
+            // Session destroy:
+            $this->plugin->removeSession($player);
+        }
     }
 
     /**
@@ -211,7 +215,7 @@ class EventHandler implements Listener{
         $item = $event->getItem();
         $block = $event->getBlock();
 
-        //PowerTool
+        // PowerTool
         if($item->isPlaceable()){
             if($this->plugin->executePowerTool($player, $item)){
                 $event->setCancelled(true);
@@ -219,7 +223,7 @@ class EventHandler implements Listener{
         }
 
 
-        //Special Signs
+        // Special Signs
         $perm = "essentials.sign.use";
 
         $tile = $block->getLevel()->getTile(new Vector3($block->getFloorX(), $block->getFloorY(), $block->getFloorZ()));
@@ -227,14 +231,15 @@ class EventHandler implements Listener{
             $text = $tile->getText();
             $message = TextFormat::RED . "You don't have permissions to use this sign";
 
-            //Free sign
+            // Free sign
             if($text[0] === "[Free]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "free")){
                     $player->sendMessage($message);
                 }else{
-                    if(($gm = $player->getServer()->getGamemodeString($player->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
-                        $player->sendMessage(TextFormat::RED . "[Error] You're in " . strtolower($gm) . " mode");
+                    $gm = $player->getGamemode();
+                    if($gm === 1 || $gm === 3){
+                        $player->sendMessage(TextFormat::RED . "[Error] You're in " . $player->getServer()->getGamemodeString($gm) . " mode");
                         return false;
                     }
 
@@ -253,13 +258,14 @@ class EventHandler implements Listener{
                 }
             }
 
-            //Gamemode sign
+            // Gamemode sign
             elseif($text[0] === "[Gamemode]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "gamemode")){
                     $player->sendMessage($message);
                 }else{
-                    if(($v = strtolower($text[1])) === "survival"){
+                    $v = strtolower($text[1]);
+                    if($v === "survival"){
                         $player->setGamemode(0);
                     }elseif($v === "creative"){
                         $player->setGamemode(1);
@@ -271,22 +277,29 @@ class EventHandler implements Listener{
                 }
             }
 
-            //Heal sign
+            // Heal sign
             elseif($text[0] === "[Heal]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "heal")){
                     $player->sendMessage($message);
+                }elseif(($gm = $player->getGamemode()) === 1 || $gm === 3){
+                    $player->sendMessage(TextFormat::RED . "[Error] You're in " . $player->getServer()->getGamemodeString($gm) . " mode");
+                    return false;
                 }else{
+
                     $player->heal($player->getMaxHealth());
                     $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 }
             }
 
-            //Repair sign
+            // Repair sign
             elseif($text[0] === "[Repair]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "repair")){
                     $player->sendMessage($message);
+                }elseif(($gm = $player->getGamemode()) === 1 || $gm === 3){
+                    $player->sendMessage(TextFormat::RED . "[Error] You're in " . $player->getServer()->getGamemodeString($gm) . " mode");
+                    return false;
                 }else{
                     if(($v = $text[1]) === "Hand"){
                         if($this->plugin->isReparable($item = $player->getInventory()->getItemInHand())){
@@ -309,7 +322,7 @@ class EventHandler implements Listener{
                 }
             }
 
-            //Time sign
+            // Time sign
             elseif($text[0] === "[Time]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "time")){
@@ -325,7 +338,7 @@ class EventHandler implements Listener{
                 }
             }
 
-            //Teleport sign
+            // Teleport sign
             elseif($text[0] === "[Teleport]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "teleport")){
@@ -336,7 +349,7 @@ class EventHandler implements Listener{
                 }
             }
 
-            //Warp sign
+            // Warp sign
             elseif($text[0] === "[Warp]"){
                 $event->setCancelled(true);
                 if(!$player->hasPermission($perm . "warp")){
@@ -369,12 +382,12 @@ class EventHandler implements Listener{
         $item = $event->getItem();
         $block = $event->getBlock();
 
-        //PowerTool
+        // PowerTool
         if($this->plugin->executePowerTool($player, $item)){
             $event->setCancelled(true);
         }
 
-        //Unlimited block placing
+        // Unlimited block placing
         elseif($this->plugin->isUnlimitedEnabled($player)){
             $event->setCancelled(true);
             $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
@@ -391,7 +404,7 @@ class EventHandler implements Listener{
         $player = $event->getPlayer();
         $block = $event->getBlock();
 
-        //Special Signs
+        // Special Signs
         $perm = "essentials.sign.break.";
 
         $tile = $block->getLevel()->getTile(new Vector3($block->getFloorX(), $block->getFloorY(), $block->getFloorZ()));
@@ -399,43 +412,43 @@ class EventHandler implements Listener{
             $text = $tile->getText();
             $message = TextFormat::RED . "You don't have permissions to break this sign";
 
-            //Free sign
+            // Free sign
             if($text[0] === "[Free]" && !$player->hasPermission($perm . "free")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Gamemode sign
+            // Gamemode sign
             elseif($text[0] === "[Gamemode]" && !$player->hasPermission($perm . "gamemode")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Heal sign
+            // Heal sign
             elseif($text[0] === "[Heal]" && !$player->hasPermission($perm . "heal")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Repair sign
+            // Repair sign
             elseif($text[0] === "[Repair]" && !$player->hasPermission($perm . "repair")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Time sign
+            // Time sign
             elseif($text[0] === "[Time]" && !$player->hasPermission($perm . "time")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Teleport sign
+            // Teleport sign
             elseif($text[0] === "[Teleport]" && !$player->hasPermission($perm . "teleport")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
             }
 
-            //Warp sign
+            // Warp sign
             elseif($text[0] === "[Warp]" && !$player->hasPermission($perm . "warp")){
                 $event->setCancelled(true);
                 $player->sendMessage($message);
@@ -449,7 +462,7 @@ class EventHandler implements Listener{
      */
     public function onSignChange(SignChangeEvent $event){
         $player = $event->getPlayer();
-        //Colored Sign
+        // Colored Sign
         if($player->hasPermission("essentials.sign.color")){
             $event->setLine(0, $this->plugin->colorMessage($event->getLine(0)));
             $event->setLine(1, $this->plugin->colorMessage($event->getLine(1)));
@@ -457,10 +470,10 @@ class EventHandler implements Listener{
             $event->setLine(3, $this->plugin->colorMessage($event->getLine(3)));
         }
 
-        //Special Signs
+        // Special Signs
         $perm = "essentials.sign.create.";
 
-        //Free sign
+        // Free sign
         if(strtolower($event->getLine(0)) === "[free]" && $player->hasPermission($perm . "free")){
             if(trim($event->getLine(1)) !== "" || $event->getLine(1) !== null){
 
@@ -493,7 +506,7 @@ class EventHandler implements Listener{
             }
         }
 
-        //Gamemode sign
+        // Gamemode sign
         elseif(strtolower($event->getLine(0)) === "[gamemode]" && $player->hasPermission($perm . "gamemode")){
             switch(strtolower($event->getLine(1))){
                 case "survival":
@@ -523,13 +536,13 @@ class EventHandler implements Listener{
             $event->setLine(0, "[Gamemode]");
         }
 
-        //Heal sign
+        // Heal sign
         elseif(strtolower($event->getLine(0)) === "[heal]" && $player->hasPermission($perm . "heal")){
             $player->sendMessage(TextFormat::GREEN . "Heal sign successfully created!");
             $event->setLine(0, "[Heal]");
         }
 
-        //Repair sign
+        // Repair sign
         elseif(strtolower($event->getLine(0)) === "[repair]" && $player->hasPermission($perm . "repair")){
             switch(strtolower($event->getLine(1))){
                 case "hand":
@@ -548,7 +561,7 @@ class EventHandler implements Listener{
             $event->setLine(0, "[Repair]");
         }
 
-        //Time sign
+        // Time sign
         elseif(strtolower($event->getLine(0)) === "[time]" && $player->hasPermission($perm . "time")){
             switch(strtolower($event->getLine(1))){
                 case "day":
@@ -567,7 +580,7 @@ class EventHandler implements Listener{
             $event->setLine(0, "[Time]");
         }
 
-        //Teleport sign
+        // Teleport sign
         elseif(strtolower($event->getLine(0)) === "[teleport]" && $player->hasPermission($perm . "teleport")){
             if(!is_numeric($event->getLine(1))){
                 $player->sendMessage(TextFormat::RED . "[Error] Invalid X position, Teleport sign will not work");
@@ -587,7 +600,7 @@ class EventHandler implements Listener{
             }
         }
 
-        //Warp sign
+        // Warp sign
         elseif(strtolower($event->getLine(0)) === "[warp]" && $player->hasPermission($perm . "warp")){
             $warp = $event->getLine(1);
             if(!$this->plugin->warpExists($warp)){

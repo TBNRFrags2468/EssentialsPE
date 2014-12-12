@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class PowerTool extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command> <arguments...>", ["pt"]);
+        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command|c:chat macro> <arguments...>", ["pt"]);
         $this->setPermission("essentials.powertool");
     }
 
@@ -23,7 +23,7 @@ class PowerTool extends BaseCommand{
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
-        if($item->getID() == Item::AIR){
+        if($item->getID() === Item::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't assign a command to an empty hand.");
             return false;
         }
@@ -43,7 +43,7 @@ class PowerTool extends BaseCommand{
             }
             $this->getPlugin()->disablePowerToolItem($sender, $item);
         }else{
-            if($args[0] == "pt" || $args[0] == "ptt" || $args[0] == "powertool" || $args[0] == "powertooltoggle"){
+            if($args[0] === "pt" || $args[0] === "ptt" || $args[0] === "powertool" || $args[0] === "powertooltoggle"){
                 $sender->sendMessage(TextFormat::RED . "This command can't be assigned");
                 return false;
             }

@@ -37,11 +37,11 @@ class Heal extends BaseCommand{
                     return false;
                 }
                 $player->heal($player->getMaxHealth());
-                $sender->sendMessage(TextFormat::GREEN . "$args[0] has been healed!");
+                $sender->sendMessage(TextFormat::GREEN . $args[0] . " has been healed!");
                 $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /heal <player>");
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /heal <player>"));
                 return false;
                 break;
         }

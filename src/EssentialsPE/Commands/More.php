@@ -30,12 +30,14 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $item = $sender->getInventory()->getItemInHand();
+        //$item = $sender->getInventory()->getItemInHand();
+        $item = clone($sender->getInventory()->getItemInHand()); // TODO: Test Oversized stacks :3
         if($item->getID() === 0){
             $sender->sendMessage(TextFormat::RED . "You can't get a stack of AIR");
             return false;
         }
         $item->setCount(($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
+        $sender->getInventory()->setItemInHand($item);
         return true;
     }
 }

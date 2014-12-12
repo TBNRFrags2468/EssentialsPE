@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Repair extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all]", ["fix"]);
+        parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", ["fix"]);
         $this->setPermission("essentials.repair");
     }
 

@@ -25,7 +25,7 @@ class Nick extends BaseCommand{
                 }
                 $nickname = $args[0];
                 $nickname === "off" ? $this->getPlugin()->removeNick($sender, true) : $this->getPlugin()->setNick($sender, $nickname, true);
-                $sender->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . ($nickname === "off" ? $sender->getName() : $nickname));
+                $sender->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             case 2:
                 if(!$sender->hasPermission("essentials.nick.other")){
@@ -34,19 +34,13 @@ class Nick extends BaseCommand{
                 }
                 $player = $this->getPlugin()->getPlayer($args[1]);
                 if(!$player){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
+                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
                 $nickname = $args[0];
-                if($nickname === "off"){
-                    $this->getPlugin()->removeNick($player, true);
-                    $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick has been disabled");
-                    $player->sendMessage(TextFormat::GREEN . "Your nick has been disabled");
-                }else{
-                    $this->getPlugin()->setNick($player, $nickname, true);
-                    $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick is now " . TextFormat::RED . $nickname);
-                    $player->sendMessage(TextFormat::GREEN . "Your nick is now " . TextFormat::RED . $nickname);
-                }
+                $nickname === "off" ? $this->getPlugin()->removeNick($player, true) : $this->getPlugin()->setNick($player, $nickname, true);
+                $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
+                $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /nick <new nick|off> <player>");

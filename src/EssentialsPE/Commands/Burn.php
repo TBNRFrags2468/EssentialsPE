@@ -27,10 +27,10 @@ class Burn extends BaseCommand{
             return false;
         }
         if(!is_numeric($time)){
-            $sender->sendMessage(TextFormat::RED . "[Error] Invalid time");
+            $sender->sendMessage(TextFormat::RED . "[Error] Invalid burning time");
         }else{
             $player->setOnFire($time);
-            $sender->sendMessage(TextFormat::YELLOW . "$args[0] is now on fire!");
+            $sender->sendMessage(TextFormat::YELLOW . $args[0] . " is now on fire!");
         }
         return true;
     }

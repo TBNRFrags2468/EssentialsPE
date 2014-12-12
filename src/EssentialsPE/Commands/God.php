@@ -41,7 +41,7 @@ class God extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled!" : "disabled"));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /god <player>");
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /god <player>"));
                 return false;
                 break;
         }

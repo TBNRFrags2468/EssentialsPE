@@ -17,7 +17,7 @@ class KickAll extends BaseCommand{
             return false;
         }
 
-        if(count($args) == 0){
+        if(count($args) < 1){
             $reason = "Unknown";
         }else{
             $reason = implode(" ", $args);

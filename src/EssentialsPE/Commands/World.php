@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,10 +25,11 @@ class World extends BaseCommand{
             case 1:
                 $world = $args[0];
                 if(!$sender->getServer()->isLevelGenerated($world) || !$sender->getServer()->isLevelLoaded($world)){
-                    $sender->sendMessage(TextFormat::RED . "[Error] World " . ($sender->getServer()->isLevelGenerated($world) ? "is not loaded" : "not found"));
+                    $sender->sendMessage(TextFormat::RED . "[Error] World " . ($sender->getServer()->isLevelGenerated($world) ? "is not loaded" : "doesn't exists"));
                     return false;
                 }
-                $sender->teleport(new Position($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ(), ($sender->getServer()->getLevelByName($world)), 0, 0));
+                $world = $sender->getServer()->getLevelByName($world);
+                $sender->teleport($world->getSpawnLocation(), 0, 0);
                 $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
                 break;
             default:

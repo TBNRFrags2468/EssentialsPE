@@ -26,7 +26,7 @@ class RealName extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        $sender->sendMessage(TextFormat::YELLOW . "$args[0]'" . (substr($args[0], -1, 1) === "s" ? "" : "s") . "realname is " . TextFormat::RED . $player->getName());
+        $sender->sendMessage(TextFormat::YELLOW . $args[0] . (substr($args[0], -1, 1) === "s" ? "'" : "'s") . "realname is: " . TextFormat::RED . $player->getName());
         return true;
     }
 }

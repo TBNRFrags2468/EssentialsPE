@@ -7,9 +7,9 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Essentials extends BaseCommand{
+class EssentialsPE extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentials [reload]", ["ess"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [reload]", ["esspe"]);
         $this->setPermission("essential.essentials");
     }
 
@@ -32,7 +32,7 @@ class Essentials extends BaseCommand{
                         $sender->sendMessage(TextFormat::AQUA . "Config successfully reloaded!");
                         break;
                     /*case "update":
-                        //TODO
+                        // TODO
                         break;*/
                     default:
                         $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());

@@ -23,7 +23,7 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /clearinventory <player>");
                     return false;
                 }
-                $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+                $gm = $sender->getGamemode();
                 if($gm === 1 || $gm === 3){
                     $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
@@ -41,8 +41,9 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
-                if($sender->getServer()->getGamemodeString($player->getGamemode()) === 1|3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] $args[0] is in " . ($sender->getServer()->getGamemodeString($player->getGamemode()) === 1 ? "creative" : "adventure") . " mode");
+                $gm = $player->getGamemode();
+                if($gm === 1 || $gm === 3){
+                    $sender->sendMessage(TextFormat::RED . "[Error] " . $args[0] . " is on " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
                 $player->getInventory()->clearAll();
@@ -50,7 +51,7 @@ class ClearInventory extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /clearinventory <player>");
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /clearinventory <player>"));
                 return false;
                 break;
         }

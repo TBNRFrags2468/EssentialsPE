@@ -33,9 +33,11 @@ class Compass extends BaseCommand{
             $direction = "north";
         }elseif($sender->getDirection() == 3){
             $direction = "east";
+        }else{
+            $sender->sendMessage(TextFormat::RED . "Oops, there was an error while getting your face direction");
         }
 
-        $sender->sendMessage(TextFormat::AQUA . "You're facing $direction");
+        $sender->sendMessage(TextFormat::AQUA . "You're facing " . $direction);
         return true;
     }
 }
