@@ -26,8 +26,7 @@ class BreakCommand extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $transparent = [0, 7, 8, 9, 10];
-        $block = $sender->getTargetBlock(100, $transparent);
+        $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;

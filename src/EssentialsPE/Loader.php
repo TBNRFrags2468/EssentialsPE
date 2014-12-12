@@ -3,6 +3,7 @@ namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Back;
+use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
@@ -18,6 +19,7 @@ use EssentialsPE\Commands\Home\Home;
 use EssentialsPE\Commands\Home\SetHome;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
+use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute;
@@ -148,7 +150,7 @@ class Loader extends PluginBase{
             new AFK($this),
             new Back($this),
             //new BigTreeCommand($this), //TODO
-            //new BreakCommand($this), //TODO
+            new BreakCommand($this),
             new Broadcast($this),
             new Burn($this),
             new ClearInventory($this),
@@ -161,7 +163,7 @@ class Loader extends PluginBase{
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
-            //new Jump($this), //TODO
+            new Jump($this),
             new KickAll($this),
             new More($this),
             new Mute($this),
