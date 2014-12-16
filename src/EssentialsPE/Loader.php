@@ -82,7 +82,8 @@ use pocketmine\utils\TextFormat;
 class Loader extends PluginBase{
     /** @var Config */
     public  $homes;
-
+    /** @var Config  */
+    public $nicks;
     /** @var Config */
     public $warps;
 
@@ -259,6 +260,7 @@ class Loader extends PluginBase{
 
     private function saveConfigs(){
         $this->homes = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
+        $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
     }
 
@@ -942,12 +944,16 @@ class Loader extends PluginBase{
         if($event->isCancelled()){
             return false;
         }
-        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
+        $config = $this->nicks;
         $nick = $event->getNewNick();
         $player->setNameTag($event->getNameTag());
         $player->setDisplayName($nick);
         if($save == true){
-            $config->set($player->getName(), $nick);
+            if($nick === $player->getName() || $nick === "off"){
+                $config->remove($player->getName());
+            }else{
+                $config->set($player->getName(), $nick);
+            }
             $config->save();
         }
         return true;
@@ -965,12 +971,16 @@ class Loader extends PluginBase{
         if($event->isCancelled()){
             return false;
         }
-        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
+        $config = $this->nicks;
         $nick = $event->getNewNick();
         $player->setNameTag($event->getNameTag());
         $player->setDisplayName($nick);
         if($save == true){
-            $config->set($player->getName(), $nick);
+            if($nick === $player->getName() || $nick === "off"){
+                $config->remove($player->getName());
+            }else{
+                $config->set($player->getName(), $nick);
+            }
             $config->save();
         }
         return true;
@@ -983,7 +993,7 @@ class Loader extends PluginBase{
      * @return bool|mixed
      */
     public function getNick(Player $player){
-        $config = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
+        $config = $this->nicks;
         if(!$config->exists($player->getName())){
             return $player->getName();
         }
