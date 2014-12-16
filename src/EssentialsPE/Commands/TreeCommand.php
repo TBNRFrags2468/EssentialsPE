@@ -5,14 +5,13 @@ use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
-use pocketmine\level\generator\object\Tree;
+use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class TreeCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <type>");
+        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <tree|birch|redwood|jungle>");
         $this->setPermission("essentials.tree");
     }
 
@@ -28,15 +27,7 @@ class TreeCommand extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $transparent = [];
-        $block = $sender->getTargetBlock(100, $transparent);
-        while(!$block->isSolid){
-            if($block === null){
-                break;
-            }
-            $transparent[] = $block->getID();
-            $block = $sender->getTargetBlock(100, $transparent);
-        }
+        $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
@@ -68,9 +59,10 @@ class TreeCommand extends BaseCommand{
                 return false;
                 break;
         }
-        $tree = new Tree();
-        $tree->growTree($sender->getLevel(), $block->getFloorX(), $block->getFloorY(), $block->getFloorZ(), new Random(mt_rand()), $type);
-        $sender->sendMessage(TextFormat::GREEN . "Tree spawned!");
+        if($sender->getLevel()->setBlock($block->add(0, 1), new Sapling($type), true, true)){
+            $sender->getLevel()->getBlock($block->add(0, 1))->onActivate(new Item(Item::DYE, 15));
+            $sender->sendMessage(TextFormat::GREEN . "Tree spawned!");
+        }
         return true;
     }
 } 
