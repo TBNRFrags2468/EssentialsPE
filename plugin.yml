@@ -1,7 +1,7 @@
 name: EssentialsPE
 main: EssentialsPE\Loader
 version: 1.0.0 GoldenMaster
-api: 1.6.0 #Prepare to update to 1.9.0 (Nested configuration values for Homes and Warps)
+api: 1.9.0
 author: LegendsOfMCPE Team
 load: STARTUP
 website: https://github.com/LegendOfMCPE/EssentialsPE
