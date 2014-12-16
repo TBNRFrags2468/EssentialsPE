@@ -13,6 +13,9 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
         $this->plugin = $plugin;
     }
 
+    /**
+     * @return Loader
+     */
     public final function getPlugin(){
         return $this->plugin;
     }
