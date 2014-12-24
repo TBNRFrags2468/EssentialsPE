@@ -24,9 +24,15 @@ class World extends BaseCommand{
         switch(count($args)){
             case 1:
                 $world = $args[0];
-                if(!$sender->getServer()->isLevelGenerated($world) || !$sender->getServer()->isLevelLoaded($world)){
-                    $sender->sendMessage(TextFormat::RED . "[Error] World " . ($sender->getServer()->isLevelGenerated($world) ? "is not loaded" : "doesn't exists"));
+                if(!$sender->getServer()->isLevelGenerated($world)){
+                    $sender->sendMessage(TextFormat::RED . "[Error] World doesn't exists");
                     return false;
+                }elseif(!$sender->getServer()->isLevelLoaded($world)){
+                    $sender->sendMessage(TextFormat::YELLOW . "Level is not loaded yet. Loading...");
+                    if(!$sender->getServer()->loadLevel($world)){
+                        $sender->sendMessage(TextFormat::RED . "[Error] The level couldn't be loaded");
+                        return false;
+                    }
                 }
                 $world = $sender->getServer()->getLevelByName($world);
                 $sender->teleport($world->getSpawnLocation(), 0, 0);
