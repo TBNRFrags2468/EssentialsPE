@@ -3,7 +3,6 @@ main: EssentialsPE\Loader
 version: 1.0.1
 api: 1.9.0
 author: LegendsOfMCPE Team
-load: STARTUP
 website: https://github.com/LegendOfMCPE/EssentialsPE
 
 permissions:
