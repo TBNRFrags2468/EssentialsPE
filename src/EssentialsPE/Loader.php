@@ -344,13 +344,7 @@ class Loader extends PluginBase{
 
             /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
         ];
-        $r = false;
-        foreach($IDs as $id){
-            if($item->getID() === $id){
-                $r = true;
-            }
-        }
-        return $r;
+        return !isset($IDs[$item->getId()]);
     }
 
     /**
@@ -469,6 +463,8 @@ class Loader extends PluginBase{
      */
     public function sessionExists(Player $player){
         return isset($this->sessions[$player->getName()]);
+
+        //TODO return isset($this->sessions[$player->getId()]);
     }
 
     /**
@@ -479,6 +475,8 @@ class Loader extends PluginBase{
     public function createSession(Player $player){
         $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $this->default));
         $this->sessions[$player->getName()] = $ev->getValues();
+
+        //TODO $this->sessions[$player->getId()] = new BaseSession();
 
         //Enable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -493,6 +491,8 @@ class Loader extends PluginBase{
      */
     public function removeSession(Player $player){
         unset($this->sessions[$player->getName()]);
+
+        //TODO unset($this->sessions[$player->getId()]);
 
         //Disable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -514,6 +514,8 @@ class Loader extends PluginBase{
         }
         $this->sessions[$player->getName()][$key] = $value;
         return true;
+
+        //TODO Remove this function
     }
 
     /**
@@ -528,6 +530,8 @@ class Loader extends PluginBase{
             return false;
         }
         return $this->sessions[$player->getName()][$key];
+
+        //TODO return $this->sessions[$player->getId()];
     }
 
     /**
@@ -778,6 +782,12 @@ class Loader extends PluginBase{
                 $home = $h;
                 break;
             }
+        }
+        if(!$this->getServer()->isLevelLoaded($home[4])){
+            if(!$this->getServer()->isLevelGenerated($home[4])){
+                return false;
+            }
+            $this->getServer()->loadLevel($home[4]);
         }
         return [new Position($home[1], $home[2], $home[3], $this->getServer()->getLevelByName($home[4])), $home[5], $home[6]];
     }
@@ -1475,16 +1485,12 @@ class Loader extends PluginBase{
         $state = $ev->willVanish();
         $this->setSession($player, "vanish", $state);
         if($state === false){
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                if($p->getName() !== $player->getName()){
-                    $p->showPlayer($player);
-                }
+            foreach($player->getLevel()->getPlayers() as $p){
+                $p->showPlayer($player);
             }
         }else{
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                if($p->getName() !== $player->getName()){
-                    $p->hidePlayer($player);
-                }
+            foreach($player->getLevel()->getPlayers() as $p){
+                $p->hidePlayer($player);
             }
         }
         return true;
@@ -1526,9 +1532,13 @@ class Loader extends PluginBase{
         if($origin->getName() !== $target->getName() && $this->isVanished($player)){
             foreach($origin->getPlayers() as $p){
                 $p->showPlayer($player);
+                $player->showPlayer($p);
             }
             foreach($target->getPlayers() as $p){
                 $p->hidePlayer($player);
+                if($this->isVanished($p)){
+                    $player->hidePlayer($p);
+                }
             }
         }
     }

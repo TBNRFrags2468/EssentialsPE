@@ -36,12 +36,12 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /warp <name> [player]");
                     return false;
                 }
-                if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps.$args[0]")){
+                if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps." . $args[0])){
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
                     return false;
                 }
                 $sender->teleport($warp[0], $warp[1], $warp[2]);
-                $sender->sendMessage(TextFormat::GREEN . "Warping to $args[0]...");
+                $sender->sendMessage(TextFormat::GREEN . "Warping to " . $args[0] . "...");
                 break;
             case 2:
                 $player = $this->getPlugin()->getPlayer($args[1]);

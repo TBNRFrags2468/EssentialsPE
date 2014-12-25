@@ -35,7 +35,7 @@ class Home extends BaseCommand{
         }
         $home = $this->getPlugin()->getHome($sender, $args[0]);
         if(!$home){
-            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists");
+            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists or the world is not available");
             return false;
         }
         $sender->teleport($home[0], $home[1], $home[2]);
