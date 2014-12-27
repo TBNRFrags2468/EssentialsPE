@@ -677,7 +677,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->setSession($player, "god", $ev->getGodMode());
+        $this->getSession($player)->isGod = $ev->getGodMode();
         return true;
     }
 
@@ -1412,7 +1412,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->setSession($player, "unlimited", $ev->getUnlimitedMode());
+        $this->getSession($player)->isUnlimitedEnabled = $ev->getUnlimitedMode();
         return true;
     }
 
