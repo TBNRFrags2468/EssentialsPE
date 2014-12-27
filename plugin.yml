@@ -205,7 +205,7 @@ permissions:
                 default: op
                 description: "Allow to disable PowerTool from all the items (of a player)"
             essentials.pvp:
-                default: true
+                default: op
                 description: "Toggle PvP on/off"
             essentials.realname:
                 default: op

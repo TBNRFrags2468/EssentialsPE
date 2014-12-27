@@ -28,7 +28,7 @@ class TPAccept extends BaseCommand{
         }
         switch(count($args)){
             case 0:
-                $player = $this->getPlugin()->getPlayer(($name = $request["latest"]));
+                $player = $this->getPlugin()->getPlayer(($name = $this->getPlugin()->getLatestRequest($sender)));
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Request unavailable");
                     return false;
@@ -52,6 +52,8 @@ class TPAccept extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $args[0]);
                     return false;
                 }
+                $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::GREEN . " accepted your teleport request! Teleporting...");
+                $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
                 if($request === "tpto"){
                     $player->teleport($sender->getPosition(), $sender->getYaw(), $sender->getPitch());
                 }else{
