@@ -24,7 +24,7 @@ class BaseSession {
             $this->isPvPEnabled = $values["isPvPEnabled"];
             //Teleport Requests
             $this->requestTo = $values["requestTo"];
-            $this->requestToAction = $values["RequestToAction"];
+            $this->requestToAction = $values["requestToAction"];
             $this->requestToTask = $values["requestToTask"];
             $this->latestRequestFrom = $values["latestRequestFrom"];
             $this->requestsFrom = $values["requestsFrom"];
