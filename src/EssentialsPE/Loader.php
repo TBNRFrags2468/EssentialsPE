@@ -716,19 +716,14 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function homeExists(Player $player, $home){
-        $list = $this->homes->get($player->getName());
-        if(!$list){
+        if(trim($home) === "" || !$this->homes->exists($player->getName())){
             return false;
         }
-        $list = explode(";", $list);
-        foreach($list as $h){
-            $h = explode(",", $h);
-            if($h[0] === strtolower($home)){
-                return true;
-                break;
-            }
+        $list = array_keys($this->homes->get($player->getName()));
+        if(!isset($list[strtolower($home)])){
+            return false;
         }
-        return false;
+        return true;
     }
 
     /**
@@ -742,22 +737,15 @@ class Loader extends PluginBase{
         if(!$this->homeExists($player, $home)){
             return false;
         }
-        $list = explode(";", $this->homes->get($player->getName()));
-        foreach($list as $h){
-            $h = explode(",", $h);
-            if($h[0] === strtolower($home)){
-                unset($h[0]);
-                $home = $h;
-                break;
-            }
-        }
-        if(!$this->getServer()->isLevelLoaded($home[4])){
-            if(!$this->getServer()->isLevelGenerated($home[4])){
+
+        $v = $this->homes->getNested($player->getName() . "." . strtolower($home));
+        if(!$this->getServer()->isLevelLoaded($v[4])){
+            if(!$this->getServer()->isLevelGenerated($v[4])){
                 return false;
             }
-            $this->getServer()->loadLevel($home[4]);
+            $this->getServer()->loadLevel($v[4]);
         }
-        return [new Position($home[1], $home[2], $home[3], $this->getServer()->getLevelByName($home[4])), $home[5], $home[6]];
+        return [new Position($v[1], $v[2], $v[3], $this->getServer()->getLevelByName($v[4])), $v[5], $v[6]];
     }
 
     /**
@@ -768,20 +756,26 @@ class Loader extends PluginBase{
      * @param Position $pos
      * @param int $yaw
      * @param int $pitch
+     * @return bool
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
         if(trim($home) === ""){
-            return;
+            return false;
         }
-        $homestring = strtolower($home) . "," . $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
+
         if($this->homeExists($player, $home)){
             $this->removeHome($player, $home);
         }
-        if(($homes = $this->homes->get($player->getName())) !== false && $homes !== ""){
-            $homestring = ";" . $homestring;
-        }
-        $this->homes->set($player->getName(), $homestring);
+        $this->homes->setNested($player->getName() . "." . strtolower($home), [
+            $pos->getX(),
+            $pos->getY(),
+            $pos->getZ(),
+            $pos->getLevel()->getName(),
+            $yaw,
+            $pitch
+        ]);
         $this->homes->save();
+        return true;
     }
 
     /**
@@ -789,23 +783,17 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param string $home
+     * @return bool
      */
     public function removeHome(Player $player, $home){
-        if($this->homeExists($player, $home)){
-            $homes = explode(";", $this->homes->get($player->getName()));
-            foreach($homes as $k => $h){
-                $name = explode(",", $h);
-                if($name[0] === strtolower($home)){
-                    array_splice($homes, $k, 1);
-                    break;
-                }
-            }
-            $this->homes->set($player->getName(), implode(";", $homes));
-            if(($homes = $this->homes->get($player->getName())) === "" || $homes === null || $homes === " "){
-                $this->homes->remove($player->getName());
-            }
-            $this->homes->save();
+        if(!$this->homeExists($player, $home)){
+            return false;
         }
+        $list = $this->homes->get($player->getName());
+        unset($list[strtolower($home)]);
+        $this->homes->set($player->getName(), $list);
+        $this->homes->save();
+        return true;
     }
 
     /**
@@ -816,22 +804,12 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function homesList(Player $player, $inArray = false){
-        $list = $this->homes->get($player->getName());
-        if(!$list){
+        if(!$this->homes->exists($player->getName())){
             return false;
         }
-        $homes = explode(";", $list);
-        $list = [];
-        foreach($homes as $home){
-            $home = explode(",", $home);
-            $list[] = $home[0];
-        }
-        if($list === []){
-            return false;
-        }
+        $list = array_keys($this->homes->get($player->getName()));
         if(!$inArray){
-            $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            return $string;
+            return wordwrap(implode(", ", $list), 30, "\n", true);
         }
         return $list;
     }
@@ -1528,7 +1506,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function warpExists($warp){
-        return ($this->warps->exists(strtolower($warp)) ? true : false);
+        return $this->warps->exists(strtolower($warp));
     }
 
     /**
@@ -1539,11 +1517,11 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function getWarp($warp){
-        if(!$this->warpExists(strtolower($warp))){
+        if(!$this->warpExists($warp)){
             return false;
         }
-        $warp = explode(",", $this->warps->get(strtolower($warp)));
-        return [new Position($warp[0], $warp[1], $warp[2], $this->getServer()->getLevelByName($warp[3])), $warp[4], $warp[5]];
+        $v = $this->warps->get(strtolower($warp));
+        return [new Position($v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3])), $v[4], $v[5]];
     }
 
     /**
@@ -1553,14 +1531,22 @@ class Loader extends PluginBase{
      * @param Position $pos
      * @param int $yaw
      * @param int $pitch
+     * @return bool
      */
     public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
-        if($warp === null || $warp === "" || $warp === " "){
-            return;
+        if(trim($warp) === ""){
+            return false;
         }
-        $value = $pos->getX() . "," . $pos->getY() . "," . $pos->getZ() . ","  . $pos->getLevel()->getName() . "," . $yaw . "," . $pitch;
-        $this->warps->set(strtolower($warp), $value);
+        $this->warps->set(strtolower($warp), [
+            $pos->getX(),
+            $pos->getY(),
+            $pos->getZ(),
+            $pos->getLevel()->getName(),
+            $yaw,
+            $pitch
+        ]);
         $this->warps->save();
+        return true;
     }
 
     /**
@@ -1587,15 +1573,11 @@ class Loader extends PluginBase{
      */
     public function warpList($inArray = false){
         $list = $this->warps->getAll(true);
-        if(!$list){
-            return false;
-        }
-        if($list === []){
+        if(!$list || count($list) < 1){
             return false;
         }
         if(!$inArray){
-            $string = wordwrap(implode(", ", $list), 30, "\n", true);
-            return $string;
+            return wordwrap(implode(", ", $list), 30, "\n", true);
         }
         return $list;
     }
