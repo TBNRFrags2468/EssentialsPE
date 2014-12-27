@@ -418,42 +418,6 @@ class Loader extends PluginBase{
     private $sessions = [];
     /** @var array  */
     private $mutes = [];
-    /** @var array  */
-    private $default = [
-        "afk" => [
-            "mode" => false,
-            "kick-taskID" => false,
-            //"auto-taskID" => false
-        ],
-        "back" => [
-            "position" => false,
-            "rotation" => false
-        ],
-        "god" => false,
-        "powertool" => [
-            "commands" => false,
-            "chat-macro" => false
-        ],
-        "pvp" => false,
-        "tprequests" => [
-            "request_to" => [
-                "player" => false, // The player that you make a request to
-                "action" => false, // The type of request made
-                "task-ID" => false // The ID of the scheduled task to cancel the request after a period of time
-            ],
-            "requests_from" => [
-                "latest" => false // This point to the latest player to make a request
-                /** This is how it works per player:
-                 *
-                 * "iksaku" => "tpto"  <--- Type of request
-                 *    ^^^
-                 * Player Name
-                 */
-            ]
-        ],
-        "unlimited" => false,
-        "vanish" => false
-    ];
 
     /**
      * Tell if a session exists for a specific player
@@ -509,24 +473,6 @@ class Loader extends PluginBase{
         if($this->getConfig()->get("enable-custom-colors") === true){
             $player->setRemoveFormat(true);
         }
-    }
-
-    /**
-     * Modify the value of a session key (See "Mute" for example)
-     *
-     * @param Player $player
-     * @param string $key
-     * @param $value
-     * @return bool
-     */
-    public function setSession(Player $player, $key, $value){
-        if(!$this->sessionExists($player)){
-            return false;
-        }
-        $this->sessions[$player->getName()][$key] = $value;
-        return true;
-
-        //TODO Remove this function
     }
 
     /**
@@ -649,6 +595,8 @@ class Loader extends PluginBase{
      */
 
     /**
+     * Return the last known spot of a player before teleporting
+     *
      * @param Player $player
      * @return bool|Position
      */
@@ -660,6 +608,8 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Get the last known rotation of a player before teleporting
+     *
      * @param Player $player
      * @return bool|array
      */
@@ -671,6 +621,8 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Updates the last position of a player.
+     *
      * @param Player $player
      * @param Position $pos
      * @param int $yaw
@@ -681,7 +633,14 @@ class Loader extends PluginBase{
         $this->getSession($player)->lastRotation = [$yaw, $pitch];
     }
 
+    public function removePlayerLastPosition(Player $player){
+        $this->getSession($player)->lastPosition = null;
+        $this->getSession($player)->lastRotation = null;
+    }
+
     /**
+     * Teleport the target player to its last known spot and set the corresponding rotation
+     *
      * @param Player $player
      * @return bool
      */
@@ -1029,7 +988,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isPowerToolEnabled(Player $player){
-        if($this->getSession($player)->ptCommands === false || $this->getSession($player)->ptChatMacros === false){
+        if($this->getSession($player)->ptCommands === false || $this->getSession($player)->ptChatMacro === false){
             return false;
         }else{
             return true;

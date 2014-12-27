@@ -13,6 +13,7 @@ use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedEnterEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
+use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
@@ -191,6 +192,17 @@ class EventHandler implements Listener{
                     $event->setCancelled(true);
                 }
             }
+        }
+    }
+
+    /**
+     * @param PlayerDeathEvent $event
+     */
+    public function onPlayerDeath(PlayerDeathEvent $event){
+        if($event->getEntity()->hasPermission("essentials.back.ondeath")){
+            $this->plugin->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getPosition(), $event->getEntity()->getYaw(), $event->getEntity()->getPitch());
+        }else{
+            $this->plugin->removePlayerLastPosition($event->getEntity());
         }
     }
 
