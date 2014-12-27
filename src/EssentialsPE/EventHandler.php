@@ -236,14 +236,14 @@ class EventHandler implements Listener{
                     $damage = $tile->getText()[2];
 
                     if(!is_numeric($item_name)){
-                        $event->getItem() = Item::fromString($item_name);
+                        $item = Item::fromString($item_name);
                     }else{
-                        $event->getItem() = Item::get($item_name);
+                        $item = Item::get($item_name);
                     }
-                    $event->getItem()->setDamage($damage);
+                    $item->setDamage($damage);
 
-                    $event->getPlayer()->getInventory()->addItem($event->getItem());
-                    $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $event->getItem()->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED .( $event->getItem()->getName() === "Unknown" ? $item_name : $event->getItem()->getName()));
+                    $event->getPlayer()->getInventory()->addItem($item);
+                    $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED .( $item->getName() === "Unknown" ? $item_name : $item->getName()));
                 }
             }
 
@@ -291,19 +291,19 @@ class EventHandler implements Listener{
                     return false;
                 }else{
                     if(($v = $tile->getText()[1]) === "Hand"){
-                        if($this->plugin->isReparable($event->getItem() = $event->getPlayer()->getInventory()->getItemInHand())){
-                            $event->getItem()->setDamage(0);
+                        if($this->plugin->isReparable($item = $event->getPlayer()->getInventory()->getItemInHand())){
+                            $item->setDamage(0);
                             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         }
                     }elseif($v === "All"){
-                        foreach($event->getPlayer()->getInventory()->getContents() as $event->getItem()){
-                            if($this->plugin->isReparable($event->getItem())){
-                                $event->getItem()->setDamage(0);
+                        foreach($event->getPlayer()->getInventory()->getContents() as $item){
+                            if($this->plugin->isReparable($item)){
+                                $item->setDamage(0);
                             }
                         }
-                        foreach($event->getPlayer()->getInventory()->getArmorContents() as $event->getItem()){
-                            if($this->plugin->isReparable($event->getItem())){
-                                $event->getItem()->setDamage(0);
+                        foreach($event->getPlayer()->getInventory()->getArmorContents() as $item){
+                            if($this->plugin->isReparable($item)){
+                                $item->setDamage(0);
                             }
                         }
                         $event->getPlayer()->sendMessage(TextFormat::GREEN . "All the tools on your inventory were repaired!" . TextFormat::AQUA . "\n(including the equipped Armor)");
