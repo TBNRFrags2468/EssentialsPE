@@ -78,6 +78,9 @@ permissions:
                     essentials.essentials.reload:
                         default: op
                         description: "Let you reload the config file of EssentialsPE"
+                    #essentials.essentials.update:
+                    #    default: op
+                    #    description: "Allow to update EssentialsPE to its latest version, if available"
             essentials.extinguish:
                 default: op
                 description: "Extinguish a player"
@@ -85,25 +88,6 @@ permissions:
                     essentials.extinguish.other:
                         default: op
                         description: "Extinguish other players"
-            essentials.gamemode:
-                default: op
-                description: "Change your gamemode"
-                children:
-                    essentials.gamemode.adventure:
-                        default: op
-                        description: "Change gamemode to Adventure"
-                    essentials.gamemode.creative:
-                        default: op
-                        description: "Change gamemode to Creative"
-                    essentials.gamemode.survival:
-                        default: op
-                        description: "Change gamemode to Survival"
-                    essentials.gamemode.spectator:
-                        default: op
-                        description: "Change gamemode to Spectator"
-                    essentials.gamemode.other:
-                        default: op
-                        description: "Change other's gamemode"
             essentials.getpos:
                 default: op
                 description: "Get any player's position"
