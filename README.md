@@ -7,7 +7,7 @@ The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/ess
 
 If you are planning to use PocketMine-MP _Dev_ builds keep in mind that EssentialsPE can crash it because may not support _Dev_ API versions.
 
-#### [Download the latest _Development_ Builds here!](http://pemapmodder.zapto.org/data/builds)
+#### [Download the latest _Development_ Builds here!](http://pemapmodder.zapto.org/data/builds/#top-LegendOfMCPE/EssentialsPE)
 
 TODO:
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
