@@ -490,10 +490,11 @@ class Loader extends PluginBase{
         }
         $state = $ev->getAFKMode();
         $this->getSession($player)->setAFK($state);
+        $time = $this->getConfig()->get("auto-afk-kick");
         if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->getSession($player)->removeAFKKickTaskID($player);
-        }elseif($state === true and (($time = $this->getAFKAutoKickTime()) !== false and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
+        }elseif($state === true and (is_int($time) and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
         }
@@ -507,15 +508,6 @@ class Loader extends PluginBase{
      */
     public function switchAFKMode(Player $player){
         $this->setAFKMode($player, ($this->isAFK($player) ? false : true));
-    }
-
-    /**
-     * Get the time until a player get kicked for AFK
-     *
-     * @return bool|int
-     */
-    public function getAFKAutoKickTime(){
-        return $this->getConfig()->get("auto-afk-kick");
     }
 
     /**  ____             _
