@@ -50,7 +50,7 @@ class AFK extends BaseCommand{
     }
 
     private function broadcastAFKStatus(Player $player){
-        $message =TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is " . ($this->getPlugin()->isAFK($player) ? "now" : "no longer") . " AFK";
+        $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->getPlugin()->isAFK($player) ? "now" : "no longer") . " AFK";
         $player->getServer()->getLogger()->info($message);
         foreach($player->getServer()->getOnlinePlayers() as $p){
             if($p !== $player){

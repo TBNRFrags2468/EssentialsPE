@@ -37,7 +37,8 @@ class EventHandler implements Listener{
     /**
      * @param PlayerPreLoginEvent $event
      *
-     * @priority HIGHEST
+     * @priority MONITOR
+     * @ignoreCancelled true
      */
     public function onPlayerPreLogin(PlayerPreLoginEvent $event){
         // Ban remove:
@@ -137,7 +138,7 @@ class EventHandler implements Listener{
     public function onEntityTeleport(EntityTeleportEvent $event){
         $entity = $event->getEntity();
         if($entity instanceof Player){
-            $this->plugin->setPlayerLastPosition($entity, $entity->getPosition(), $entity->yaw, $entity->pitch);
+            $this->plugin->setPlayerLastPosition($entity, $entity->getPosition(), $entity->getYaw(), $entity->getPitch());
         }
     }
 

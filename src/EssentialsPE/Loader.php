@@ -426,7 +426,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function sessionExists(Player $player){
-        return isset($this->sessions[$player->getId()]);
+        return isset($this->sessions[$player->getName()]);
     }
 
     /**
@@ -453,7 +453,7 @@ class Loader extends PluginBase{
             "isUnlimitedEnabled" => false,
             "isVanished" => false
         ]));
-        $this->sessions[$player->getId()] = new BaseSession($ev->getValues());
+        $this->sessions[$player->getName()] = new BaseSession($ev->getValues());
 
         //Enable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -467,7 +467,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function removeSession(Player $player){
-        unset($this->sessions[$player->getId()]);
+        unset($this->sessions[$player->getName()]);
 
         //Disable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -483,7 +483,7 @@ class Loader extends PluginBase{
         if(!$this->sessionExists($player)){
             return false;
         }
-        return $this->sessions[$player->getId()];
+        return $this->sessions[$player->getName()];
     }
 
     /**
@@ -494,6 +494,16 @@ class Loader extends PluginBase{
      *   / ____ \| |    | . \
      *  /_/    \_|_|    |_|\_\
      */
+
+    /**
+     * Tell if the player is AFK or not
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isAFK(Player $player){
+        return $this->getSession($player)->isAFK();
+    }
 
     /**
      * Change the AFK mode of a player
@@ -512,13 +522,13 @@ class Loader extends PluginBase{
             return false;
         }
         $state = $ev->getAFKMode();
-        $this->sessions[$player->getId()]->isAFK = $state;
-        if($state === false && ($id = $this->getAFKAutoKickTaskID($player)) !== false){
+        $this->getSession($player)->setAFK($state);
+        if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
-            $this->removeAFKAutoKickTaskID($player);
+            $this->getSession($player)->removeAFKKickTaskID($player);
         }elseif($state === true and (($time = $this->getAFKAutoKickTime()) !== false and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
-            $this->setAFKAutoKickTaskID($player, $task->getTaskId());
+            $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
         }
         return true;
     }
@@ -533,55 +543,12 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Tell if the player is AFK or not
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isAFK(Player $player){
-        return $this->sessions[$player->getId()]->isAFK;
-    }
-
-    /**
      * Get the time until a player get kicked for AFK
      *
      * @return bool|int
      */
     public function getAFKAutoKickTime(){
         return $this->getConfig()->get("auto-afk-kick");
-    }
-
-    /**
-     * Set the Auto-Kick TaskID of the player
-     *
-     * @param Player $player
-     * @param int $taskID
-     */
-    private function setAFKAutoKickTaskID(Player $player, $taskID){
-        $this->sessions[$player->getId()]->kickAFK = $taskID;
-    }
-
-    /**
-     * Removes the Auto-Kick TaskID of the player
-     *
-     * @param Player $player
-     */
-    private function removeAFKAutoKickTaskID(Player $player){
-        $this->sessions[$player->getId()]->kickAFK = false;
-    }
-
-    /**
-     * Return the Auto-kick TaskID of a player for being AFK
-     * Return "false" if the player isn't AFK or isn't on a Kick Queue
-     *
-     * @param Player $player
-     * @return mixed
-     */
-    private function getAFKAutoKickTaskID(Player $player){
-        if(!$this->isAFK($player)){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->kickAFK;
     }
 
     /**  ____             _
@@ -599,23 +566,17 @@ class Loader extends PluginBase{
      * @return bool|Position
      */
     public function getLastPlayerPosition(Player $player){
-        if(!$this->sessions[$player->getId()]->lastPosition instanceof Position){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->lastPosition;
+        return $this->getSession($player)->getLastPosition();
     }
 
     /**
      * Get the last known rotation of a player before teleporting
      *
      * @param Player $player
-     * @return bool|array
+     * @return array|bool
      */
     public function getLastPlayerRotation(Player $player){
-        if(count($this->sessions[$player->getId()]->lastRotation) !== 2){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->lastRotation;
+        return $this->getSession($player)->getLastRotation();
     }
 
     /**
@@ -627,13 +588,14 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
-        $this->sessions[$player->getId()]->lastPosition = $pos;
-        $this->sessions[$player->getId()]->lastRotation = [$yaw, $pitch];
+        $this->getSession($player)->setLastPosition($pos, $yaw, $pitch);
     }
 
+    /**
+     * @param Player $player
+     */
     public function removePlayerLastPosition(Player $player){
-        $this->sessions[$player->getId()]->lastPosition = null;
-        $this->sessions[$player->getId()]->lastRotation = null;
+        $this->getSession($player)->removeLastPosition();
     }
 
     /**
@@ -661,6 +623,16 @@ class Loader extends PluginBase{
      */
 
     /**
+     * Tell if a player is in God Mode
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isGod(Player $player){
+        return $this->getSession($player)->isGod();
+    }
+
+    /**
      * Set the God Mode on or off
      *
      * @param Player $player
@@ -675,7 +647,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->sessions[$player->getId()]->isGod = $ev->getGodMode();
+        $this->getSession($player)->setGod($ev->getGodMode());
         return true;
     }
 
@@ -686,16 +658,6 @@ class Loader extends PluginBase{
      */
     public function switchGodMode(Player $player){
         $this->setGodMode($player, ($this->isGod($player) ? false : true));
-    }
-
-    /**
-     * Tell if a player is in God Mode
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isGod(Player $player){
-        return $this->sessions[$player->getId()]->isGod;
     }
 
     /**  _    _
@@ -836,9 +798,19 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function muteSessionCreate(Player $player){
-        if(!isset($this->mutes[$player->getId()])){
-            $this->mutes[$player->getId()] = false;
+        if(!isset($this->mutes[$player->getName()])){
+            $this->mutes[$player->getName()] = false;
         }
+    }
+
+    /**
+     * Tell if the is Muted or not
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isMuted(Player $player){
+        return $this->mutes[$player->getName()];
     }
 
     /**
@@ -856,7 +828,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->mutes[$player->getId()] = $ev->willMute();
+        $this->mutes[$player->getName()] = $ev->willMute();
         return true;
     }
 
@@ -867,16 +839,6 @@ class Loader extends PluginBase{
      */
     public function switchMute(Player $player){
         $this->setMute($player, ($this->isMuted($player) ? false : true));
-    }
-
-    /**
-     * Tell if the is Muted or not
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isMuted(Player $player){
-        return $this->mutes[$player->getId()];
     }
 
     /**  _   _ _      _
@@ -971,11 +933,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isPowerToolEnabled(Player $player){
-        if($this->sessions[$player->getId()]->ptCommands === false || $this->sessions[$player->getId()]->ptChatMacro === false){
-            return false;
-        }else{
-            return true;
-        }
+        return $this->getSession($player)->isPowerToolEnabled();
     }
 
     /**
@@ -1017,15 +975,10 @@ class Loader extends PluginBase{
      * @param Player $player
      * @param Item $item
      * @param string $command
+     * @return bool
      */
     public function setPowerToolItemCommand(Player $player, Item $item, $command){
-        if($item->getID() !== 0){
-            if(!is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()])){
-                $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()] = $command;
-            }else{
-                $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()][] = $command;
-            }
-        }
+        return $this->getSession($player)->setPowerToolItemCommand($item->getId(), $command);
     }
 
     /**
@@ -1037,10 +990,7 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function getPowerToolItemCommand(Player $player, Item $item){
-        if($item->getId() === 0 || (!isset($this->sessions[$player->getId()]->ptCommands[$item->getID()]) || is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()]))){
-            return false;
-        }
-        return $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()];
+        return $this->getSession($player)->getPowerToolItemCommand($item->getId());
     }
 
     /**
@@ -1052,11 +1002,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setPowerToolItemCommands(Player $player, Item $item, array $commands){
-        if($item->getID() === 0){
-            return false;
-        }
-        $this->sessions[$player->getId()]->ptCommands = $commands;
-        return true;
+        return $this->getSession($player)->setPowerToolItemCommands($item->getId(), $commands);
     }
 
     /**
@@ -1068,29 +1014,19 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function getPowerToolItemCommands(Player $player, Item $item){
-        if(!isset($this->sessions[$player->getId()]->ptCommands[$item->getID()]) || !is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()])){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->ptCommands[$item->getID()];
+        return $this->getSession($player)->getPowerToolItemCommands($item->getId());
     }
 
     /**
-     *
      * Let you remove 1 command of the item command list
-     * [if there're more than 1)
+     * [ONLY if there're more than 1)
      *
      * @param Player $player
      * @param Item $item
      * @param string $command
      */
     public function removePowerToolItemCommand(Player $player, Item $item, $command){
-        if(is_array($commands = $this->getPowerToolItemCommands($player, $item))){
-            foreach($commands as $c){
-                if(stripos(strtolower($c), strtolower($command)) !== false){
-                    unset($c);
-                }
-            }
-        }
+        $this->getSession($player)->removePowerToolItemCommand($item->getId(), $command);
     }
 
     /**
@@ -1102,12 +1038,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setPowerToolItemChatMacro(Player $player, Item $item, $chat_message){
-        if($item->getID() === 0){
-            return false;
-        }
-        $chat_message = str_replace("\\n", "\n", $chat_message);
-        $this->sessions[$player->getId()]->ptChatMacro[$item->getID()] = $chat_message;
-        return true;
+        return $this->getSession($player)->setPowerToolItemChatMacro($item->getId(), $chat_message);
     }
 
     /**
@@ -1118,10 +1049,7 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function getPowerToolItemChatMacro(Player $player, Item $item){
-        if(!isset($this->sessions[$player->getId()]->ptChatMacro[$item->getID()])){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->ptChatMacro[$item->getID()];
+        return $this->getSession($player)->getPowerToolItemChatMacro($item->getId());
     }
 
     /**
@@ -1131,8 +1059,7 @@ class Loader extends PluginBase{
      * @param Item $item
      */
     public function disablePowerToolItem(Player $player, Item $item){
-        unset($this->sessions[$player->getId()]->ptCommands[$item->getID()]);
-        unset($this->sessions[$player->getId()]->ptChatMacro[$item->getID()]);
+        $this->getSession($player)->disablePowerToolItem($item->getId());
     }
 
     /**
@@ -1141,8 +1068,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function disablePowerTool(Player $player){
-        $this->sessions[$player->getId()]->ptCommands = false;
-        $this->sessions[$player->getId()]->ptChatMacro = false;
+        $this->getSession($player)->disablePowerTool();
     }
 
     /**  _____        _____
@@ -1152,6 +1078,16 @@ class Loader extends PluginBase{
      *  | |     \ V /| |
      *  |_|      \_/ |_|
      */
+
+    /**
+     * Tell if the PvP mode is enabled for the specified player, or not
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isPvPEnabled(Player $player){
+        return $this->getSession($player)->isPVPEnabled();
+    }
 
     /**
      * Set the PvP mode on or off
@@ -1168,7 +1104,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->sessions[$player->getId()]->isPvPEnabled = $ev->getPvPMode();
+        $this->getSession($player)->setPvP($ev->getPvPMode());
         return true;
     }
 
@@ -1179,16 +1115,6 @@ class Loader extends PluginBase{
      */
     public function switchPvP(Player $player){
         $this->setPvP($player, ($this->isPvPEnabled($player) ? false : true));
-    }
-
-    /**
-     * Tell if the PvP mode is enabled for the specified player, or not
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isPvPEnabled(Player $player){
-        return $this->sessions[$player->getId()]->isPvPEnabled;
     }
 
     /**  _______ _____  _____                           _
@@ -1384,6 +1310,16 @@ class Loader extends PluginBase{
      */
 
     /**
+     * Tells if the unlimited mode is enabled
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isUnlimitedEnabled(Player $player){
+        return $this->getSession($player)->isUnlimitedEnabled();
+    }
+
+    /**
      * Set the unlimited place of items on/off to a player
      *
      * @param Player $player
@@ -1398,23 +1334,17 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->sessions[$player->getId()]->isUnlimitedEnabled = $ev->getUnlimitedMode();
+        $this->getSession($player)->setUnlimited($ev->getUnlimitedMode());
         return true;
     }
 
     /**
+     * Automatically switch the state of the Unlimited mode
+     *
      * @param Player $player
      */
     public function switchUnlimited(Player $player){
         $this->setUnlimited($player, ($this->isUnlimitedEnabled($player) ? false : true));
-    }
-
-    /**
-     * @param Player $player
-     * @return bool
-     */
-    public function isUnlimitedEnabled(Player $player){
-        return $this->sessions[$player->getId()]->isUnlimitedEnabled;
     }
 
     /** __      __         _     _
@@ -1424,6 +1354,16 @@ class Loader extends PluginBase{
      *     \  | (_| | | | | \__ | | | |
      *      \/ \__,_|_| |_|_|___|_| |_|
      */
+
+    /**
+     * Tell if a player is Vanished, or not
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function isVanished(Player $player){
+        return $this->getSession($player)->isVanished();
+    }
 
     /**
      * Set the Vanish mode on or off
@@ -1441,7 +1381,7 @@ class Loader extends PluginBase{
             return false;
         }
         $state = $ev->willVanish();
-        $this->sessions[$player->getId()]->isVanished = $state;
+        $this->getSession($player)->setVanish($state);
         if($state === false){
             foreach($player->getLevel()->getPlayers() as $p){
                 $p->showPlayer($player);
@@ -1462,16 +1402,6 @@ class Loader extends PluginBase{
      */
     public function switchVanish(Player $player){
         $this->setVanish($player, ($this->isVanished($player) ? false : true));
-    }
-
-    /**
-     * Tell if a player is Vanished, or not
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function isVanished(Player $player){
-        return $this->sessions[$player->getId()]->isVanished;
     }
 
     /**
