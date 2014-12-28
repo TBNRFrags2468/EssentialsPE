@@ -29,6 +29,9 @@ permissions:
                     essentials.afk.kickexempt:
                         default: op
                         description: "Exempt the user from being auto kicked for AFK"
+            essentials.antioch:
+                default: op
+                description: "Place live TNT at the spot you're looking at"
             essentials.back:
                 default: op
                 description: "Return to your previous spot before teleporting"

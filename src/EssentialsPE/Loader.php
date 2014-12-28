@@ -2,6 +2,7 @@
 namespace EssentialsPE;
 
 use EssentialsPE\Commands\AFK;
+use EssentialsPE\Commands\Antioch;
 use EssentialsPE\Commands\Back;
 use EssentialsPE\Commands\BreakCommand;
 use EssentialsPE\Commands\Broadcast;
@@ -66,7 +67,6 @@ use pocketmine\item\Item;
 use pocketmine\level\Level;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
-use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
@@ -149,6 +149,7 @@ class Loader extends PluginBase{
         $cmdmap = $this->getServer()->getCommandMap();
         $cmdmap->registerAll("essentialspe", [
             new AFK($this),
+            new Antioch($this),
             new Back($this),
             //new BigTreeCommand($this), //TODO
             new BreakCommand($this),
@@ -372,40 +373,6 @@ class Loader extends PluginBase{
         return $players;
     }
 
-    /**
-     * Spawn a carpet of bomb!
-     *
-     * @param Player $player
-     */
-    public function nuke(Player $player){
-        for($x = -10; $x <= 10; $x += 5){
-            for($z = -10; $z <= 10; $z += 5){
-                $pos = new Vector3($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z);
-                $level = $player->getLevel();
-                $mot = (new Random())->nextSignedFloat() * M_PI * 2;
-                $tnt = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
-                    "Pos" => new Enum("Pos", [
-                        new Double("", $pos->x + 0.5),
-                        new Double("", $pos->y),
-                        new Double("", $pos->z + 0.5)
-                    ]),
-                    "Motion" => new Enum("Motion", [
-                        new Double("", -sin($mot) * 0.02),
-                        new Double("", 0.2),
-                        new Double("", -cos($mot) * 0.02)
-                    ]),
-                    "Rotation" => new Enum("Rotation", [
-                        new Float("", 0),
-                        new Float("", 0)
-                    ]),
-                    "Fuse" => new Byte("Fuse", 80),
-                ]));
-                $tnt->namedtag->setName("EssNuke");
-                $tnt->spawnToAll();
-            }
-        }
-    }
-
     /**   _____              _
      *   / ____|            (_)
      *  | (___   ___ ___ ___ _  ___  _ __  ___
@@ -612,6 +579,67 @@ class Loader extends PluginBase{
         }
         $player->teleport($pos, $rotation[0], $rotation[1]);
         return true;
+    }
+
+    /**  ______       _   _ _   _
+     *  |  ____|     | | (_| | (_)
+     *  | |__   _ __ | |_ _| |_ _  ___ ___
+     *  |  __| | '_ \| __| | __| |/ _ / __|
+     *  | |____| | | | |_| | |_| |  __\__ \
+     *  |______|_| |_|\__|_|\__|_|\___|___/
+     */
+
+    /**
+     * Spawn a carpet of bomb!
+     *
+     * @param Player $player
+     */
+    public function nuke(Player $player){
+        for($x = -10; $x <= 10; $x += 5){
+            for($z = -10; $z <= 10; $z += 5){
+                $pos = new Position($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z, $player->getLevel());
+                $this->createTNT($pos);
+            }
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @return bool
+     */
+    public function antioch(Player $player){
+        $block = $player->getTargetBlock(100, [0, 8, 9, 10, 11]);
+        if($block === null){
+            return false;
+        }
+        $this->createTNT(new Position($block->getX(), $block->getY() + 1, $block->getZ(), $player->getLevel()));
+        return true;
+    }
+
+    /**
+     * @param Position $pos
+     */
+    public function createTNT(Position $pos){
+        $mot = (new Random())->nextSignedFloat() * M_PI * 2;
+        $entity = Entity::createEntity("PrimedTNT", $pos->getLevel()->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
+            "Pos" => new Enum("Pos", [
+                new Double("", $pos->x + 0.5),
+                new Double("", $pos->y),
+                new Double("", $pos->z + 0.5)
+            ]),
+            "Motion" => new Enum("Motion", [
+                new Double("", -sin($mot) * 0.02),
+                new Double("", 0.2),
+                new Double("", -cos($mot) * 0.02)
+            ]),
+            "Rotation" => new Enum("Rotation", [
+                new Float("", 0),
+                new Float("", 0)
+            ]),
+            "Fuse" => new Byte("Fuse", 80),
+        ]));
+        $entity->namedtag->setName("EssNuke");
+        $entity->spawnToAll();
     }
 
     /**   _____           _
