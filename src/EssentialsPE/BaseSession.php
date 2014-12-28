@@ -35,44 +35,105 @@ class BaseSession {
         }
     }
 
-    //AFK mode
+    /**
+     *            ______ _  __
+     *      /\   |  ____| |/ /
+     *     /  \  | |__  | ' /
+     *    / /\ \ |  __| |  <
+     *   / ____ \| |    | . \
+     *  /_/    \_|_|    |_|\_\
+     */
+
     public $isAFK = false;
     public $kickAFK = null;
     public $autoAFK = null;
 
-    //Back
+
+
+    /**  ____             _
+     *  |  _ \           | |
+     *  | |_) | __ _  ___| | __
+     *  |  _ < / _` |/ __| |/ /
+     *  | |_) | (_| | (__|   <
+     *  |____/ \__,_|\___|_|\_\
+     */
+
     public $lastPosition = null;
     public $lastRotation = null;
 
-    //God mode
+    /**   _____           _
+     *   / ____|         | |
+     *  | |  __  ___   __| |
+     *  | | |_ |/ _ \ / _` |
+     *  | |__| | (_) | (_| |
+     *   \_____|\___/ \__,_|
+     */
+
     public $isGod = false;
 
-    //PowerTool
+    /**  _____                    _______          _
+     *  |  __ \                  |__   __|        | |
+     *  | |__) _____      _____ _ __| | ___   ___ | |
+     *  |  ___/ _ \ \ /\ / / _ | '__| |/ _ \ / _ \| |
+     *  | |  | (_) \ V  V |  __| |  | | (_) | (_) | |
+     *  |_|   \___/ \_/\_/ \___|_|  |_|\___/ \___/|_|
+     */
+
     public $ptCommands = false;
     public $ptChatMacro = false;
 
-    //Player vs Player (PvP)
+    /**  _____        _____
+     *  |  __ \      |  __ \
+     *  | |__) __   _| |__) |
+     *  |  ___/\ \ / |  ___/
+     *  | |     \ V /| |
+     *  |_|      \_/ |_|
+     */
+
     public $isPvPEnabled = true;
 
-    //Teleport Requests
-        //Request to:
-        public $requestTo = false;
-        public $requestToAction = false;
-        public $requestToTask = null;
+    /**  _______ _____  _____                           _
+     *  |__   __|  __ \|  __ \                         | |
+     *     | |  | |__) | |__) |___  __ _ _   _  ___ ___| |_ ___
+     *     | |  |  ___/|  _  // _ \/ _` | | | |/ _ / __| __/ __|
+     *     | |  | |    | | \ |  __| (_| | |_| |  __\__ | |_\__ \
+     *     |_|  |_|    |_|  \_\___|\__, |\__,_|\___|___/\__|___/
+     *                                | |
+     *                                |_|
+     */
 
-        //Requests from:
-        public $latestRequestFrom = null;
-        public $requestsFrom = [];
-        /** This is how it works per player:
-         *
-        * "iksaku" => "tpto"  <--- Type of request
-        *    ^^^
-        * Requester Name
-        */
+    //Request to:
+    public $requestTo = false;
+    public $requestToAction = false;
+    public $requestToTask = null;
 
-    //Unlimited mode
+    //Requests from:
+    public $latestRequestFrom = null;
+    public $requestsFrom = [];
+    /** This is how it works per player:
+    *
+    * "iksaku" => "tpto"  <--- Type of request
+    *    ^^^
+    * Requester Name
+    */
+
+    /**  _    _       _ _           _ _           _   _____ _
+     *  | |  | |     | (_)         (_| |         | | |_   _| |
+     *  | |  | |_ __ | |_ _ __ ___  _| |_ ___  __| |   | | | |_ ___ _ __ ___  ___
+     *  | |  | | '_ \| | | '_ ` _ \| | __/ _ \/ _` |   | | | __/ _ | '_ ` _ \/ __|
+     *  | |__| | | | | | | | | | | | | ||  __| (_| |  _| |_| ||  __| | | | | \__ \
+     *   \____/|_| |_|_|_|_| |_| |_|_|\__\___|\__,_| |_____|\__\___|_| |_| |_|___/
+     */
+
     public $isUnlimitedEnabled = false;
 
-    //Vanish mode
+    /** __      __         _     _
+     *  \ \    / /        (_)   | |
+     *   \ \  / __ _ _ __  _ ___| |__
+     *    \ \/ / _` | '_ \| / __| '_ \
+     *     \  | (_| | | | | \__ | | | |
+     *      \/ \__,_|_| |_|_|___|_| |_|
+     */
+
     public $isVanished = false;
 }

@@ -476,6 +476,17 @@ class Loader extends PluginBase{
     }
 
     /**
+     * @param Player $player
+     * @return bool|BaseSession
+     */
+    public function getSession(Player $player){
+        if(!$this->sessionExists($player)){
+            return false;
+        }
+        return $this->sessions[$player->getId()];
+    }
+
+    /**
      *            ______ _  __
      *      /\   |  ____| |/ /
      *     /  \  | |__  | ' /
