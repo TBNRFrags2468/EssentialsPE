@@ -514,7 +514,7 @@ class Loader extends PluginBase{
             return false;
         }
         $state = $ev->getAFKMode();
-        $this->getSession($player)->isAFK = $state;
+        $this->sessions[$player->getId()]->isAFK = $state;
         if($state === false && ($id = $this->getAFKAutoKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->removeAFKAutoKickTaskID($player);
@@ -541,7 +541,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isAFK(Player $player){
-        return $this->getSession($player)->isAFK;
+        return $this->sessions[$player->getId()]->isAFK;
     }
 
     /**
@@ -560,7 +560,7 @@ class Loader extends PluginBase{
      * @param int $taskID
      */
     private function setAFKAutoKickTaskID(Player $player, $taskID){
-        $this->getSession($player)->kickAFK = $taskID;
+        $this->sessions[$player->getId()]->kickAFK = $taskID;
     }
 
     /**
@@ -569,7 +569,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     private function removeAFKAutoKickTaskID(Player $player){
-        $this->getSession($player)->kickAFK = false;
+        $this->sessions[$player->getId()]->kickAFK = false;
     }
 
     /**
@@ -583,7 +583,7 @@ class Loader extends PluginBase{
         if(!$this->isAFK($player)){
             return false;
         }
-        return $this->getSession($player)->kickAFK;
+        return $this->sessions[$player->getId()]->kickAFK;
     }
 
     /**  ____             _
@@ -601,10 +601,10 @@ class Loader extends PluginBase{
      * @return bool|Position
      */
     public function getLastPlayerPosition(Player $player){
-        if(!$this->getSession($player)->lastPosition instanceof Position){
+        if(!$this->sessions[$player->getId()]->lastPosition instanceof Position){
             return false;
         }
-        return $this->getSession($player)->lastPosition;
+        return $this->sessions[$player->getId()]->lastPosition;
     }
 
     /**
@@ -614,10 +614,10 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function getLastPlayerRotation(Player $player){
-        if(count($this->getSession($player)->lastRotation) !== 2){
+        if(count($this->sessions[$player->getId()]->lastRotation) !== 2){
             return false;
         }
-        return $this->getSession($player)->lastRotation;
+        return $this->sessions[$player->getId()]->lastRotation;
     }
 
     /**
@@ -629,13 +629,13 @@ class Loader extends PluginBase{
      * @param int $pitch
      */
     public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
-        $this->getSession($player)->lastPosition = $pos;
-        $this->getSession($player)->lastRotation = [$yaw, $pitch];
+        $this->sessions[$player->getId()]->lastPosition = $pos;
+        $this->sessions[$player->getId()]->lastRotation = [$yaw, $pitch];
     }
 
     public function removePlayerLastPosition(Player $player){
-        $this->getSession($player)->lastPosition = null;
-        $this->getSession($player)->lastRotation = null;
+        $this->sessions[$player->getId()]->lastPosition = null;
+        $this->sessions[$player->getId()]->lastRotation = null;
     }
 
     /**
@@ -677,7 +677,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->getSession($player)->isGod = $ev->getGodMode();
+        $this->sessions[$player->getId()]->isGod = $ev->getGodMode();
         return true;
     }
 
@@ -697,7 +697,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isGod(Player $player){
-        return $this->getSession($player)->isGod;
+        return $this->sessions[$player->getId()]->isGod;
     }
 
     /**  _    _
@@ -719,7 +719,7 @@ class Loader extends PluginBase{
         if(trim($home) === "" || !$this->homes->exists($player->getName())){
             return false;
         }
-        $list = array_keys($this->homes->get($player->getName()));
+        $list = $this->homes->get($player->getName());
         if(!isset($list[strtolower($home)])){
             return false;
         }
@@ -791,7 +791,11 @@ class Loader extends PluginBase{
         }
         $list = $this->homes->get($player->getName());
         unset($list[strtolower($home)]);
-        $this->homes->set($player->getName(), $list);
+        if(count($list) > 0){
+            $this->homes->set($player->getName(), $list);
+        }else{
+            $this->homes->remove($player->getName());
+        }
         $this->homes->save();
         return true;
     }
@@ -808,6 +812,9 @@ class Loader extends PluginBase{
             return false;
         }
         $list = array_keys($this->homes->get($player->getName()));
+        if(count($list) < 1){
+            return false;
+        }
         if(!$inArray){
             return wordwrap(implode(", ", $list), 30, "\n", true);
         }
@@ -966,7 +973,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isPowerToolEnabled(Player $player){
-        if($this->getSession($player)->ptCommands === false || $this->getSession($player)->ptChatMacro === false){
+        if($this->sessions[$player->getId()]->ptCommands === false || $this->sessions[$player->getId()]->ptChatMacro === false){
             return false;
         }else{
             return true;
@@ -1015,7 +1022,7 @@ class Loader extends PluginBase{
      */
     public function setPowerToolItemCommand(Player $player, Item $item, $command){
         if($item->getID() !== 0){
-            if(!is_array($this->getSession($player)->ptCommands[$item->getID()])){
+            if(!is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()])){
                 $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()] = $command;
             }else{
                 $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()][] = $command;
@@ -1032,7 +1039,7 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function getPowerToolItemCommand(Player $player, Item $item){
-        if($item->getId() === 0 || (!isset($this->getSession($player)->ptCommands[$item->getID()]) || is_array($this->getSession($player)->ptCommands[$item->getID()]))){
+        if($item->getId() === 0 || (!isset($this->sessions[$player->getId()]->ptCommands[$item->getID()]) || is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()]))){
             return false;
         }
         return $this->sessions[$player->getName()]["powertool"]["commands"][$item->getID()];
@@ -1050,7 +1057,7 @@ class Loader extends PluginBase{
         if($item->getID() === 0){
             return false;
         }
-        $this->getSession($player)->ptCommands = $commands;
+        $this->sessions[$player->getId()]->ptCommands = $commands;
         return true;
     }
 
@@ -1063,10 +1070,10 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function getPowerToolItemCommands(Player $player, Item $item){
-        if(!isset($this->getSession($player)->ptCommands[$item->getID()]) || !is_array($this->getSession($player)->ptCommands[$item->getID()])){
+        if(!isset($this->sessions[$player->getId()]->ptCommands[$item->getID()]) || !is_array($this->sessions[$player->getId()]->ptCommands[$item->getID()])){
             return false;
         }
-        return $this->getSession($player)->ptCommands[$item->getID()];
+        return $this->sessions[$player->getId()]->ptCommands[$item->getID()];
     }
 
     /**
@@ -1101,7 +1108,7 @@ class Loader extends PluginBase{
             return false;
         }
         $chat_message = str_replace("\\n", "\n", $chat_message);
-        $this->getSession($player)->ptChatMacro[$item->getID()] = $chat_message;
+        $this->sessions[$player->getId()]->ptChatMacro[$item->getID()] = $chat_message;
         return true;
     }
 
@@ -1113,10 +1120,10 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function getPowerToolItemChatMacro(Player $player, Item $item){
-        if(!isset($this->getSession($player)->ptChatMacro[$item->getID()])){
+        if(!isset($this->sessions[$player->getId()]->ptChatMacro[$item->getID()])){
             return false;
         }
-        return $this->getSession($player)->ptChatMacro[$item->getID()];
+        return $this->sessions[$player->getId()]->ptChatMacro[$item->getID()];
     }
 
     /**
@@ -1126,8 +1133,8 @@ class Loader extends PluginBase{
      * @param Item $item
      */
     public function disablePowerToolItem(Player $player, Item $item){
-        unset($this->getSession($player)->ptCommands[$item->getID()]);
-        unset($this->getSession($player)->ptChatMacro[$item->getID()]);
+        unset($this->sessions[$player->getId()]->ptCommands[$item->getID()]);
+        unset($this->sessions[$player->getId()]->ptChatMacro[$item->getID()]);
     }
 
     /**
@@ -1136,8 +1143,8 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function disablePowerTool(Player $player){
-        $this->getSession($player)->ptCommands = false;
-        $this->getSession($player)->ptChatMacro = false;
+        $this->sessions[$player->getId()]->ptCommands = false;
+        $this->sessions[$player->getId()]->ptChatMacro = false;
     }
 
     /**  _____        _____
@@ -1163,7 +1170,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->getSession($player)->isPvPEnabled = $ev->getPvPMode();
+        $this->sessions[$player->getId()]->isPvPEnabled = $ev->getPvPMode();
         return true;
     }
 
@@ -1183,7 +1190,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isPvPEnabled(Player $player){
-        return $this->getSession($player)->isPvPEnabled;
+        return $this->sessions[$player->getId()]->isPvPEnabled;
     }
 
     /**  _______ _____  _____                           _
@@ -1207,10 +1214,10 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function hasARequest(Player $player){
-        if($this->getSession($player)->latestRequestFrom === null){
+        if($this->sessions[$player->getId()]->latestRequestFrom === null){
             return false;
         }
-        return $this->getSession($player)->requestsFrom;
+        return $this->sessions[$player->getId()]->requestsFrom;
     }
 
     /**
@@ -1220,10 +1227,10 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function getLatestRequest(Player $player){
-        if($this->getSession($player)->latestRequestFrom === null){
+        if($this->sessions[$player->getId()]->latestRequestFrom === null){
             return false;
         }
-        return $this->getSession($player)->latestRequestFrom;
+        return $this->sessions[$player->getId()]->latestRequestFrom;
     }
 
     /**
@@ -1238,10 +1245,10 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function hasARequestFrom(Player $target, Player $requester){
-        if(!isset($this->getSession($target)->requestsFrom[$requester->getName()])){
+        if(!isset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()])){
             return false;
         }
-        return $this->getSession($target)->requestsFrom[$requester->getName()];
+        return $this->sessions[$target->getId()]->requestsFrom[$requester->getName()];
     }
 
     /**
@@ -1255,10 +1262,10 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function madeARequest(Player $player){
-        if($this->getSession($player)->requestTo === false){
+        if($this->sessions[$player->getId()]->requestTo === false){
             return false;
         }
-        return [$this->getSession($player)->requestTo, $this->getSession($player)->requestToAction];
+        return [$this->sessions[$player->getId()]->requestTo, $this->sessions[$player->getId()]->requestToAction];
     }
 
     /**
@@ -1268,11 +1275,11 @@ class Loader extends PluginBase{
      * @param Player $target
      */
     public function requestTPTo(Player $requester, Player $target){
-        $this->getSession($requester)->requestTo = $target->getName();
-        $this->getSession($requester)->requestToAction = "tpto";
+        $this->sessions[$requester->getId()]->requestTo = $target->getName();
+        $this->sessions[$requester->getId()]->requestToAction = "tpto";
 
-        $this->getSession($target)->latestRequestFrom = $requester->getName();
-        $this->getSession($target)->requestsFrom[$requester->getName()] = "tpto";
+        $this->sessions[$target->getId()]->latestRequestFrom = $requester->getName();
+        $this->sessions[$target->getId()]->requestsFrom[$requester->getName()] = "tpto";
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1285,11 +1292,11 @@ class Loader extends PluginBase{
      */
     public function requestTPHere(Player $requester, Player $target){
 
-        $this->getSession($requester)->requestTo = $target->getName();
-        $this->getSession($requester)->requestToAction = "tphere";
+        $this->sessions[$requester->getId()]->requestTo = $target->getName();
+        $this->sessions[$requester->getId()]->requestToAction = "tphere";
 
-        $this->getSession($target)->latestRequestFrom = $requester->getName();
-        $this->getSession($target)->requestsFrom[$requester->getName()] = "tphere";
+        $this->sessions[$target->getId()]->latestRequestFrom = $requester->getName();
+        $this->sessions[$target->getId()]->requestsFrom[$requester->getName()] = "tphere";
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1302,20 +1309,23 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function removeTPRequest(Player $requester, Player $target = null){
-        if($this->getSession($requester)->requestTo === false && $target === null){
+        if($this->sessions[$requester->getId()]->requestTo === false && $target === null){
             return false;
         }
 
-        if($target !== null && $this->getSession($requester)->requestTo === $target->getName()){
-            $this->getSession($requester)->requestTo = false;
-            $this->getSession($requester)->requestToAction = false;
-            unset($this->getSession($target)->requestsFrom[$requester->getName()]);
+        if($target !== null && $this->sessions[$requester->getId()]->requestTo === $target->getName()){
+            $this->sessions[$requester->getId()]->requestTo = false;
+            $this->sessions[$requester->getId()]->requestToAction = false;
+            unset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()]);
         }elseif($target === null){
-            $this->getSession($requester)->requestTo = false;
-            $this->getSession($requester)->requestToAction = false;
-            unset($this->getSession($target)->requestsFrom[$requester->getName()]);
-            if($this->getSession($target)->requestsFrom["latest"] === $requester->getName()){
-                $this->getSession($target)->requestsFrom["latest"] = false;
+            $target = $this->getPlayer($this->sessions[$requester->getId()]->requestTo);
+            $this->sessions[$requester->getId()]->requestTo = false;
+            $this->sessions[$requester->getId()]->requestToAction = false;
+            if($target !== false){
+                unset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()]);
+                if($this->sessions[$target->getId()]->requestsFrom["latest"] === $requester->getName()){
+                    $this->sessions[$target->getId()]->requestsFrom["latest"] = false;
+                }
             }
         }
 
@@ -1343,7 +1353,7 @@ class Loader extends PluginBase{
         if(!$this->madeARequest($player)){
             return false;
         }
-        return $this->getSession($player)->requestToTask;
+        return $this->sessions[$player->getId()]->requestToTask;
     }
 
     /**
@@ -1353,7 +1363,7 @@ class Loader extends PluginBase{
      * @param int $id
      */
     private function setTPRequestTaskID(Player $player, $id){
-        $this->getSession($player)->requestToTask = $id;
+        $this->sessions[$player->getId()]->requestToTask = $id;
     }
 
     /**
@@ -1363,7 +1373,7 @@ class Loader extends PluginBase{
      */
     private function cancelTPRequestTask(Player $player){
         $this->getServer()->getScheduler()->cancelTask($this->getTPRequestTaskID($player));
-        $this->getSession($player)->requestToTask = false;
+        $this->sessions[$player->getId()]->requestToTask = false;
     }
 
 
@@ -1390,7 +1400,7 @@ class Loader extends PluginBase{
         if($ev->isCancelled()){
             return false;
         }
-        $this->getSession($player)->isUnlimitedEnabled = $ev->getUnlimitedMode();
+        $this->sessions[$player->getId()]->isUnlimitedEnabled = $ev->getUnlimitedMode();
         return true;
     }
 
@@ -1406,7 +1416,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isUnlimitedEnabled(Player $player){
-        return $this->getSession($player)->isUnlimitedEnabled;
+        return $this->sessions[$player->getId()]->isUnlimitedEnabled;
     }
 
     /** __      __         _     _
@@ -1433,7 +1443,7 @@ class Loader extends PluginBase{
             return false;
         }
         $state = $ev->willVanish();
-        $this->getSession($player)->isVanished = $state;
+        $this->sessions[$player->getId()]->isVanished = $state;
         if($state === false){
             foreach($player->getLevel()->getPlayers() as $p){
                 $p->showPlayer($player);
@@ -1463,7 +1473,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isVanished(Player $player){
-        return $this->getSession($player)->isVanished;
+        return $this->sessions[$player->getId()]->isVanished;
     }
 
     /**

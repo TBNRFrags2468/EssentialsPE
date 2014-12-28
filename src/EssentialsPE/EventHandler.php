@@ -36,6 +36,8 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerPreLoginEvent $event
+     *
+     * @priority HIGHEST
      */
     public function onPlayerPreLogin(PlayerPreLoginEvent $event){
         // Ban remove:
@@ -54,7 +56,7 @@ class EventHandler implements Listener{
      */
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
-        $event->setJoinMessage($event->getPlayer()->getDisplayName() . " joined the game");
+        $event->setJoinMessage(TextFormat::GREEN . $event->getPlayer()->getDisplayName() . " joined the game");
         // Hide vanished players
         foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
             if($this->plugin->isVanished($p)){
@@ -68,7 +70,7 @@ class EventHandler implements Listener{
      */
     public function onPlayerQuit(PlayerQuitEvent $event){
         // Quit message (nick):
-        $event->setQuitMessage($event->getPlayer()->getDisplayName() . " left the game");
+        $event->setQuitMessage(TextFormat::YELLOW . $event->getPlayer()->getDisplayName() . " left the game");
         // Nick and NameTag restore:
         $this->plugin->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
 
@@ -83,8 +85,6 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerChatEvent $event
-     *
-     * @priority HIGH
      */
     public function onPlayerChat(PlayerChatEvent $event){
         if($this->plugin->isMuted($event->getPlayer())){
@@ -94,8 +94,6 @@ class EventHandler implements Listener{
 
     /**
      * @param PlayerCommandPreprocessEvent $event
-     *
-     * @priority HIGH
      */
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
         $command = $this->plugin->colorMessage($event->getMessage(), $event->getPlayer());
