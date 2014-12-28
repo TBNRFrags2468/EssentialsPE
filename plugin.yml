@@ -295,6 +295,10 @@ permissions:
             essentials.sudo:
                 default: op
                 description: "Run a command as another player"
+                children:
+                    essentials.sudo.exempt:
+                        default: op
+                        description: "Prevent from being Sudo'ed"
             essentials.suicide:
                 default: op
                 description: "Kill yourself"
