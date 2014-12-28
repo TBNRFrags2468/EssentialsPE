@@ -109,7 +109,7 @@ class Loader extends PluginBase{
             //Nicks
             $this->setNick($p, $p->getName(), false);
             //Vanish
-            if($this->getSession($p, "vanish") === true){
+            if($this->isVanished($p)){
                 foreach($this->getServer()->getOnlinePlayers() as $players){
                     $players->showPlayer($p);
                 }
@@ -473,19 +473,6 @@ class Loader extends PluginBase{
         if($this->getConfig()->get("enable-custom-colors") === true){
             $player->setRemoveFormat(true);
         }
-    }
-
-    /**
-     * Return the value of a session key
-     *
-     * @param Player $player
-     * @return bool|BaseSession
-     */
-    public function getSession(Player $player){
-        if(!$this->sessionExists($player)){
-            return false;
-        }
-        return $this->sessions[$player->getId()];
     }
 
     /**
