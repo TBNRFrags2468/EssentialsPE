@@ -1138,23 +1138,7 @@ class Loader extends PluginBase{
      * @return bool|array
      */
     public function hasARequest(Player $player){
-        if($this->sessions[$player->getId()]->latestRequestFrom === null){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->requestsFrom;
-    }
-
-    /**
-     * Return the name of the latest teleport requester for a specific player
-     *
-     * @param Player $player
-     * @return bool|string
-     */
-    public function getLatestRequest(Player $player){
-        if($this->sessions[$player->getId()]->latestRequestFrom === null){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->latestRequestFrom;
+        return $this->getSession($player)->hasARequest();
     }
 
     /**
@@ -1166,13 +1150,20 @@ class Loader extends PluginBase{
      *
      * @param Player $target
      * @param Player $requester
-     * @return bool|array
+     * @return bool|string
      */
     public function hasARequestFrom(Player $target, Player $requester){
-        if(!isset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()])){
-            return false;
-        }
-        return $this->sessions[$target->getId()]->requestsFrom[$requester->getName()];
+        return $this->getSession($target)->hasARequestFrom($requester->getName());
+    }
+
+    /**
+     * Return the name of the latest teleport requester for a specific player
+     *
+     * @param Player $player
+     * @return bool|string
+     */
+    public function getLatestRequest(Player $player){
+        return $this->getSession($player)->getLatestRequestFrom();
     }
 
     /**
@@ -1183,13 +1174,10 @@ class Loader extends PluginBase{
      *      "tphere" means that the requester wants to tp the target to its position
      *
      * @param Player $player
-     * @return bool|array
+     * @return array|bool
      */
     public function madeARequest(Player $player){
-        if($this->sessions[$player->getId()]->requestTo === false){
-            return false;
-        }
-        return [$this->sessions[$player->getId()]->requestTo, $this->sessions[$player->getId()]->requestToAction];
+        return $this->getSession($player)->madeARequest();
     }
 
     /**
@@ -1199,11 +1187,9 @@ class Loader extends PluginBase{
      * @param Player $target
      */
     public function requestTPTo(Player $requester, Player $target){
-        $this->sessions[$requester->getId()]->requestTo = $target->getName();
-        $this->sessions[$requester->getId()]->requestToAction = "tpto";
+        $this->getSession($requester)->requestTP($target->getName(), "tpto");
 
-        $this->sessions[$target->getId()]->latestRequestFrom = $requester->getName();
-        $this->sessions[$target->getId()]->requestsFrom[$requester->getName()] = "tpto";
+        $this->getSession($target)->receiveRequest($requester->getName(), "tpto");
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1215,12 +1201,9 @@ class Loader extends PluginBase{
      * @param Player $target
      */
     public function requestTPHere(Player $requester, Player $target){
+        $this->getSession($requester)->requestTP($target->getName(), "tphere");
 
-        $this->sessions[$requester->getId()]->requestTo = $target->getName();
-        $this->sessions[$requester->getId()]->requestToAction = "tphere";
-
-        $this->sessions[$target->getId()]->latestRequestFrom = $requester->getName();
-        $this->sessions[$target->getId()]->requestsFrom[$requester->getName()] = "tphere";
+        $this->getSession($target)->receiveRequest($requester->getName(), "tphere");
 
         $this->scheduleTPRequestTask($requester);
     }
@@ -1233,23 +1216,18 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function removeTPRequest(Player $requester, Player $target = null){
-        if($this->sessions[$requester->getId()]->requestTo === false && $target === null){
+        if(!$this->getSession($requester)->madeARequest() && $target === null){
             return false;
         }
 
-        if($target !== null && $this->sessions[$requester->getId()]->requestTo === $target->getName()){
-            $this->sessions[$requester->getId()]->requestTo = false;
-            $this->sessions[$requester->getId()]->requestToAction = false;
-            unset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()]);
+        if($target !== null && $this->getSession($requester)->madeARequestTo($target->getName())){
+            $this->getSession($requester)->cancelTPRequest();
+            $this->getSession($target)->removeRequestFrom($requester->getName());
         }elseif($target === null){
-            $target = $this->getPlayer($this->sessions[$requester->getId()]->requestTo);
-            $this->sessions[$requester->getId()]->requestTo = false;
-            $this->sessions[$requester->getId()]->requestToAction = false;
+            $target = $this->getPlayer($this->getSession($requester)->madeARequest()[0]);
+            $this->getSession($requester)->cancelTPRequest();
             if($target !== false){
-                unset($this->sessions[$target->getId()]->requestsFrom[$requester->getName()]);
-                if($this->sessions[$target->getId()]->requestsFrom["latest"] === $requester->getName()){
-                    $this->sessions[$target->getId()]->requestsFrom["latest"] = false;
-                }
+                $this->getSession($target)->removeRequestFrom($requester->getName());
             }
         }
 
@@ -1264,30 +1242,7 @@ class Loader extends PluginBase{
      */
     private function scheduleTPRequestTask(Player $player){
         $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new TPRequestTask($this, $player), 20 * 60 * 5);
-        $this->setTPRequestTaskID($player, $task->getTaskId());
-    }
-
-    /**
-     * Return the Task ID (Internal use ONLY!)
-     *
-     * @param Player $player
-     * @return bool|int
-     */
-    private function getTPRequestTaskID(Player $player){
-        if(!$this->madeARequest($player)){
-            return false;
-        }
-        return $this->sessions[$player->getId()]->requestToTask;
-    }
-
-    /**
-     * Modify the Task ID (Internal use ONLY!)
-     *
-     * @param Player $player
-     * @param int $id
-     */
-    private function setTPRequestTaskID(Player $player, $id){
-        $this->sessions[$player->getId()]->requestToTask = $id;
+        $this->getSession($player)->setRequestToTaskID($task->getTaskId());
     }
 
     /**
@@ -1296,8 +1251,8 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     private function cancelTPRequestTask(Player $player){
-        $this->getServer()->getScheduler()->cancelTask($this->getTPRequestTaskID($player));
-        $this->sessions[$player->getId()]->requestToTask = false;
+        $this->getServer()->getScheduler()->cancelTask($this->getSession($player)->getRequestToTaskID());
+        $this->getSession($player)->removeRequestToTaskID();
     }
 
 

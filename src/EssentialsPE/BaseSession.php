@@ -341,6 +341,58 @@ class BaseSession {
     private $requestToAction = false;
     private $requestToTask = null;
 
+    /**
+     * @return array|bool
+     */
+    public function madeARequest(){
+        return ($this->requestTo !== false ? [$this->requestTo, $this->requestToAction] : false);
+    }
+
+    /**
+     * @param string $target
+     * @return bool
+     */
+    public function madeARequestTo($target){
+        return $this->requestTo === $target;
+    }
+
+    /**
+     * @param string $target
+     * @param string $action
+     */
+    public function requestTP($target, $action){
+        $this->requestTo = $target;
+        $this->requestToAction = $action;
+    }
+
+    public function cancelTPRequest(){
+        $this->requestTo = false;
+        $this->requestToAction = false;
+    }
+
+    /**
+     * @return bool|int
+     */
+    public function getRequestToTaskID(){
+        return ($this->requestToTask !== null ? $this->requestToTask : false);
+    }
+
+    /**
+     * @param int $taskId
+     * @return bool
+     */
+    public function setRequestToTaskID($taskId){
+        if(!is_int($taskId)){
+            return false;
+        }
+        $this->requestToTask = $taskId;
+        return true;
+    }
+
+    public function removeRequestToTaskID(){
+        $this->requestToTask = null;
+    }
+
     //Requests from:
     private $latestRequestFrom = null;
     private $requestsFrom = [];
@@ -351,7 +403,46 @@ class BaseSession {
     * Requester Name
     */
 
-    //TODO
+    /**
+     * @return array|bool
+     */
+    public function hasARequest(){
+        return (count($this->requestsFrom) > 0 ? $this->requestsFrom : false);
+    }
+
+    /**
+     * @param string $requester
+     * @return bool|string
+     */
+    public function hasARequestFrom($requester){
+        return (isset($this->requestsFrom[$requester]) ? $this->requestsFrom[$requester] : false);
+    }
+
+    /**
+     * @return bool|string
+     */
+    public function getLatestRequestFrom(){
+        return ($this->latestRequestFrom !== null ? $this->latestRequestFrom : false);
+    }
+
+    /**
+     * @param string $requester
+     * @param string $action
+     */
+    public function receiveRequest($requester, $action){
+        $this->latestRequestFrom = $requester;
+        $this->requestsFrom[$requester] = $action;
+    }
+
+    /**
+     * @param string $requester
+     */
+    public function removeRequestFrom($requester){
+        unset($this->requestsFrom[$requester]);
+        if($this->getLatestRequestFrom() === $requester){
+            $this->latestRequestFrom = null;
+        }
+    }
 
     /**  _    _       _ _           _ _           _   _____ _
      *  | |  | |     | (_)         (_| |         | | |_   _| |
