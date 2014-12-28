@@ -727,13 +727,13 @@ class Loader extends PluginBase{
         }
 
         $v = $this->homes->getNested($player->getName() . "." . strtolower($home));
-        if(!$this->getServer()->isLevelLoaded($v[4])){
-            if(!$this->getServer()->isLevelGenerated($v[4])){
+        if(!$this->getServer()->isLevelLoaded($v[3])){
+            if(!$this->getServer()->isLevelGenerated($v[3])){
                 return false;
             }
-            $this->getServer()->loadLevel($v[4]);
+            $this->getServer()->loadLevel($v[3]);
         }
-        return [new Position($v[1], $v[2], $v[3], $this->getServer()->getLevelByName($v[4])), $v[5], $v[6]];
+        return [new Position($v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3])), $v[4], $v[5]];
     }
 
     /**
@@ -1442,6 +1442,12 @@ class Loader extends PluginBase{
             return false;
         }
         $v = $this->warps->get(strtolower($warp));
+        if(!$this->getServer()->isLevelLoaded($v[4])){
+            if(!$this->getServer()->isLevelGenerated($v[4])){
+                return false;
+            }
+            $this->getServer()->loadLevel($v[4]);
+        }
         return [new Position($v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3])), $v[4], $v[5]];
     }
 
