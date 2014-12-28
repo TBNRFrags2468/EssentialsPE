@@ -26,10 +26,9 @@ class SetHome extends BaseCommand{
             return false;
         }
         if(strtolower($args[0]) === "bed"){
-            $sender->sendMessage(TextFormat::RED . "[Error] " .  ($sender->hasPermission("essentials.home.bed") ? "You can only set a \"bed\" home by sleeping in a bed" : "You don't have permission to do this"));
+            $sender->sendMessage(TextFormat::RED . "[Error] You can only set a \"bed\" home by sleeping in a bed");
             return false;
-        }
-        if($args[0] === null || $args[0] === "" || $args[0] === " "){
+        }elseif(trim($args[0] === "")){
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Home name");
             return false;
         }
