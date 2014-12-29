@@ -30,6 +30,7 @@ use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
+use EssentialsPE\Commands\PTime;
 use EssentialsPE\Commands\PvP;
 use EssentialsPE\Commands\RealName;
 use EssentialsPE\Commands\Repair;
@@ -72,6 +73,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
+use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -172,6 +174,7 @@ class Loader extends PluginBase{
             new Near($this),
             new Nick($this),
             new Nuke($this),
+            new PTime($this),
             new PvP($this),
             new RealName($this),
             new Repair($this),
@@ -371,6 +374,30 @@ class Loader extends PluginBase{
             }
         }
         return $players;
+    }
+
+    /**
+     * Change the time of a player
+     *
+     * @param Player $player
+     * @param $time
+     * @param bool $static
+     * @return bool
+     */
+    public function setPlayerTime(Player $player, $time, $static = false){
+        if(!is_int($time) || !is_bool($static)){
+            return false;
+        }
+        $pk = new SetTimePacket();
+        $pk->time = $time;
+        $pk->started = ($static === false);
+        $pk->encode();
+        $pk->isEncoded = true;
+        $player->dataPacket($pk);
+        if(isset($pk->__encapsulatedPacket)){
+            unset($pk->__encapsulatedPacket);
+        }
+        return true;
     }
 
     /**   _____              _
