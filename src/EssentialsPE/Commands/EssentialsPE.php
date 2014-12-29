@@ -32,7 +32,7 @@ class EssentialsPE extends BaseCommand{
                         $sender->sendMessage(TextFormat::AQUA . "Config successfully reloaded!");
                         break;
                     /*case "update":
-                        // TODO
+                        $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|update>");
                         break;*/
                     default:
                         $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
@@ -40,6 +40,19 @@ class EssentialsPE extends BaseCommand{
                         break;
                 }
                 break;
+            /*case 2:
+                switch(strtolower($args[1])){
+                    case "check":
+                        //TODO
+                        break;
+                    case "install":
+                        //TODO
+                        break;
+                    default:
+                        $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|update>");
+                        break;
+                }
+                break;*/
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
                 return false;
