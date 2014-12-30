@@ -80,7 +80,7 @@ class Near extends BaseCommand{
         }else{
             $near = $this->getPlugin()->getNearPlayers($player, $radius);
         }
-        if(count($near) <= 0){
+        if(count($near) < 1){
             $msg = TextFormat::GRAY . "** There are no players near to $who! **";
         }else{
             $msg = TextFormat::YELLOW . "** There " . (count($near) > 1 ? "are " : "is ") . TextFormat::AQUA . count($near) . TextFormat::YELLOW . "player" . (count($near) > 1 ? "s " : " ") . "near to $who:";
