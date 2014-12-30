@@ -1,4 +1,4 @@
-[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge) EssentialsPE
+EssentialsPE [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ================
 
 The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/essentials/) for [PocketMine-MP Software](http://http://www.pocketmine.net/).
