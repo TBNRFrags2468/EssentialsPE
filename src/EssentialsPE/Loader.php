@@ -359,7 +359,7 @@ class Loader extends PluginBase{
      * @return bool|Player[]
      */
     public function getNearPlayers(Player $player, $radius = null){
-        if($radius === null){
+        if($radius === null || !is_int((int) $radius)){
             $radius = $this->getConfig()->get("near-default-radius");
         }
         if(!is_numeric($radius)){
@@ -385,7 +385,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setPlayerTime(Player $player, $time, $static = false){
-        if(!is_int($time) || !is_bool($static)){
+        if(!is_int((int) $time) || !is_bool($static)){
             return false;
         }
         $pk = new SetTimePacket();
