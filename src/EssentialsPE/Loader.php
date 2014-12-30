@@ -501,7 +501,6 @@ class Loader extends PluginBase{
 
     /**
      * Change the AFK mode of a player
-     * Also
      *
      * @param Player $player
      * @param bool $state
