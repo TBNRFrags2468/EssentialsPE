@@ -49,7 +49,7 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps." . $args[0])){
+                if(!$sender->hasPermission("essentials.warps.*") || !$sender->hasPermission("essentials.warps." . $args[0])){
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another to that warp");
                     return false;
                 }
