@@ -39,7 +39,7 @@ class Near extends BaseCommand{
                         $sender->sendMessage(TextFormat::RED . "Usage: /near <player> [radius]");
                         return false;
                     }
-                    $radius = $args[0];
+                    $radius = (int) $args[0];
                     $this->broadcastPlayers($sender, "you", $radius);
                 }
                 $this->broadcastPlayers($sender, $player->getDisplayName());
