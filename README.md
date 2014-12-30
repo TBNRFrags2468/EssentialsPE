@@ -11,8 +11,6 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 
 TODO:
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
-- [x] Checkout per-warp permission nodes.
 - [ ] Add _Homes_ limit.
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
-- [x] Add _Permission Nodes_ documentation.
