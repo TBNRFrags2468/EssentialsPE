@@ -471,11 +471,11 @@ class Loader extends PluginBase{
 
     /**
      * @param Player $player
-     * @return bool|BaseSession
+     * @return BaseSession
      */
     public function getSession(Player $player){
         if(!$this->sessionExists($player)){
-            return false;
+            $this->createSession($player);
         }
         return $this->sessions[$player->getName()];
     }
