@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Near extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "near", "List the players near to you", "/near [radius|player {radius}]", ["nearby"]);
+        parent::__construct($plugin, "near", "List the players near to you", "/near [player]", ["nearby"]);
         $this->setPermission("essentials.near");
     }
 
@@ -19,11 +19,11 @@ class Near extends BaseCommand{
         }
         switch(count($args)){
             case 0:
-                if(!($sender instanceof Player)){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /near <player> [radius]");
+                if(!$sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "Usage: /near <player>");
                     return false;
                 }
-                $this->broadcastPlayers($sender, "you");
+                $sender->sendMessage($this->broadcastPlayers($sender, "you"));
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.near.other")){
@@ -32,37 +32,13 @@ class Near extends BaseCommand{
                 }
                 $player = $this->getPlugin()->getPlayer($args[0]);
                 if(!$player){
-                    if(!is_numeric($args[0]) && ($sender instanceof Player)){
-                        $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                        return false;
-                    }elseif(is_numeric($args[0]) && (!$sender instanceof Player)){
-                        $sender->sendMessage(TextFormat::RED . "Usage: /near <player> [radius]");
-                        return false;
-                    }
-                    $radius = (int) $args[0];
-                    $this->broadcastPlayers($sender, "you", $radius);
-                }
-                $this->broadcastPlayers($sender, $player->getDisplayName());
-                break;
-            case 2:
-                if(!$sender->hasPermission("essentials.near.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                $player = $this->getPlugin()->getPlayer($args[0]);
-                if($player === false){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $radius = $args[1];
-                if(!is_numeric($radius)){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Invalid radius");
-                    return false;
-                }
-                $this->broadcastPlayers($sender, $player->getDisplayName(), $radius);
+                $sender->sendMessage($this->broadcastPlayers($player, $args[0]));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /near <player>"));
                 return false;
                 break;
         }
@@ -70,24 +46,20 @@ class Near extends BaseCommand{
     }
 
     /**
-     * @param CommandSender $player
+     * @param Player $player
      * @param string $who
-     * @param int $radius
+     * @return string
      */
-    private function broadcastPlayers(CommandSender $player, $who, $radius = null){
-        if($radius === null){
-            $near = $this->getPlugin()->getNearPlayers($player);
-        }else{
-            $near = $this->getPlugin()->getNearPlayers($player, $radius);
-        }
+    private function broadcastPlayers(Player $player, $who){
+        $near = $this->getPlugin()->getNearPlayers($player);
         if(count($near) < 1){
-            $msg = TextFormat::GRAY . "** There are no players near to $who! **";
+            $msg = TextFormat::GRAY . "** There are no players near to " . $who . "! **";
         }else{
-            $msg = TextFormat::YELLOW . "** There " . (count($near) > 1 ? "are " : "is ") . TextFormat::AQUA . count($near) . TextFormat::YELLOW . "player" . (count($near) > 1 ? "s " : " ") . "near to $who:";
+            $msg = TextFormat::YELLOW . "** There " . (count($near) > 1 ? "are " : "is ") . TextFormat::AQUA . count($near) . TextFormat::YELLOW . "player" . (count($near) > 1 ? "s " : " ") . "near to " . $who . ":";
             foreach($near as $p){
                 $msg .= TextFormat::YELLOW . "\n* " . TextFormat::LIGHT_PURPLE . $p->getDisplayName();
             }
         }
-        $player->sendMessage($msg);
+        return $msg;
     }
 } 
