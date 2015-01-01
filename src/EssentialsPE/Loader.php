@@ -10,6 +10,12 @@ use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
 use EssentialsPE\Commands\Depth;
+use EssentialsPE\Commands\Economy\Balance;
+use EssentialsPE\Commands\Economy\Eco;
+use EssentialsPE\Commands\Economy\Pay;
+use EssentialsPE\Commands\Economy\Sell;
+use EssentialsPE\Commands\Economy\SetWorth;
+use EssentialsPE\Commands\Economy\Worth;
 use EssentialsPE\Commands\EssentialsPE;
 use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
@@ -83,8 +89,10 @@ use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
     /** @var Config */
-    public  $homes;
-    /** @var Config  */
+    public $economy;
+    /** @var Config */
+    public $homes;
+    /** @var Config */
     public $nicks;
     /** @var Config */
     public $warps;
@@ -190,6 +198,14 @@ class Loader extends PluginBase{
             new Vanish($this),
             new World($this),
 
+            //Economy
+            //new Balance($this),
+            //new Eco($this),
+            //new Pay($this),
+            //new Sell($this),
+            //new SetWorth($this),
+            //new Worth($this),
+
             //Home
             new DelHome($this),
             new Home($this),
@@ -220,41 +236,46 @@ class Loader extends PluginBase{
 
     public function checkConfig(){
         $this->saveDefaultConfig();
+        $this->saveResource("Economy.yml");
         $cfg = $this->getConfig();
 
         $booleans = ["safe-afk", "enable-custom-colors"];
         foreach($booleans as $key){
             if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
+                $value = false;
                 switch($key){
                     // Properties to auto set true
                     case "safe-afk":
-                        $cfg->set($key, true);
+                        $value = true;
                         break;
                     // Properties to auto set false
                     case "enable-custom-colors":
-                        $cfg->set($key, false);
+                        $value = false;
                         break;
                 }
+                $cfg->set($key, $value);
             }
         }
 
         $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
         foreach($numerics as $key){
             if(!is_numeric($cfg->get($key))){
+                $value = 0;
                 switch($key){
                     case "auto-afk-kick":
-                        $cfg->set($key, 300);
+                        $value = 300;
                         break;
                     case "oversized-stacks":
-                        $cfg->set($key, 64);
+                        $value = 64;
                         break;
                     case "near-radius-limit":
-                        $cfg->set($key, 200);
+                        $value = 200;
                         break;
                     case "near-default-radius":
-                        $cfg->set($key, 100);
+                        $value = 100;
                         break;
                 }
+                $cfg->set($key, $value);
             }
         }
 
@@ -263,6 +284,26 @@ class Loader extends PluginBase{
     }
 
     private function saveConfigs(){
+        $this->economy = new Config($this->getDataFolder() . "Economy.yml", Config::YAML);
+        $keys = ["default-balance", "max-money", "min-money"];
+        foreach($keys as $k){
+            if(!is_int($k)){
+                $value = 0;
+                switch($k){
+                    case "default-balance":
+                        $value = 0;
+                        break;
+                    case "max-money":
+                        $value = 10000000000000;
+                        break;
+                    case "min-money":
+                        $value = -10000;
+                        break;
+                }
+                $this->economy->set($k, $value);
+            }
+        }
+
         $this->homes = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
         $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
@@ -597,6 +638,118 @@ class Loader extends PluginBase{
         }
         $player->teleport($pos, $rotation[0], $rotation[1]);
         return true;
+    }
+
+    /**  ______
+     *  |  ____|
+     *  | |__   ___ ___  _ __   ___  _ __ ___  _   _
+     *  |  __| / __/ _ \| '_ \ / _ \| '_ ` _ \| | | |
+     *  | |___| (_| (_) | | | | (_) | | | | | | |_| |
+     *  |______\___\___/|_| |_|\___/|_| |_| |_|\__, |
+     *                                          __/ |
+     *                                         |___/
+     */
+
+    /**
+     * Get the default balance for new players
+     *
+     * @return int
+     */
+    public function getDefaultBalance(){
+        return $this->getConfig()->get("default-balance");
+    }
+
+    /**
+     * Gets the max balance that a player can own
+     *
+     * @return bool|mixed
+     */
+    public function getMaxBalance(){
+        return $this->economy->get("max-money");
+    }
+
+    public function getMinBalance(){
+        return $this->economy->get("min-money");
+    }
+
+    /**
+     * Returns the currency symbol
+     *
+     * @return string
+     */
+    public function getCurrencySymbol(){
+        return $this->economy->get("currency-symbol");
+    }
+
+    /**
+     * Return the current balance of a player.
+     *
+     * @param Player $player
+     * @return int
+     */
+    public function getPlayerBalance(Player $player){
+        $balance = $this->economy->getNested("player-balances." . $player->getName());
+        if(!$balance){
+            $this->setPlayerBalance($player, $b = $this->getDefaultBalance());
+            return $b;
+        }
+        return $balance;
+    }
+
+    /**
+     * Sets the balance of a player
+     *
+     * @param Player $player
+     * @param $balance
+     */
+    public function setPlayerBalance(Player $player, $balance){
+        if($balance > $this->getMaxBalance()){
+            $balance = $this->getMaxBalance();
+        }elseif($balance < $this->getMinBalance()){
+            $balance = $this->getMinBalance();
+        }elseif($balance < 0 && !$player->hasPermission("essentials.eco.load")){
+            $balance = 0;
+        }
+        $this->economy->setNested("player-balances." . $player->getName(), (int) $balance);
+    }
+
+    /**
+     * Sums a quantity to player's balance
+     * NOTE: You can also specify negative quantities!
+     *
+     * @param Player $player
+     * @param $quantity
+     */
+    public function addToPlayerBalance(Player $player, $quantity){
+        $balance = $this->getPlayerBalance($player) + (int) $quantity;
+        if($balance > $this->getMaxBalance()){
+            $balance = $this->getMaxBalance();
+        }elseif($balance < $this->getMinBalance()){
+            $balance = $this->getMinBalance();
+        }elseif($balance < 0 && !$player->hasPermission("essentials.eco.load")){
+            $balance = 0;
+        }
+        $this->setPlayerBalance($player, $balance);
+    }
+
+    /**
+     * Get the worth of an item
+     *
+     * @param $itemId
+     * @return bool|int
+     */
+    public function getItemWorth($itemId){
+        return $this->economy->getNested("worth." . (int) $itemId, false);
+    }
+
+    /**
+     * Sets the worth of an item
+     *
+     * @param $itemId
+     * @param $worth
+     */
+    public function setItemWorth($itemId, $worth){
+        $this->economy->setNested("worth." . (int) $itemId, (int) $worth);
     }
 
     /**  ______       _   _ _   _

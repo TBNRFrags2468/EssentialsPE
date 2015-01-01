@@ -1,6 +1,6 @@
 name: EssentialsPE
 main: EssentialsPE\Loader
-version: 1.0.2
+version: 1.1.0
 api: 1.9.0
 author: LegendsOfMCPE Team
 website: https://github.com/LegendOfMCPE/EssentialsPE
@@ -39,6 +39,13 @@ permissions:
                     essentials.back.ondeath:
                         default: op
                         description: "Return to the place where you die"
+            essentials.balance:
+                default: true
+                description: "Allow players to see their balance"
+                children:
+                    essentials.balance.other:
+                        default: op
+                        description: "Let players to see other's balance"
             essentials.bigtree:
                 default: op
                 description: "Spawns a big tree"
@@ -74,6 +81,13 @@ permissions:
             essentials.depth:
                 default: true
                 description: "Get your current height related to sea-level"
+            essentials.eco:
+                default: op
+                description: "Access to the /eco command"
+                children:
+                    essentials.eco.loan:
+                        default: true
+                        description: "Allow players to have negative balance"
             essentials.essentials:
                 default: op
                 description: "See the current Essentials version"
@@ -181,6 +195,9 @@ permissions:
             essentials.oversizedstacks:
                 default: op
                 description: "Allow to get oversized stacks"
+            essentials.pay:
+                default: true
+                description: "Pay another player from your balance"
             essentials.powertool:
                 default: op
                 description: "Allow to toggle and use PowerTool"
@@ -191,6 +208,13 @@ permissions:
             essentials.powertooltoggle:
                 default: op
                 description: "Allow to disable PowerTool from all the items (of a player)"
+            essentials.ptime:
+               default: op
+               description: "Change your current time!"
+               children:
+                    essentials.ptime.other:
+                        default: op
+                        description: "Change other's time"
             essentials.pvp:
                 default: op
                 description: "Toggle PvP on/off"
@@ -210,6 +234,9 @@ permissions:
             essentials.seen:
                 default: op
                 description: "Check player's last online time"
+            essentials.sell:
+                default: true
+                description: "Sell an item with the /sell command"
             essentials.sethome:
                 default: true
                 description: "Create/update a home"
@@ -219,6 +246,9 @@ permissions:
             essentials.setwarp:
                 default: op
                 description: "Create/update a warp"
+            essentials.setworth:
+                default: op
+                description: "Sets the worth of an item"
             essentials.sign:
                 default: op
                 description: "Allow to manage special signs"
@@ -355,3 +385,6 @@ permissions:
             essentials.world:
                 default: op
                 description: "Teleport to another world"
+            essentials.worth:
+                default: true
+                description: "Get the price of an item"
