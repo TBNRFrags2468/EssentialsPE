@@ -21,7 +21,7 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
             return false;
         }
-        $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
+        $gm = $sender->getGamemode();
         if($gm === 1 || $gm === 3){
             $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
             return false;
@@ -30,14 +30,14 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        //$item = $sender->getInventory()->getItemInHand();
-        $item = clone($sender->getInventory()->getItemInHand()); // TODO: Test Oversized stacks :3
+        $item = clone($sender->getInventory()->getItemInHand());
         if($item->getID() === 0){
             $sender->sendMessage(TextFormat::RED . "You can't get a stack of AIR");
             return false;
         }
         $item->setCount(($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
         $sender->getInventory()->setItemInHand($item);
+        $sender->sendMessage(TextFormat::AQUA . "Giving filled up the item stack to " . $item->getCount());
         return true;
     }
 }

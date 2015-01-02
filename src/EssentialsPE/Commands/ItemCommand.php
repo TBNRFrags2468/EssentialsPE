@@ -32,15 +32,14 @@ class ItemCommand extends BaseCommand{
         }
 
         //Getting the item...
-        if(strpos($args[0], ":") !== false){
-            $v = explode(":", $args[0]);
+        $item_name = array_shift($args);
+        if(strpos($item_name, ":") !== false){
+            $v = explode(":", $item_name);
             $item_name = $v[0];
             $damage = $v[1];
         }else{
-            $item_name = $args[0];
             $damage = 0;
         }
-        unset($args[0]); //In case of needing to get other values (Example below)
 
         if(!is_numeric($item_name)){
             $item = Item::fromString($item_name);
@@ -58,16 +57,16 @@ class ItemCommand extends BaseCommand{
         }
 
         //Setting the amount...
-        if(!isset($args[1]) || !is_numeric($args[1])){
+        $amount = array_shift($args);
+        if(!isset($amount) || !is_numeric($amount)){
             if(!$sender->hasPermission("essentials.oversizedstacks")){
                 $item->setCount($item->getMaxStackSize());
             }else{
                 $item->setCount($this->getPlugin()->getConfig()->get("oversized-stacks"));
             }
         }else{
-            $item->setCount($args[1]);
+            $item->setCount($amount);
         }
-        unset($args[1]); //In case of needing to get other values (Example below)
 
         //Getting other values...
         /*foreach($args as $a){
@@ -79,8 +78,9 @@ class ItemCommand extends BaseCommand{
         }*/
 
         //Giving the item...
-        $sender->getInventory()->addItem($item);
-        $sender->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . $item->getName() === "Unknown" ? $item_name : $item->getName());
+        $slot = $sender->getInventory()->firstEmpty();
+        $sender->getInventory()->setItem($slot, $item);
+        $sender->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . ($item->getName() === "Unknown" ? $item_name : $item->getName()));
         return false;
     }
 }

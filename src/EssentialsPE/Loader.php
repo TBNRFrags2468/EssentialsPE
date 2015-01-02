@@ -949,7 +949,7 @@ class Loader extends PluginBase{
             return false;
         }
         $list = $this->homes->get($player->getName());
-        unset($list[strtolower($home)]);
+        unset($list[strtolower($home)]);  //TODO Fix? (Issue #60)
         if(count($list) > 0){
             $this->homes->set($player->getName(), $list);
         }else{
