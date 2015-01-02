@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands\Economy;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
@@ -21,14 +22,14 @@ class Eco extends BaseCommand{
             case 3:
                 $player = $this->getPlugin()->getPlayer($args[1]);
                 if(!$player){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player nto found");
+                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
                 if(!isset($args[2]) && strtolower($args[0]) !== "reset"){
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify an amount");
                     return false;
                 }
-                if(!is_int((int) $args[2])){
+                if(isset($args[2]) && !is_int((int) $args[2])){
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid amount");
                     return false;
                 }
@@ -39,7 +40,8 @@ class Eco extends BaseCommand{
                         $this->getPlugin()->addToPlayerBalance($player, $balance);
                         break;
                     case "take":
-                        $balance = (int) "-" . $args[2];
+                        $balance = (int) $args[2];
+                        $balance = $balance - ($balance * 2);
                         $sender->sendMessage(TextFormat::YELLOW . "Taking the balance...");
                         $this->getPlugin()->addToPlayerBalance($player, $balance);
                         break;
@@ -53,6 +55,9 @@ class Eco extends BaseCommand{
                         $this->getPlugin()->setPlayerBalance($player, $this->getPlugin()->getDefaultBalance());
                         break;
                 }
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
                 break;
         }
         return true;

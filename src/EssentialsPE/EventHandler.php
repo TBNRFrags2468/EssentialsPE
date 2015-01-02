@@ -221,6 +221,7 @@ class EventHandler implements Listener{
         $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
         if($tile instanceof Sign){
             // Free sign
+            // TODO Implement costs
             if($tile->getText()[0] === "[Free]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.free")){
@@ -247,6 +248,7 @@ class EventHandler implements Listener{
             }
 
             // Gamemode sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Gamemode]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.gamemode")){
@@ -266,6 +268,7 @@ class EventHandler implements Listener{
             }
 
             // Heal sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Heal]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.heal")){
@@ -281,6 +284,7 @@ class EventHandler implements Listener{
             }
 
             // Repair sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Repair]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.repair")){
@@ -311,6 +315,7 @@ class EventHandler implements Listener{
             }
 
             // Time sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Time]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.time")){
@@ -327,6 +332,7 @@ class EventHandler implements Listener{
             }
 
             // Teleport sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Teleport]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.teleport")){
@@ -338,6 +344,7 @@ class EventHandler implements Listener{
             }
 
             // Warp sign
+            // TODO Implement costs
             elseif($tile->getText()[0] === "[Warp]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.warp")){
@@ -356,6 +363,26 @@ class EventHandler implements Listener{
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "Warping to " . $tile->getText()[1] . "...");
                 }
             }
+
+            /**
+             * Economy signs
+             */
+
+            // Balance sign
+            elseif($tile->getText()[0] === "[Balance]"){
+                $event->setCancelled(true);
+                if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
+                    $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
+                }else{
+                    $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->plugin->getCurrencySymbol() . $this->plugin->getPlayerBalance($event->getPlayer()));
+                }
+            }
+
+            /**
+             * TODO Implement:
+             * - Buy sign
+             * - Sell sign
+             */
         }
         return true;
     }

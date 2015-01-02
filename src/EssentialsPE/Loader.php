@@ -711,6 +711,7 @@ class Loader extends PluginBase{
             $balance = 0;
         }
         $this->economy->setNested("player-balances." . $player->getName(), (int) $balance);
+        $this->economy->save();
     }
 
     /**
@@ -726,7 +727,7 @@ class Loader extends PluginBase{
             $balance = $this->getMaxBalance();
         }elseif($balance < $this->getMinBalance()){
             $balance = $this->getMinBalance();
-        }elseif($balance < 0 && !$player->hasPermission("essentials.eco.load")){
+        }elseif($balance < 0 && !$player->hasPermission("essentials.eco.loan")){
             $balance = 0;
         }
         $this->setPlayerBalance($player, $balance);
@@ -750,6 +751,56 @@ class Loader extends PluginBase{
      */
     public function setItemWorth($itemId, $worth){
         $this->economy->setNested("worth." . (int) $itemId, (int) $worth);
+        $this->economy->save();
+    }
+
+    /**
+     * @param Player $player
+     * @param Item $item
+     * @return array|bool|int
+     */
+    public function sellPlayerItem(Player $player, Item $item, $amount = null){
+        if(!$this->getItemWorth($item->getId())){
+            return false;
+        }
+        /** @var Item[] $contents */
+        $contents = [];
+        $quantity = 0;
+        foreach($player->getInventory()->getContents() as $s => $i){
+            if($i->getId() === $item->getId() && $i->getDamage() === $item->getDamage()){
+                $contents[$s] = clone $i;
+                $quantity += $i->getCount();
+            }
+        }
+        $worth = $this->getItemWorth($item->getId());
+        if($amount === null){
+            $worth = $worth * $quantity;
+            $player->getInventory()->remove($item);
+            $this->addToPlayerBalance($player, $worth);
+            return $worth;
+        }
+        $amount = (int) $amount;
+        if($amount < 0){
+            $amount = $quantity - $amount;
+        }elseif($amount > $quantity){
+            return -1;
+        }
+
+        $count = $amount;
+        foreach($contents as $s => $i){
+            if(($count - $i->getCount()) >= 0){
+                $count = $count - $i->getCount();
+                $i->setCount(0);
+            }else{
+                $c = $i->getCount() - $count;
+                $i->setCount($c);
+                $count = 0;
+            }
+            if($count <= 0){
+                break;
+            }
+        }
+        return [$amount, $worth];
     }
 
     /**  ______       _   _ _   _

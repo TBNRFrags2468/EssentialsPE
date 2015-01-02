@@ -1,6 +1,7 @@
 .idea/*
 *.xml
 config.yml
+Economy.yml
 Homes.yml
 Nicks.yml
 Warps.yml

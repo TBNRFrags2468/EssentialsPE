@@ -23,7 +23,7 @@ class Balance extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /balance <player>");
                     return false;
                 }
-                $sender->sendMessage(TextFormat::AQUA . "You have " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($sender));
+                $sender->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($sender));
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.balance.other")){

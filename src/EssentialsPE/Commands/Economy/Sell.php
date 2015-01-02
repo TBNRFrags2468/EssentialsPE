@@ -51,42 +51,21 @@ class Sell extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid amount to sell");
             return false;
         }
-        /** @var Item[] $contents */
-        $contents = [];
-        $quantity = 0;
-        foreach($sender->getInventory()->getContents() as $s => $i){
-            if($i->getId() === $item->getId() && $i->getDamage() === $item->getDamage()){
-                $contents[$s] = clone $i;
-                $quantity += $i->getCount();
-            }
+
+        $amount = $this->getPlugin()->sellPlayerItem($sender, $item, (isset($args[1]) ? $args[1] : null));
+        if(!$amount){
+            $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
+            return false;
+        }elseif($amount === -1){
+            $sender->sendMessage(TextFormat::RED . "[Error] You don't have that amount of items");
+            return false;
         }
-        $worth = $this->getPlugin()->getItemWorth($item->getId());
-        if(!isset($args[1])){
-            $worth = $worth * $quantity;
-            $sender->getInventory()->remove($item);
-            $this->getPlugin()->addToPlayerBalance($sender, $worth);
-            $sender->sendMessage(TextFormat::GREEN . "Item sold! You got " . $this->getPlugin()->getCurrencySymbol() . $worth);
-            return true;
+
+        if(is_array($amount)){
+            $sender->sendMessage(TextFormat::RED . "Sold " . $amount[0] . " items! You got" . $this->getPlugin()->getCurrencySymbol() . ($amount[1] * $amount[0]));
+        }else{
+            $sender->sendMessage(TextFormat::GREEN . "Item sold! You got " . $this->getPlugin()->getCurrencySymbol() . $amount);
         }
-        $amount = (int) $args[1];
-        if($amount < 0){
-            $amount = $quantity - $amount;
-        }
-        $count = $amount;
-        foreach($contents as $s => $i){
-            if(($count - $i->getCount()) >= 0){
-                $count = $count - $i->getCount();
-                $i->setCount(0);
-            }else{
-                $c = $i->getCount() - $count;
-                $i->setCount($c);
-                $count = 0;
-            }
-            if($count <= 0){
-                break;
-            }
-        }
-        $sender->sendMessage(TextFormat::RED . "Sold " . $amount . " items! You got" . $this->getPlugin()->getCurrencySymbol() . ($worth * $amount));
         return true;
     }
 }
