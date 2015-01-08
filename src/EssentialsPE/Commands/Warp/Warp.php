@@ -27,7 +27,7 @@ class Warp extends BaseCommand{
         }
         $warp = $this->getPlugin()->getWarp($args[0]);
         if(!$warp){
-            $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
+            $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exist");
             return false;
         }
         switch(count($args)){
