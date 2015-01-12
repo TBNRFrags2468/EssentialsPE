@@ -78,8 +78,7 @@ class ItemCommand extends BaseCommand{
         }*/
 
         //Giving the item...
-        $slot = $sender->getInventory()->firstEmpty();
-        $sender->getInventory()->setItem($slot, $item);
+        $sender->getInventory()->setItem($sender->getInventory()->firstEmpty(), $item);
         $sender->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . ($item->getName() === "Unknown" ? $item_name : $item->getName()));
         return false;
     }

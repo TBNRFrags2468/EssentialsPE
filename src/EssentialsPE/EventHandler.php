@@ -64,6 +64,7 @@ class EventHandler implements Listener{
                 $event->getPlayer()->hidePlayer($p);
             }
         }
+        //$this->plugin->setPlayerBalance($event->getPlayer(), $this->plugin->getDefaultBalance()); TODO
     }
 
     /**
@@ -369,14 +370,14 @@ class EventHandler implements Listener{
              */
 
             // Balance sign
-            elseif($tile->getText()[0] === "[Balance]"){
+            /**elseif($tile->getText()[0] === "[Balance]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                 }else{
                     $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->plugin->getCurrencySymbol() . $this->plugin->getPlayerBalance($event->getPlayer()));
                 }
-            }
+            }*/
 
             /**
              * TODO Implement:

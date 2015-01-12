@@ -325,6 +325,10 @@ permissions:
             essentials.spawn:
                 default: true
                 description: "Teleport to server's main spawn"
+                children:
+                    essentials.spawn.other:
+                        default: op
+                        description: "Teleport others to the server's main spawn"
             essentials.sudo:
                 default: op
                 description: "Run a command as another player"

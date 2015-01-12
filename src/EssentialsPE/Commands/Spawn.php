@@ -27,6 +27,10 @@ class Spawn extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
                 break;
             case 1:
+                if(!$sender->hasPermission("essentials.spawn.other")){
+                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                    return false;
+                }
                 $player = $this->getPlugin()->getPlayer($args[0]);
                 if(!$player) {
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");

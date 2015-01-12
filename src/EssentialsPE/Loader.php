@@ -28,6 +28,7 @@ use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
+use EssentialsPE\Commands\Kit;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
@@ -94,6 +95,8 @@ class Loader extends PluginBase{
     public $homes;
     /** @var Config */
     public $nicks;
+    /** @var Config */
+    public $kits;
     /** @var Config */
     public $warps;
 
@@ -177,6 +180,7 @@ class Loader extends PluginBase{
             new ItemDB($this),
             new Jump($this),
             new KickAll($this),
+            //new Kit($this),
             new More($this),
             new Mute($this),
             new Near($this),
@@ -236,7 +240,8 @@ class Loader extends PluginBase{
 
     public function checkConfig(){
         $this->saveDefaultConfig();
-        $this->saveResource("Economy.yml");
+        //$this->saveResource("Economy.yml");
+        $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
         $booleans = ["safe-afk", "enable-custom-colors"];
@@ -284,7 +289,7 @@ class Loader extends PluginBase{
     }
 
     private function saveConfigs(){
-        $this->economy = new Config($this->getDataFolder() . "Economy.yml", Config::YAML);
+        /**$this->economy = new Config($this->getDataFolder() . "Economy.yml", Config::YAML);
         $keys = ["default-balance", "max-money", "min-money"];
         foreach($keys as $k){
             if(!is_int($k)){
@@ -302,9 +307,10 @@ class Loader extends PluginBase{
                 }
                 $this->economy->set($k, $value);
             }
-        }
+        }*/
 
         $this->homes = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
+        $this->kits = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
         $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
     }
@@ -703,11 +709,11 @@ class Loader extends PluginBase{
      * @param $balance
      */
     public function setPlayerBalance(Player $player, $balance){
-        if($balance > $this->getMaxBalance()){
-            $balance = $this->getMaxBalance();
-        }elseif($balance < $this->getMinBalance()){
-            $balance = $this->getMinBalance();
-        }elseif($balance < 0 && !$player->hasPermission("essentials.eco.load")){
+        if((int) $balance > (int) $this->getMaxBalance()){
+            $balance = (int) $this->getMaxBalance();
+        }elseif((int) $balance < (int) $this->getMinBalance()){
+            $balance = (int) $this->getMinBalance();
+        }elseif((int) $balance < 0 && !$player->hasPermission("essentials.eco.load")){
             $balance = 0;
         }
         $this->economy->setNested("player-balances." . $player->getName(), (int) $balance);
@@ -1023,6 +1029,52 @@ class Loader extends PluginBase{
         }
         $list = array_keys($this->homes->get($player->getName()));
         if(count($list) < 1){
+            return false;
+        }
+        if(!$inArray){
+            return wordwrap(implode(", ", $list), 30, "\n", true);
+        }
+        return $list;
+    }
+
+    /**  _  ___ _
+     *  | |/ (_| |
+     *  | ' / _| |_ ___
+     *  |  < | | __/ __|
+     *  | . \| | |_\__ \
+     *  |_|\_|_|\__|___/
+     */
+
+    /**
+     * Check if a kit exists
+     *
+     * @param $kit
+     * @return bool
+     */
+    public function kitExists($kit){
+        return $this->kits->exists(($kit));
+    }
+
+    /**
+     * Return the contents of a kit, if existent
+     *
+     * @param $kit
+     * @return bool|array
+     */
+    public function getKit($kit){
+        if(!$this->kitExists($kit)){
+            return false;
+        }
+        return $this->kits->get($kit);
+    }
+
+    /**
+     * @param bool $inArray
+     * @return array|bool|string
+     */
+    public function kitList($inArray = false){
+        $list = $this->kits->getAll(true);
+        if(!$list || count($list) < 1){
             return false;
         }
         if(!$inArray){
