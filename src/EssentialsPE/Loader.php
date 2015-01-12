@@ -180,7 +180,7 @@ class Loader extends PluginBase{
             new ItemDB($this),
             new Jump($this),
             new KickAll($this),
-            //new Kit($this),
+            new Kit($this),
             new More($this),
             new Mute($this),
             new Near($this),
@@ -313,6 +313,15 @@ class Loader extends PluginBase{
         $this->kits = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
         $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+    }
+
+    public function reloadFiles(){
+        $this->getConfig()->reload();
+        //$this->economy->reload();
+        $this->homes->reload();
+        $this->kits->reload();
+        $this->nicks->reload();
+        $this->warps->reload();
     }
 
     /*

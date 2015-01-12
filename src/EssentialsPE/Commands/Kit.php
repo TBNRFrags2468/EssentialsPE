@@ -71,7 +71,7 @@ class Kit extends BaseCommand{
             }else{
                 $amount = 1;
             }
-            $item_name = array_shift($k);
+            $item_name = $k[0];
             if(strpos($item_name, ":") !== false){
                 $v = explode(":", $item_name);
                 $item_name = $v[0];

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class EssentialsPE extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [reload]", ["esspe"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [reload]", ["essentials", "ess", "esspe"]);
         $this->setPermission("essential.essentials");
     }
 
@@ -19,19 +19,22 @@ class EssentialsPE extends BaseCommand{
         }
         switch(count($args)){
             case 0:
-                $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::GREEN . "v" . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
+                $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::YELLOW . "v" . TextFormat::GREEN . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
                 break;
             case 1:
                 switch(strtolower($args[0])){
                     case "reload":
+                    case "r":
                         if(!$sender->hasPermission("essentials.essentials.reload")){
                             $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                             return false;
                         }
                         $this->getPlugin()->checkConfig();
+                        $this->getPlugin()->reloadFiles();
                         $sender->sendMessage(TextFormat::AQUA . "Config successfully reloaded!");
                         break;
                     /*case "update":
+                    case "u":
                         $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|update>");
                         break;*/
                     default:
@@ -43,9 +46,11 @@ class EssentialsPE extends BaseCommand{
             /*case 2:
                 switch(strtolower($args[1])){
                     case "check":
+                    case "c":
                         //TODO
                         break;
                     case "install":
+                    case "i":
                         //TODO
                         break;
                     default:
