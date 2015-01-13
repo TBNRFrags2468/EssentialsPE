@@ -95,9 +95,6 @@ permissions:
                     essentials.essentials.reload:
                         default: op
                         description: "Let you reload the config file of EssentialsPE"
-                    #essentials.essentials.update:
-                    #    default: op
-                    #    description: "Allow to update EssentialsPE to its latest version, if available"
             essentials.extinguish:
                 default: op
                 description: "Extinguish a player"
@@ -161,6 +158,13 @@ permissions:
             essentials.kill:
                 default: op
                 description: "Kill other players"
+            essntials.kit:
+                default: true
+                description: "Access to the /kit command"
+                children:
+                    essentials.kit.other:
+                        default: op
+                        description: "Give a kit to other players"
             essentials.more:
                 default: op
                 description: "Get a stack of the item you're holding"

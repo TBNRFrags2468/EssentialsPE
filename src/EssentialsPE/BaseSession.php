@@ -198,7 +198,7 @@ class BaseSession {
      * @return bool
      */
     public function setPowerToolItemCommand($itemId, $command){
-        if(!is_int($itemId) || $itemId === 0){
+        if(!is_int((int) $itemId) || (int) $itemId === 0){
             return false;
         }
         if(!is_array($this->ptCommands[$itemId])){
@@ -226,7 +226,7 @@ class BaseSession {
      * @return bool
      */
     public function setPowerToolItemCommands($itemId, array $commands){
-        if(!is_int($itemId) || $itemId === 0 || count($commands) < 1){
+        if(!is_int((int) $itemId) || (int) $itemId === 0 || count($commands) < 1){
             return false;
         }
         $this->ptCommands[$itemId] = $commands;

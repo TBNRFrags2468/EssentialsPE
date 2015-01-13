@@ -284,6 +284,26 @@ class Loader extends PluginBase{
             }
         }
 
+        /**$updater = ["channel", "warn-console", "warn-ops"];
+        foreach($updater as $key){
+            $k = $this->getConfig()->getNested("updater." . $key);
+            $value = true;
+            switch($key){
+                case "channel":
+                    if(!is_string($k)|| (strtolower($k) !== "stable" || strtolower($k) !== "beta")){
+                        $value = (string) "stable";
+                    }
+                    break;
+                case "warn-console":
+                case "warn-ops":
+                    if(!is_bool($k)){
+                        $value = true;
+                    }
+                    break;
+            }
+            $this->getConfig()->setNested("updater." . $key, $value);
+        }*/
+
         $cfg->save();
         $cfg->reload();
     }
@@ -338,6 +358,15 @@ class Loader extends PluginBase{
      *  '----------------'  '----------------'  '----------------'
      *
      */
+
+    /**
+     * Tell the build of the updater for EssentialsPE (Doesn't work right now xD)
+     *
+     * @return string
+     */
+    /**public function getUpdateBuild(){
+        return $this->getConfig()->getNested("update.channel");
+    }*/
 
     /**
      * Let you search for a player using his Display name(Nick) or Real name
@@ -423,6 +452,7 @@ class Loader extends PluginBase{
         }
         $radius = new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius);
         $entities = $player->getLevel()->getNearbyEntities($radius, $player);
+        /** @var Player[] $players */
         $players = [];
         foreach($entities as $e){
             if($e instanceof Player){

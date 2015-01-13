@@ -3,13 +3,14 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
+use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class EssentialsPE extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [reload]", ["essentials", "ess", "esspe"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [reload|update]", ["essentials", "ess", "esspe"]);
         $this->setPermission("essential.essentials");
     }
 
@@ -35,7 +36,11 @@ class EssentialsPE extends BaseCommand{
                         break;
                     /*case "update":
                     case "u":
-                        $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|update>");
+                        if(!$sender->hasPermission("essentials.essentials.update")){
+                            $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                            return false;
+                        }
+                        $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|install>");
                         break;*/
                     default:
                         $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
@@ -44,14 +49,24 @@ class EssentialsPE extends BaseCommand{
                 }
                 break;
             /*case 2:
+                if(strtolower($args[0]) !== "update" && strtolower($args[0]) !== "u"){
+                    $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                    return false;
+                }
+                if($sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You can only perform this action on the console");
+                    return false;
+                }
                 switch(strtolower($args[1])){
                     case "check":
                     case "c":
-                        //TODO
+                        $this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new UpdateFetchTask("stable")); //Just for tests... When the config works, use the getUpdateBuild() function
+                        //$this->getPlugin()->getLogger()->info($this->getPlugin()->getUpdateBuild());
                         break;
                     case "install":
                     case "i":
-                        //TODO
+                    $this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new UpdateFetchTask("stable", true)); //Just for tests... When the config works, use the getUpdateBuild() function
+                        #$this->getPlugin()->getServer()->getScheduler()->scheduleAsyncTask(new UpdateFetchTask($this->getPlugin()->getUpdateBuild(), true));
                         break;
                     default:
                         $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|update>");
