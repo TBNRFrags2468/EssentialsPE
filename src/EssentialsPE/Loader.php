@@ -101,7 +101,9 @@ class Loader extends PluginBase{
     public $warps;
 
     public function onEnable(){
-        @mkdir($this->getDataFolder());
+        if(!is_dir($this->getDataFolder())){
+            mkdir($this->getDataFolder());
+        }
         $this->checkConfig();
         $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
