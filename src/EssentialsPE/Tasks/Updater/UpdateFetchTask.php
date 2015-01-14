@@ -65,6 +65,7 @@ class UpdateFetchTask extends AsyncTask{
             $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " New " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing..."));
             if($this->install === true){
                 $this->install($server);
+                $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " Successfully updated to version " . TextFormat::GREEN . $v . TextFormat::YELLOW . ". To start using the new features, please fully restart your server.");
             }
         }else{
             $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " You're using the latest " . TextFormat::GREEN . $this->build . " version");
@@ -72,7 +73,6 @@ class UpdateFetchTask extends AsyncTask{
     }
 
     public function install(Server $server){
-        $server->getPluginManager()->disablePlugin($server->getPluginManager()->getPlugin("EssentialsPE"));
         $url = $this->getResult()["downloadURL"];
         if(file_exists($server->getPluginPath() . "EssentialsPE.phar")){
             unlink($server->getPluginPath() . "EssentialsPE.phar");
@@ -85,7 +85,5 @@ class UpdateFetchTask extends AsyncTask{
         curl_exec($ch);
         curl_close($ch);
         fclose($file);
-        $server->getPluginManager()->loadPlugin($server->getPluginPath() . "EssentialsPE.phar");
-        $server->enablePlugin($server->getPluginManager()->getPlugin("EssentialsPE"));
     }
 }
