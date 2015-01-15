@@ -20,7 +20,7 @@ enable-custom-colors: false
 
 # These options will let you configure how the auto-updater will work
 updater:
-  # Enable it?
+  # Enable the AUTOMATIC updater
   enabled: true
   # Allow to set a time interval for the auto-updater to work (In seconds) [Default is 30 minutes {1800 seconds}]
   time-interval: 1800

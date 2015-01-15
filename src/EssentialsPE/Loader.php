@@ -290,7 +290,7 @@ class Loader extends PluginBase{
             }
         }
 
-        /**$updater = ["channel", "warn-console", "warn-ops"];
+        $updater = ["channel", "warn-console", "warn-ops"];
         foreach($updater as $key){
             $k = $this->getConfig()->getNested("updater." . $key);
             $value = true;
@@ -308,7 +308,29 @@ class Loader extends PluginBase{
                     break;
             }
             $this->getConfig()->setNested("updater." . $key, $value);
-        }*/
+        }
+
+        $updater = ["enabled", "warn-console", "warn-players", "stable", "time-interval"];
+        foreach($updater as $key){
+            $k = $this->getConfig()->getNested("updater" . $key);
+            $value = true;
+            switch($key){
+                case "enabled":
+                case "warn-console":
+                case "warn-players":
+                case "stable":
+                    if(!is_bool($k)){
+                        $value = true;
+                    }
+                    break;
+                case "time-interval":
+                    if(!is_int($k)){
+                        $value = 1800;
+                    }
+                    break;
+            }
+            $this->getConfig()->setNested("updater" . $key, $value);
+        }
 
         $cfg->save();
         $cfg->reload();
@@ -1699,7 +1721,9 @@ class Loader extends PluginBase{
      * Schedules the updater task :3
      */
     public function scheduleUpdaterTask(){
-        $this->getServer()->getScheduler()->scheduleDelayedTask(new AutoFetchCallerTask($this), $this->getUpdaterInterval() * 20);
+        if($this->isUpdaterEnabled()){
+            $this->getServer()->getScheduler()->scheduleDelayedTask(new AutoFetchCallerTask($this), $this->getUpdaterInterval() * 20);
+        }
     }
 
     /**
