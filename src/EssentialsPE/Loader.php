@@ -70,6 +70,8 @@ use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFKKickTask;
 use EssentialsPE\Tasks\TPRequestTask;
+use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
+use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -117,6 +119,8 @@ class Loader extends PluginBase{
             $this->muteSessionCreate($p);
             $this->createSession($p);
         }
+
+        $this->scheduleUpdaterTask();
     }
 
     public function onDisable(){
@@ -360,15 +364,6 @@ class Loader extends PluginBase{
      *  '----------------'  '----------------'  '----------------'
      *
      */
-
-    /**
-     * Tell the build of the updater for EssentialsPE (Doesn't work right now xD)
-     *
-     * @return string
-     */
-    /**public function getUpdateBuild(){
-        return $this->getConfig()->getNested("update.channel");
-    }*/
 
     /**
      * Let you search for a player using his Display name(Nick) or Real name
@@ -1643,6 +1638,86 @@ class Loader extends PluginBase{
      */
     public function switchUnlimited(Player $player){
         $this->setUnlimited($player, ($this->isUnlimitedEnabled($player) ? false : true));
+    }
+
+    /**  _    _           _       _
+     *  | |  | |         | |     | |
+     *  | |  | |_ __   __| | __ _| |_ ___ _ __
+     *  | |  | | '_ \ / _` |/ _` | __/ _ | '__|
+     *  | |__| | |_) | (_| | (_| | ||  __| |
+     *   \____/| .__/ \__,_|\__,_|\__\___|_|
+     *         | |
+     *         |_|
+     */
+
+    /** @var UpdateFetchTask */
+    private $updaterTask;
+
+    /**
+     * Tell if the updater is enabled or not
+     *
+     * @return bool
+     */
+    public function isUpdaterEnabled(){
+        return $this->getConfig()->getNested("updater.enabled");
+    }
+
+    /**
+     * Tell the build of the updater for EssentialsPE
+     *
+     * @return string
+     */
+    public function getUpdateBuild(){
+        return ($this->getConfig()->getNested("updater.stable") ? "stable" : "beta");
+    }
+
+    /**
+     * Get the interval for the updater to get in action
+     *
+     * @return int
+     */
+    public function getUpdaterInterval(){
+        return $this->getConfig()->getNested("updater.time-interval");
+    }
+
+    /**
+     * Get the latest version, and install it if you want
+     *
+     * @param bool $install
+     * @return bool
+     */
+    public function fetchEssentialsPEUpdate($install = false){
+        if($this->updaterTask !== null && $this->updaterTask->isRunning()){
+            return false;
+        }
+        $this->getServer()->getScheduler()->scheduleAsyncTask($task = new UpdateFetchTask($this->getUpdateBuild(), $install));
+        $this->updaterTask = $task;
+        return true;
+    }
+
+    /**
+     * Schedules the updater task :3
+     */
+    public function scheduleUpdaterTask(){
+        $this->getServer()->getScheduler()->scheduleDelayedTask(new AutoFetchCallerTask($this), $this->getUpdaterInterval() * 20);
+    }
+
+    /**
+     * Warn about a new update of EssentialsPE
+     *
+     * @param string $message
+     */
+    public function broadcastUpdateAvailability($message){
+        if($this->getConfig()->getNested("updater.warn-console")){
+            $this->getLogger()->info($message);
+        }
+        if($this->getConfig()->getNested("updater.warn-players")){
+            foreach($this->getServer()->getOnlinePlayers() as $p){
+                if($p->hasPermission("essentials.update.notify")){
+                    $p->sendMessage($message);
+                }
+            }
+        }
     }
 
     /** __      __         _     _

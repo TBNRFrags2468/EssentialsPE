@@ -91,10 +91,6 @@ permissions:
             essentials.essentials:
                 default: op
                 description: "See the current Essentials version"
-                children:
-                    essentials.essentials.reload:
-                        default: op
-                        description: "Let you reload the config file of EssentialsPE"
             essentials.extinguish:
                 default: op
                 description: "Extinguish a player"
@@ -225,6 +221,9 @@ permissions:
             essentials.realname:
                 default: op
                 description: "See a player's realname"
+            essentials.reload:
+                default: op
+                description: "Allow to reload EssentialsPE's config"
             essentials.repair:
                 default: op
                 description: "Repair the item you're holding"
@@ -377,6 +376,13 @@ permissions:
                     essentials.unlimited.other:
                         default: op
                         description: "Allow to enable unlimited placing of blocks to other players"
+            essentials.update:
+                default: op
+                description: "Allow to update EssentialsPE to the latest available version, or to check if there is one available"
+                children:
+                    essentials.update.notify:
+                        default: op
+                        description: "Get notified when a new version of EssentialsPE if found"
             essentials.vanish:
                 default: op
                 description: "Hide yourself or another player"

@@ -17,3 +17,16 @@ near-default-radius: 200
 
 # This option let you enable color codes in the server, but keep in mind that the client may not support them
 enable-custom-colors: false
+
+# These options will let you configure how the auto-updater will work
+updater:
+  # Enable it?
+  enabled: true
+  # Allow to set a time interval for the auto-updater to work (In seconds) [Default is 30 minutes {1800 seconds}]
+  time-interval: 1800
+  # Do you want to warn the console?
+  warn-console: true
+  # Do you want to warn players with the permission 'essentials.update'?
+  warn-players: true
+  # Do you want to use 'stable' releases? If not, beta ones will be used instead
+  stable: true

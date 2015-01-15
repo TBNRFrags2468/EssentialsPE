@@ -61,15 +61,19 @@ class UpdateFetchTask extends AsyncTask{
     public function onCompletion(Server $server){
         /** @var Loader $esspe */
         $esspe = $server->getPluginManager()->getPlugin("EssentialsPE");
-        if($esspe->getDescription()->getVersion() !== ($v = $this->getResult()["version"])){
-            $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " New " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing..."));
-            if($this->install === true){
-                $this->install($server);
-                $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " Successfully updated to version " . TextFormat::GREEN . $v . TextFormat::YELLOW . ". To start using the new features, please fully restart your server.");
-            }
+        if($esspe->getDescription()->getVersion() < ($v = $this->getResult()["version"])){
+            $continue = true;
+            $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " A new " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing...");
         }else{
-            $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " You're using the latest " . TextFormat::GREEN . $this->build . " version");
+            $continue = false;
+            $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " No new version found, you're using the latest " . TextFormat::GREEN . $this->build . TextFormat::YELLOW. " version of EssentialsPE";
         }
+        $esspe->broadcastUpdateAvailability($message);
+        if($continue && $this->install){
+            $this->install($server);
+            $esspe->broadcastUpdateAvailability($server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " Successfully updated to version " . TextFormat::GREEN . $v . TextFormat::YELLOW . ". To start using the new features, please fully restart your server."));
+        }
+        $esspe->scheduleUpdaterTask();
     }
 
     public function install(Server $server){

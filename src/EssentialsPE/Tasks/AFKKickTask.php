@@ -19,7 +19,7 @@ class AFKKickTask extends PluginTask{
     }
 
     public function onRun($currentTick){
-        $this->owner->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's AFKKickTask");
+        $this->getOwner()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's AFKKickTask");
         if($this->plugin->isAFK($this->player) && !$this->player->hasPermission("essentials.afk.kickexempt")){
             $this->player->kick("You have been kicked for idling more than " . (($time = floor($this->plugin->getConfig()->get("auto-afk-kick"))) / 60 >= 1 ? ($time / 60) . " minutes" : $time . " seconds"));
         }

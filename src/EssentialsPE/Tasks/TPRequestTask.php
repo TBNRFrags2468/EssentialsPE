@@ -19,7 +19,7 @@ class TPRequestTask extends PluginTask{
     }
 
     public function onRun($currentTick){
-        $this->owner->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's TPRequestTask");
+        $this->getOwner()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's TPRequestTask");
         $this->plugin->removeTPRequest($this->requester);
     }
 } 
