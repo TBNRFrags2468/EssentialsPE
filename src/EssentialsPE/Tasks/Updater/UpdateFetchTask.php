@@ -49,9 +49,9 @@ class UpdateFetchTask extends AsyncTask{
                     }
                 }
                 $r["version"] = substr($i["name"], 13);
-                $r["downloadURL"] = $i["assets"][1]["browser_download_url"];
+                $r["downloadURL"] = $i["assets"][0]["browser_download_url"];
                 break;
-            /**case "development":
+            /*case "development":
                 // IDK How to do this :(
                 break;*/
         }
@@ -66,7 +66,7 @@ class UpdateFetchTask extends AsyncTask{
             $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " A new " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing...");
         }else{
             $continue = false;
-            $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " No new version found, you're using the latest " . TextFormat::GREEN . $this->build . TextFormat::YELLOW. " version of EssentialsPE";
+            $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " No new version found, you're using the latest version of EssentialsPE";
         }
         $esspe->broadcastUpdateAvailability($message);
         if($continue && $this->install){

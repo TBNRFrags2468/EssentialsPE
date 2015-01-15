@@ -25,11 +25,12 @@ class EssentialsPE extends BaseCommand{
             case 2:
                 switch(strtolower($args[0])){
                     case "update":
+                    case "u":
                         if(!$sender->hasPermission("essentials.update")){
                             $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                             return false;
                         }
-                        if(isset($args[1]) && (($a = strtolower($args[1])) === "check" || $a === "install")){
+                        if(isset($args[1]) && (($a = strtolower($args[1])) === "check" || $a === "c" || $a === "install" || $a === "i")){
                             if(!$this->getPlugin()->fetchEssentialsPEUpdate((strtolower($args[1]) === "check" ? false : true))) {
                                 $sender->sendMessage(TextFormat::YELLOW . "The updater is already working... Please wait a few moments and try again");
                             }
