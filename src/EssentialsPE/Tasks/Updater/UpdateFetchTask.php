@@ -18,10 +18,10 @@ class UpdateFetchTask extends AsyncTask{
     }
 
     public function onRun(){
-        if($this->build === "stable"){ // PocketMine-MP Forums
-            $ch = curl_init("http://forums.pocketmine.net/api.php?action=getResource&value=886");
-        }else{ // Github repository
+        if($this->build === "beta"){ // Github repository for 'Beta' releases
             $ch = curl_init("https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases");
+        }else{ // PocketMine repository for 'Stable' releases
+            $ch = curl_init("http://forums.pocketmine.net/api.php?action=getResource&value=886");
         }
         curl_setopt($ch, CURLOPT_AUTOREFERER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
