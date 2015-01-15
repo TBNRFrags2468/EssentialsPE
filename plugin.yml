@@ -221,9 +221,6 @@ permissions:
             essentials.realname:
                 default: op
                 description: "See a player's realname"
-            essentials.reload:
-                default: op
-                description: "Allow to reload EssentialsPE's config"
             essentials.repair:
                 default: op
                 description: "Repair the item you're holding"
