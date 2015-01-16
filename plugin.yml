@@ -23,9 +23,9 @@ permissions:
                     essentials.afk.other:
                         default: op
                         description: "Change other's AFK status"
-                    #essentials.afk.auto:
-                    #    default: op
-                    #    description: "Players with this permission will be set to AFK after a period of inaction"
+                    essentials.afk.preventauto:
+                        default: op
+                        description: "Players with this permission will NOT be put into AFK after a period of inaction"
                     essentials.afk.kickexempt:
                         default: op
                         description: "Exempt the user from being auto kicked for AFK"

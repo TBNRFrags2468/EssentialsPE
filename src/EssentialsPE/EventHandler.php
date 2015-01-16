@@ -131,6 +131,8 @@ class EventHandler implements Listener{
             }
             $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
         }
+
+        $this->plugin->setLastPlayerMovement($entity, time());
     }
 
     /**

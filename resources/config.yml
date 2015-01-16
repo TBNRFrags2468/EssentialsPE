@@ -3,9 +3,12 @@
 
 # This option let you disable player damage when they're AFK
 safe-afk: true
-# Time until the server kick an AFK player (in seconds)
+# Time until the server kicks an AFK player (in seconds)
 # Set it to -1 for not timeout
 auto-afk-kick: 300
+# Time until a player is set into AFK mode (in seconds)
+# Set it to -1 to disable it
+auto-afk-set: 300
 
 # Let you configure the size of a stack that players (with permission) can get (via /more or /item)
 oversized-stacks: 64

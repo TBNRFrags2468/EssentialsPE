@@ -1,0 +1,24 @@
+<?php
+namespace EssentialsPE\Tasks\AFK;
+
+use EssentialsPE\BaseTask;
+use EssentialsPE\Loader;
+use pocketmine\Player;
+use pocketmine\utils\TextFormat;
+
+class AFKKickTask extends BaseTask{
+    /** @var Player  */
+    protected $player;
+
+    public function __construct(Loader $plugin, Player $player){
+        parent::__construct($plugin);
+        $this->player = $player;
+    }
+
+    public function onRun($currentTick){
+        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's AFKKickTask");
+        if($this->getPlugin()->isAFK($this->player) && !$this->player->hasPermission("essentials.afk.kickexempt")){
+            $this->player->kick("You have been kicked for idling more than " . (($time = floor($this->getPlugin()->getConfig()->get("auto-afk-kick"))) / 60 >= 1 ? ($time / 60) . " minutes" : $time . " seconds"));
+        }
+    }
+} 

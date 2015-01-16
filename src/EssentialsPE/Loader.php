@@ -68,7 +68,8 @@ use EssentialsPE\Events\PlayerPvPModeChangeEvent;
 use EssentialsPE\Events\PlayerUnlimitedModeChangeEvent;
 use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Events\SessionCreateEvent;
-use EssentialsPE\Tasks\AFKKickTask;
+use EssentialsPE\Tasks\AFK\AFKKickTask;
+use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
@@ -538,6 +539,7 @@ class Loader extends PluginBase{
             "isAFK" => false,
             "kickAFK" => null,
             "autoAFK" => null,
+            "lastMovement" => null,
             "lastPosition" => null,
             "lastRotation" => null,
             "isGod" => false,
@@ -639,6 +641,35 @@ class Loader extends PluginBase{
      */
     public function switchAFKMode(Player $player){
         $this->setAFKMode($player, ($this->isAFK($player) ? false : true));
+    }
+
+    /**
+     * For internal use ONLY
+     *
+     * This function schedules the global Auto-AFK setter
+     */
+    public function scheduleAutoAFKSetter(){
+        if($this->getConfig()->get("auto-afk-set") > 0){
+            $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKSetterTask($this), (600)); // Check every 30 seconds...
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @return int|null
+     */
+    public function getLastPlayerMovement(Player $player){
+        return $this->getSession($player)->getLastMovement();
+    }
+
+    /**
+     * @param Player $player
+     * @param int $time
+     */
+    public function setLastPlayerMovement(Player $player, $time){
+        if(!$player->hasPermission("essentials.afk.preventauto")){
+            $this->getSession($player)->setLastMovement($time);
+        }
     }
 
     /**  ____             _

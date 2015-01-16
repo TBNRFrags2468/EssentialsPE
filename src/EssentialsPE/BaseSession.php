@@ -14,6 +14,7 @@ class BaseSession {
             $this->isAFK = $values["isAFK"];
             $this->kickAFK = $values["kickAFK"];
             $this->autoAFK = $values["autoAFK"];
+            $this->lastMovement = $values["lastMovement"];
             //Back
             $this->lastPosition = $values["lastPosition"];
             $this->lastRotation = $values["lastRotation"];
@@ -35,6 +36,10 @@ class BaseSession {
             //Vanish mode
             $this->isVanished = $values["isVanished"];
         }
+
+        /**foreach($values as $k => $v){
+            $this->{$k} = $v;
+        }*/
     }
 
     /**
@@ -49,6 +54,7 @@ class BaseSession {
     private $isAFK = false;
     private $kickAFK = null;
     private $autoAFK = null;
+    private $lastMovement = null;
 
     /**
      * @return bool
@@ -95,6 +101,19 @@ class BaseSession {
         $this->kickAFK = null;
     }
 
+    /**
+     * @return int|null
+     */
+    public function getLastMovement(){
+        return $this->lastMovement;
+    }
+
+    /**
+     * @param int $time
+     */
+    public function setLastMovement($time){
+        $this->lastMovement = (int) $time;
+    }
 
     /**  ____             _
      *  |  _ \           | |

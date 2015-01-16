@@ -1,25 +1,22 @@
 <?php
 namespace EssentialsPE\Tasks;
 
+use EssentialsPE\BaseTask;
 use EssentialsPE\Loader;
 use pocketmine\Player;
-use pocketmine\scheduler\PluginTask;
 use pocketmine\utils\TextFormat;
 
-class TPRequestTask extends PluginTask{
+class TPRequestTask extends BaseTask{
     /** @var Player  */
     protected $requester;
-    /** @var Loader  */
-    protected $plugin;
 
     public function __construct(Loader $plugin, Player $requester){
         parent::__construct($plugin);
-        $this->plugin = $plugin;
         $this->requester = $requester;
     }
 
     public function onRun($currentTick){
-        $this->getOwner()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's TPRequestTask");
-        $this->plugin->removeTPRequest($this->requester);
+        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's TPRequestTask");
+        $this->getPlugin()->removeTPRequest($this->requester);
     }
 } 

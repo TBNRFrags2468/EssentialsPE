@@ -1,19 +1,16 @@
 <?php
 namespace EssentialsPE\Tasks\Updater;
 
+use EssentialsPE\BaseTask;
 use EssentialsPE\Loader;
-use pocketmine\scheduler\PluginTask;
 
-class AutoFetchCallerTask extends PluginTask{
-    /** @var Loader */
-    protected $plugin;
+class AutoFetchCallerTask extends BaseTask{
 
     public function __construct(Loader $plugin){
         parent::__construct($plugin);
-        $this->plugin = $plugin;
     }
 
     public function onRun($currentTick){
-        $this->plugin->fetchEssentialsPEUpdate(false);
+        $this->getPlugin()->fetchEssentialsPEUpdate(false);
     }
 }
