@@ -18,6 +18,13 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 - [ ] Add _Special Signs_ documentation.
 - [ ] Add API for _Join_ and _Leave_ messages.
 
+###### AFK:
+  - [x] Implement Auto-AFK setter
+  - [ ] Test the Auto-AFK setter
+
+###### Updater:
+  - [ ] Fix the *Beta* channel
+
 ###### Economy:
   - [ ] Implement Commands:
      - [x] Balance.
