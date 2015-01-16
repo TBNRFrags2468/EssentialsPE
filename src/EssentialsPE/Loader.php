@@ -1690,7 +1690,8 @@ class Loader extends PluginBase{
      * @return string
      */
     public function getUpdateBuild(){
-        return ($this->getConfig()->getNested("updater.stable") ? "stable" : "beta");
+        //return ($this->getConfig()->getNested("updater.stable") ? "stable" : "beta"); TODO Just while the 'beta' channel is fixed...
+        return "stable";
     }
 
     /**
