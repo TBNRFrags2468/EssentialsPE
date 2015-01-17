@@ -25,7 +25,6 @@ class BaseSession {
 
     private $isAFK = false;
     private $kickAFK = null;
-    private $autoAFK = null;
     private $lastMovement = null;
 
     /**

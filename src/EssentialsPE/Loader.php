@@ -541,7 +541,6 @@ class Loader extends PluginBase{
         $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, [
             "isAFK" => false,
             "kickAFK" => null,
-            "autoAFK" => null,
             "lastMovement" => (!$player->hasPermission("esssentials.afk.preventauto") ? null : time()),
             "lastPosition" => null,
             "lastRotation" => null,
