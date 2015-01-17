@@ -330,7 +330,7 @@ class Loader extends PluginBase{
                     }
                     break;
             }
-            $this->getConfig()->setNested("updater" . $key, $value);
+            $this->getConfig()->setNested("updater." . $key, $value);
         }
 
         $cfg->save();
