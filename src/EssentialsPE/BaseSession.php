@@ -9,37 +9,9 @@ class BaseSession {
      * @param array $values
      */
     public function __construct($values = []){
-        if(count($values) > 0){
-            //AFK mode
-            $this->isAFK = $values["isAFK"];
-            $this->kickAFK = $values["kickAFK"];
-            $this->autoAFK = $values["autoAFK"];
-            $this->lastMovement = $values["lastMovement"];
-            //Back
-            $this->lastPosition = $values["lastPosition"];
-            $this->lastRotation = $values["lastRotation"];
-            //God mode
-            $this->isGod = $values["isGod"];
-            //PowerTool
-            $this->ptCommands = $values["ptCommands"];
-            $this->ptChatMacro = $values["ptChatMacros"];
-            //Player vs Player
-            $this->isPvPEnabled = $values["isPvPEnabled"];
-            //Teleport Requests
-            $this->requestTo = $values["requestTo"];
-            $this->requestToAction = $values["requestToAction"];
-            $this->requestToTask = $values["requestToTask"];
-            $this->latestRequestFrom = $values["latestRequestFrom"];
-            $this->requestsFrom = $values["requestsFrom"];
-            //Unlimited mode
-            $this->isUnlimitedEnabled = $values["isUnlimitedEnabled"];
-            //Vanish mode
-            $this->isVanished = $values["isVanished"];
-        }
-
-        /**foreach($values as $k => $v){
+        foreach($values as $k => $v){
             $this->{$k} = $v;
-        }*/
+        }
     }
 
     /**

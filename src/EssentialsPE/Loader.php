@@ -542,7 +542,7 @@ class Loader extends PluginBase{
             "isAFK" => false,
             "kickAFK" => null,
             "autoAFK" => null,
-            "lastMovement" => /*($player->hasPermission("esssentials.afk.preventauto") ? null : time())*/ time(),
+            "lastMovement" => (!$player->hasPermission("esssentials.afk.preventauto") ? null : time()),
             "lastPosition" => null,
             "lastRotation" => null,
             "isGod" => false,
