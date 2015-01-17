@@ -16,7 +16,7 @@ class TPRequestTask extends BaseTask{
     }
 
     public function onRun($currentTick){
-        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::RED . "Running EssentialsPE's TPRequestTask");
+        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's TPRequestTask");
         $this->getPlugin()->removeTPRequest($this->requester);
     }
 } 

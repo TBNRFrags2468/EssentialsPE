@@ -24,8 +24,7 @@ class AFK extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->switchAFKMode($sender);
-                $sender->sendMessage(TextFormat::YELLOW . "You're " . ($this->getPlugin()->isAFK($sender) ? "now" : "no longer") . " AFK");
-                $this->broadcastAFKStatus($sender);
+                $this->getPlugin()->broadcastAFKStatus($sender);
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.afk.other")){
@@ -38,8 +37,7 @@ class AFK extends BaseCommand{
                     return false;
                 }
                 $this->getPlugin()->switchAFKMode($player);
-                $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->getPlugin()->isAFK($sender) ? "now" : "no longer") . " AFK");
-                $this->broadcastAFKStatus($player);
+                $this->getPlugin()->broadcastAFKStatus($player);
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /afk <player>"));
@@ -47,15 +45,5 @@ class AFK extends BaseCommand{
                 break;
         }
         return true;
-    }
-
-    private function broadcastAFKStatus(Player $player){
-        $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->getPlugin()->isAFK($player) ? "now" : "no longer") . " AFK";
-        $player->getServer()->getLogger()->info($message);
-        foreach($player->getServer()->getOnlinePlayers() as $p){
-            if($p !== $player){
-                $p->sendMessage($message);
-            }
-        }
     }
 } 

@@ -122,6 +122,7 @@ class Loader extends PluginBase{
         }
 
         $this->scheduleUpdaterTask();
+        $this->scheduleAutoAFKSetter();
     }
 
     public function onDisable(){
@@ -296,13 +297,15 @@ class Loader extends PluginBase{
             $k = $this->getConfig()->getNested("updater." . $key);
             $value = true;
             switch($key){
-                case "channel":
-                    if(!is_string($k)|| (strtolower($k) !== "stable" || strtolower($k) !== "beta")){
-                        $value = (string) "stable";
+                case "time-iterval":
+                    if(!is_int($k)){
+                        $value = 1800;
                     }
                     break;
+                case "enabled":
                 case "warn-console":
-                case "warn-ops":
+                case "warn-players":
+                case "stable":
                     if(!is_bool($k)){
                         $value = true;
                     }
@@ -539,7 +542,7 @@ class Loader extends PluginBase{
             "isAFK" => false,
             "kickAFK" => null,
             "autoAFK" => null,
-            "lastMovement" => null,
+            "lastMovement" => /*($player->hasPermission("esssentials.afk.preventauto") ? null : time())*/ time(),
             "lastPosition" => null,
             "lastRotation" => null,
             "isGod" => false,
@@ -655,6 +658,8 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Get the last time that a player moved
+     *
      * @param Player $player
      * @return int|null
      */
@@ -663,12 +668,30 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Change the last time that a player moved
+     *
      * @param Player $player
      * @param int $time
      */
     public function setLastPlayerMovement(Player $player, $time){
         if(!$player->hasPermission("essentials.afk.preventauto")){
             $this->getSession($player)->setLastMovement($time);
+        }
+    }
+
+    /**
+     * Broadcast the AFK status of a player
+     *
+     * @param Player $player
+     */
+    public function broadcastAFKStatus(Player $player){
+        $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
+        $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->isAFK($player) ? "now" : "no longer") . " AFK";
+        $this->getServer()->getLogger()->info($message);
+        foreach($this->getServer()->getOnlinePlayers() as $p){
+            if($p !== $player){
+                $p->sendMessage($message);
+            }
         }
     }
 
@@ -852,6 +875,7 @@ class Loader extends PluginBase{
     /**
      * @param Player $player
      * @param Item $item
+     * @param int|null $amount
      * @return array|bool|int
      */
     public function sellPlayerItem(Player $player, Item $item, $amount = null){
@@ -1095,7 +1119,7 @@ class Loader extends PluginBase{
             return false;
         }
         $list = $this->homes->get($player->getName());
-        unset($list[strtolower($home)]);  //TODO Fix? (Issue #60)
+        unset($list[strtolower($home)]);
         if(count($list) > 0){
             $this->homes->set($player->getName(), $list);
         }else{

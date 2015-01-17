@@ -123,13 +123,7 @@ class EventHandler implements Listener{
         $entity = $event->getPlayer();
         if($this->plugin->isAFK($entity)){
             $this->plugin->setAFKMode($entity, false);
-            $entity->sendMessage(TextFormat::GREEN . "You're no longer AFK");
-            foreach($entity->getServer()->getOnlinePlayers() as $p){
-                if($p !== $entity){
-                    $p->sendMessage(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
-                }
-            }
-            $entity->getServer()->getLogger()->info(TextFormat::GREEN . $entity->getDisplayName() . " is no longer AFK");
+            $this->plugin->broadcastAFKStatus($entity);
         }
 
         $this->plugin->setLastPlayerMovement($entity, time());

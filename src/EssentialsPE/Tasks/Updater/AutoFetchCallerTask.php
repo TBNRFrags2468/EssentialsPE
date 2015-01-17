@@ -3,6 +3,7 @@ namespace EssentialsPE\Tasks\Updater;
 
 use EssentialsPE\BaseTask;
 use EssentialsPE\Loader;
+use pocketmine\utils\TextFormat;
 
 class AutoFetchCallerTask extends BaseTask{
 
@@ -11,6 +12,7 @@ class AutoFetchCallerTask extends BaseTask{
     }
 
     public function onRun($currentTick){
+        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AutoFetchCallerTask");
         $this->getPlugin()->fetchEssentialsPEUpdate(false);
     }
 }

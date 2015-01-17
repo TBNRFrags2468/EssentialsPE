@@ -61,6 +61,7 @@ class UpdateFetchTask extends AsyncTask{
     public function onCompletion(Server $server){
         /** @var Loader $esspe */
         $esspe = $server->getPluginManager()->getPlugin("EssentialsPE");
+        $esspe->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's UpdateFetchTask");
         if($esspe->getDescription()->getVersion() < ($v = $this->getResult()["version"])){
             $continue = true;
             $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " A new " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing...");
