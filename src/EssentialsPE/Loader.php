@@ -121,7 +121,9 @@ class Loader extends PluginBase{
             $this->createSession($p);
         }
 
-        $this->scheduleUpdaterTask();
+        if($this->isUpdaterEnabled()){
+            $this->fetchEssentialsPEUpdate(false);
+        }
         $this->scheduleAutoAFKSetter();
     }
 
