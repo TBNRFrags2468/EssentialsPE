@@ -511,6 +511,34 @@ class Loader extends PluginBase{
         return true;
     }
 
+    /**
+     * Easy get an item by name and metadata.
+     * The way this function understand the information about the item is:
+     * 'ItemNameOrID:Metadata' - Example (Granite block item):
+     *      '1:1' - or - 'stone:1'
+     *
+     * @param $item_name
+     * @return Item|\pocketmine\item\ItemBlock
+     */
+    public function getItem($item_name){
+        if(strpos($item_name, ":") !== false){
+            $v = explode(":", $item_name);
+            $item_name = $v[0];
+            $damage = $v[1];
+        }else{
+            $damage = 0;
+        }
+
+        if(!is_numeric($item_name)){
+            $item = Item::fromString($item_name);
+        }else{
+            $item = Item::get($item_name);
+        }
+        $item->setDamage($damage);
+
+        return $item;
+    }
+
     /**   _____              _
      *   / ____|            (_)
      *  | (___   ___ ___ ___ _  ___  _ __  ___

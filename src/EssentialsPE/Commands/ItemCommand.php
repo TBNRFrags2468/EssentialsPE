@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -33,20 +32,7 @@ class ItemCommand extends BaseCommand{
 
         //Getting the item...
         $item_name = array_shift($args);
-        if(strpos($item_name, ":") !== false){
-            $v = explode(":", $item_name);
-            $item_name = $v[0];
-            $damage = $v[1];
-        }else{
-            $damage = 0;
-        }
-
-        if(!is_numeric($item_name)){
-            $item = Item::fromString($item_name);
-        }else{
-            $item = Item::get($item_name);
-        }
-        $item->setDamage($damage);
+        $item = $this->getPlugin()->getItem($item_name);
 
         if($item->getID() === 0){
             $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $item_name . "\"");

@@ -20,7 +20,6 @@ use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\server\ServerCommandEvent;
-use pocketmine\item\Item;
 use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\tile\Sign;
@@ -232,12 +231,7 @@ class EventHandler implements Listener{
                     $item_name = $tile->getText()[1];
                     $damage = $tile->getText()[2];
 
-                    if(!is_numeric($item_name)){
-                        $item = Item::fromString($item_name);
-                    }else{
-                        $item = Item::get($item_name);
-                    }
-                    $item->setDamage($damage);
+                    $item = $this->plugin->getItem($item_name . ":" . $damage);
 
                     $event->getPlayer()->getInventory()->addItem($item);
                     $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED .( $item->getName() === "Unknown" ? $item_name : $item->getName()));
@@ -483,11 +477,7 @@ class EventHandler implements Listener{
                     $damage = 0;
                 }
 
-                if(!is_numeric($item_name)){
-                    $item = Item::fromString($item_name);
-                }else{
-                    $item = Item::get($item_name);
-                }
+                $item = $this->plugin->getItem($item_name . ":" . $damage);
 
                 if($item->getID() === 0 || $item->getName() === "Air"){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid item name/ID");
