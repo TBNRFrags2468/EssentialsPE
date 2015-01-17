@@ -31,7 +31,11 @@ class EssentialsPE extends BaseCommand{
                             return false;
                         }
                         if(isset($args[1]) && (($a = strtolower($args[1])) === "check" || $a === "c" || $a === "install" || $a === "i")){
-                            if(!$this->getPlugin()->fetchEssentialsPEUpdate((strtolower($args[1]) === "check" ? false : true))) {
+                            $install = false;
+                            if($a === "i" || $a === "install"){
+                                $install = true;
+                            }
+                            if(!$this->getPlugin()->fetchEssentialsPEUpdate($install)) {
                                 $sender->sendMessage(TextFormat::YELLOW . "The updater is already working... Please wait a few moments and try again");
                             }
                             return true;

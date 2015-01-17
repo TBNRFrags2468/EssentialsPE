@@ -5,6 +5,7 @@ use EssentialsPE\Loader;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
+use pocketmine\utils\Utils;
 
 class UpdateFetchTask extends AsyncTask{
     /** @var string */
@@ -19,20 +20,11 @@ class UpdateFetchTask extends AsyncTask{
 
     public function onRun(){
         if($this->build === "beta"){
-            $ch = curl_init("https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases"); // Github repository for 'Beta' releases
+            $url = "https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases"; // Github repository for 'Beta' releases
         }else{
-            $ch = curl_init("http://forums.pocketmine.net/api.php?action=getResource&value=886"); // PocketMine repository for 'Stable' releases
+            $url = "http://forums.pocketmine.net/api.php?action=getResource&value=886"; // PocketMine repository for 'Stable' releases
         }
-        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
-        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
-        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        $i = json_decode(curl_exec($ch), true);
-        curl_close($ch);
+        $i = json_decode(Utils::getURL($url), true);
 
         $r = [];
         switch(strtolower($this->build)){
@@ -84,9 +76,17 @@ class UpdateFetchTask extends AsyncTask{
         }
         $file = fopen($server->getPluginPath() . "EssentialsPE.phar", 'w+');
         $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_HTTPHEADER, ["User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64; rv:12.0) Gecko/20100101 Firefox/12.0 PocketMine-MP"]);
+        curl_setopt($ch, CURLOPT_AUTOREFERER, true);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, 2);
+        curl_setopt($ch, CURLOPT_FORBID_REUSE, 1);
+        curl_setopt($ch, CURLOPT_FRESH_CONNECT, 1);
         curl_setopt($ch, CURLOPT_TIMEOUT, 50);
         curl_setopt($ch, CURLOPT_FILE, $file);
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
         curl_exec($ch);
         curl_close($ch);
         fclose($file);
