@@ -254,7 +254,7 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 	
-		$value = null;
+        $value = null;
         $booleans = ["safe-afk", "enable-custom-colors"];
         foreach($booleans as $key){
             if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
@@ -269,7 +269,7 @@ class Loader extends PluginBase{
                         break;
                 }
                 if($value !== null){
-		    		$cfg->set($key, $value);
+                    $cfg->set($key, $value);
                 }
             }
         }
@@ -292,7 +292,7 @@ class Loader extends PluginBase{
                         break;
                 }
                 if($value !== null){
-		    		$cfg->set($key, $value);
+                    $cfg->set($key, $value);
                 }
             }
         }
