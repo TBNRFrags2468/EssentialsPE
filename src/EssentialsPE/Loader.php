@@ -253,11 +253,11 @@ class Loader extends PluginBase{
         //$this->saveResource("Economy.yml");
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
-
+	
+	$value = null;
         $booleans = ["safe-afk", "enable-custom-colors"];
         foreach($booleans as $key){
             if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
-                $value = false;
                 switch($key){
                     // Properties to auto set true
                     case "safe-afk":
@@ -268,14 +268,15 @@ class Loader extends PluginBase{
                         $value = false;
                         break;
                 }
-                $cfg->set($key, $value);
+                if($value !== null){
+		    $cfg->set($key, $value);
+                }
             }
         }
 
         $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
         foreach($numerics as $key){
             if(!is_numeric($cfg->get($key))){
-                $value = 0;
                 switch($key){
                     case "auto-afk-kick":
                         $value = 300;
@@ -290,14 +291,15 @@ class Loader extends PluginBase{
                         $value = 100;
                         break;
                 }
-                $cfg->set($key, $value);
+                if($value !== null){
+		    $cfg->set($key, $value);
+                }
             }
         }
 
         $updater = ["enabled", "time-interval", "warn-console", "warn-players", "stable"];
         foreach($updater as $key){
             $k = $this->getConfig()->getNested("updater." . $key);
-            $value = null;
             switch($key){
                 case "time-interval":
                     if(!is_int($k)){
