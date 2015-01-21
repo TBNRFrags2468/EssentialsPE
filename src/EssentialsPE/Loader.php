@@ -789,7 +789,7 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Gets the max balance that a player can own
+     * Get the max balance that a player can own
      *
      * @return bool|mixed
      */
@@ -797,6 +797,11 @@ class Loader extends PluginBase{
         return $this->economy->get("max-money");
     }
 
+    /**
+     * Gets the minium balance that a player can own
+     *
+     * @return bool|mixed
+     */
     public function getMinBalance(){
         return $this->economy->get("min-money");
     }
