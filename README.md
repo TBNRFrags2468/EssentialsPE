@@ -15,16 +15,15 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
-- [ ] Add option for _Join_ and _Leave_ messages.
 
 ###### AFK:
   - [x] Implement Auto-AFK setter
   - [x] Test the Auto-AFK setter
 
 ###### Updater:
-  - [ ] Fix the *Beta* channel:
+  - [x] Fix the *Beta* channel:
      - [x] Fix the _Fetcher_
-     - [ ] Fix the _Downloader_
+     - [x] Fix the _Downloader_
 
 ###### Economy:
   - [ ] Implement Commands:
@@ -42,3 +41,6 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
      - [ ] Sell.
      - [ ] Balance.
   - [ ] Test Economy Signs.
+
+#### TODO (Multi-Language Update)
+- [ ] Add option for _Join_ and _Leave_ messages.
