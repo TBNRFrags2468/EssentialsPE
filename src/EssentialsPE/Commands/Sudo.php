@@ -34,7 +34,7 @@ class Sudo extends BaseCommand{
         $v = implode(" ", $args);
         if(substr($v, 0, 2) === "c:"){
             $sender->sendMessage(TextFormat::GREEN . "Sending message as " . $name);
-            $this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new PlayerChatEvent($player, $v));
+            $this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new PlayerChatEvent($player, substr($v, 2)));
             if(!$ev->isCancelled()){
                 $this->getPlugin()->getServer()->broadcastMessage(\sprintf($ev->getFormat(), $ev->getPlayer()->getDisplayName(), $ev->getMessage()), $ev->getRecipients());
             }
