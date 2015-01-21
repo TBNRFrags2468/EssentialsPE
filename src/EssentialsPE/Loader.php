@@ -1198,6 +1198,8 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Get a list of all available kits
+     *
      * @param bool $inArray
      * @return array|bool|string
      */
