@@ -685,9 +685,7 @@ class Loader extends PluginBase{
      * @param int $time
      */
     public function setLastPlayerMovement(Player $player, $time){
-        if(!$player->hasPermission("essentials.afk.preventauto")){
-            $this->getSession($player)->setLastMovement($time);
-        }
+        $this->getSession($player)->setLastMovement($time);
     }
 
     /**
