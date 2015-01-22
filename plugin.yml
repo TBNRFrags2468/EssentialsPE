@@ -393,6 +393,10 @@ permissions:
             essentials.warp:
                 default: true
                 description: "Teleport to a warp"
+                children:
+                    essentials.warp.other:
+                        default: op
+                        description: "Teleport other players to a warp"
             essentials.world:
                 default: op
                 description: "Teleport to another world"
