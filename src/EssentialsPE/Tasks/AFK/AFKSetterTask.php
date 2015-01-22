@@ -25,8 +25,7 @@ class AFKSetterTask extends BaseTask{
         foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
             if(!$this->getPlugin()->isAFK($p) && ($last = $this->getPlugin()->getLastPlayerMovement($p)) !== null && !$p->hasPermission("essentials.afk.preventauto")){
                 if(time() - $last >= ($default = $this->getPlugin()->getConfig()->get("afk-auto-set")) || $default - (time() - $last) <= 15){
-                    $this->getPlugin()->setAFKMode($p, true);
-                    $this->getPlugin()->broadcastAFKStatus($p);
+                    $this->getPlugin()->setAFKMode($p, true, true);
                 }
             }
         }

@@ -253,10 +253,10 @@ class Loader extends PluginBase{
         //$this->saveResource("Economy.yml");
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
-	
-        $value = null;
-        $booleans = ["safe-afk", "enable-custom-colors"];
+
+        $booleans = ["enable-custom-colors"];
         foreach($booleans as $key){
+            $value = null;
             if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
                 switch($key){
                     // Properties to auto set true
@@ -274,8 +274,9 @@ class Loader extends PluginBase{
             }
         }
 
-        $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
+        $numerics = ["oversized-stacks", "near-radius-limit", "near-default-radius"];
         foreach($numerics as $key){
+            $value = null;
             if(!is_numeric($cfg->get($key))){
                 switch($key){
                     case "auto-afk-kick":
@@ -297,8 +298,30 @@ class Loader extends PluginBase{
             }
         }
 
+        $afk = ["safe", "auto-set", "auto-kick", "broadcast"];
+        foreach($afk as $key){
+            $value = null;
+            $k = $this->getConfig()->getNested("afk." . $key);
+            switch($key){
+                case "safe":
+                case "broadcast":
+                    if(!is_bool($k)){
+                        $value = true;
+                    }
+                    break;
+                case "auto-set":
+                case "auto-kick":
+                    if(!is_int($k)){
+                        $value = 300;
+                    }
+                    break;
+            }
+            $this->getConfig()->setNested("afk." . $key, $value);
+        }
+
         $updater = ["enabled", "time-interval", "warn-console", "warn-players", "stable"];
         foreach($updater as $key){
+            $value = null;
             $k = $this->getConfig()->getNested("updater." . $key);
             switch($key){
                 case "time-interval":
@@ -625,25 +648,29 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param bool $state
+     * @param bool $broadcast
      * @return bool
      */
-    public function setAFKMode(Player $player, $state){
+    public function setAFKMode(Player $player, $state, $broadcast = true){
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state));
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state, $broadcast));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->getAFKMode();
         $this->getSession($player)->setAFK($state);
-        $time = $this->getConfig()->get("auto-afk-kick");
+        $time = $this->getConfig()->getNested("afk.auto-kick");
         if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->getSession($player)->removeAFKKickTaskID($player);
         }elseif($state === true and (is_int($time) and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
+        }
+        if($ev->getBroadcast()){
+            $this->broadcastAFKStatus($player);
         }
         return true;
     }
@@ -652,9 +679,10 @@ class Loader extends PluginBase{
      * Automatically switch the AFK mode on/off
      *
      * @param Player $player
+     * @param bool $broadcast
      */
-    public function switchAFKMode(Player $player){
-        $this->setAFKMode($player, ($this->isAFK($player) ? false : true));
+    public function switchAFKMode(Player $player, $broadcast = true){
+        $this->setAFKMode($player, ($this->isAFK($player) ? false : true), $broadcast);
     }
 
     /**
@@ -663,7 +691,7 @@ class Loader extends PluginBase{
      * This function schedules the global Auto-AFK setter
      */
     public function scheduleAutoAFKSetter(){
-        if($this->getConfig()->get("auto-afk-set") > 0){
+        if($this->getConfig()->getNested("afk.auto-set") > 0){
             $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKSetterTask($this), (600)); // Check every 30 seconds...
         }
     }
@@ -694,6 +722,9 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function broadcastAFKStatus(Player $player){
+        if(!$this->getConfig()->getNested("afk.broadcast")){
+            return;
+        }
         $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
         $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->isAFK($player) ? "now" : "no longer") . " AFK";
         $this->getServer()->getLogger()->info($message);

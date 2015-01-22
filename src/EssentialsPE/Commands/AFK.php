@@ -23,8 +23,7 @@ class AFK extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /afk <player>");
                     return false;
                 }
-                $this->getPlugin()->switchAFKMode($sender);
-                $this->getPlugin()->broadcastAFKStatus($sender);
+                $this->getPlugin()->switchAFKMode($sender, true);
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.afk.other")){
@@ -36,8 +35,7 @@ class AFK extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $this->getPlugin()->switchAFKMode($player);
-                $this->getPlugin()->broadcastAFKStatus($player);
+                $this->getPlugin()->switchAFKMode($player, true);
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /afk <player>"));

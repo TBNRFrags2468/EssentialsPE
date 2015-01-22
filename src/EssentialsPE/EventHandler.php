@@ -88,6 +88,9 @@ class EventHandler implements Listener{
      * @param PlayerChatEvent $event
      */
     public function onPlayerChat(PlayerChatEvent $event){
+        if($this->plugin->isAFK($event->getPlayer())){
+            $this->plugin->setAFKMode($event->getPlayer(), false, true);
+        }
         if($this->plugin->isMuted($event->getPlayer())){
             $event->setCancelled(true);
         }
@@ -121,8 +124,7 @@ class EventHandler implements Listener{
     public function onPlayerMove(PlayerMoveEvent $event){
         $entity = $event->getPlayer();
         if($this->plugin->isAFK($entity)){
-            $this->plugin->setAFKMode($entity, false);
-            $this->plugin->broadcastAFKStatus($entity);
+            $this->plugin->setAFKMode($entity, false, true);
         }
 
         $this->plugin->setLastPlayerMovement($entity, time());
@@ -166,25 +168,26 @@ class EventHandler implements Listener{
      */
     public function onEntityDamageByEntity(EntityDamageEvent $event){
         $victim = $event->getEntity();
-        if($event instanceof EntityDamageByEntityEvent){
-            $issuer = $event->getDamager();
-            if($victim instanceof Player && $issuer instanceof Player){
-                if($this->plugin->isGod($victim)){
-                    $event->setCancelled(true);
-                }elseif($this->plugin->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
-                    $event->setCancelled(true);
-                }
+        if($victim instanceof Player){
+            if($this->plugin->isGod($victim) || ($this->plugin->isAFK($victim)) && $this->plugin->getConfig()->getNested("afk.safe")){
+                $event->setCancelled(true);
+            }
 
-                if($this->plugin->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
-                    $event->setCancelled(true);
-                }
+            if($event instanceof EntityDamageByEntityEvent){
+                $issuer = $event->getDamager();
+                if($issuer instanceof Player){
+                    if(!($s = $this->plugin->isPvPEnabled($issuer)) || !$this->plugin->isPvPEnabled($victim)){
+                        $issuer->sendMessage(TextFormat::RED . (!$s ? "You have" : $victim->getDisplayName() . " has") . " PvP disabled!");
+                        $event->setCancelled(true);
+                    }
 
-                if(!$this->plugin->isPvPEnabled($issuer)){
-                    $issuer->sendMessage(TextFormat::RED . "You have PvP disabled!");
-                    $event->setCancelled(true);
-                }elseif(!$this->plugin->isPvPEnabled($victim)){
-                    $issuer->sendMessage(TextFormat::RED . $victim->getDisplayName() . " has PvP disabled!");
-                    $event->setCancelled(true);
+                    if($this->plugin->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
+                        $event->setCancelled(true);
+                    }
+
+                    if($this->plugin->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
+                        $event->setCancelled(true);
+                    }
                 }
             }
         }

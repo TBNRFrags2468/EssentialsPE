@@ -11,10 +11,12 @@ class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
 
     /** @var Player */
     protected $player;
-    /** @var bool  */
+    /** @var bool */
     protected $isAFK;
-    /** @var bool  */
+    /** @var bool */
     protected $mode;
+    /** @var bool */
+    protected $broadcast;
 
     protected $timerID;
 
@@ -22,12 +24,14 @@ class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
      * @param Loader $plugin
      * @param Player $player
      * @param bool $mode
+     * @param bool $broadcast
      */
-    public function __construct(Loader $plugin, Player $player, $mode){
+    public function __construct(Loader $plugin, Player $player, $mode, $broadcast){
         parent::__construct($plugin);
         $this->player = $player;
         $this->isAFK = $plugin->isAFK($player);
         $this->mode = $mode;
+        $this->broadcast = $broadcast;
     }
 
     /**
@@ -68,5 +72,23 @@ class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
         if(is_bool($mode)){
             $this->mode = $mode;
         }
+    }
+
+    /**
+     * Tell if the AFK status will be broadcast
+     *
+     * @return bool
+     */
+    public function getBroadcast(){
+        return $this->broadcast;
+    }
+
+    /**
+     * Specify if the AFK status will be broadcast
+     *
+     * @param bool $mode
+     */
+    public function setBroadcast($mode){
+        $this->broadcast = $mode;
     }
 } 
