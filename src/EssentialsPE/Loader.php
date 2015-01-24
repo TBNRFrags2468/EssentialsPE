@@ -117,7 +117,6 @@ class Loader extends PluginBase{
             //Nicks
             $this->setNick($p, $this->getNick($p), false);
             //Sessions & Mute
-            $this->muteSessionCreate($p);
             $this->createSession($p);
         }
 
@@ -463,7 +462,7 @@ class Loader extends PluginBase{
 
             /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
         ];
-        return !isset($IDs[$item->getId()]);
+        return in_array($item->getId(), $IDs);
     }
 
     /**
@@ -554,8 +553,6 @@ class Loader extends PluginBase{
 
     /** @var array  */
     private $sessions = [];
-    /** @var array  */
-    private $mutes = [];
 
     /**
      * Tell if a session exists for a specific player
@@ -1251,19 +1248,8 @@ class Loader extends PluginBase{
      *  |_|  |_|\__,_|\__\___|
      */
 
-    /**
-     * Create the mute session for a player
-     *
-     * The mute session is handled separately of other Sessions because
-     * using it separately, players can't be unmuted by leaving and joining again...
-     *
-     * @param Player $player
-     */
-    public function muteSessionCreate(Player $player){
-        if(!isset($this->mutes[$player->getName()])){
-            $this->mutes[$player->getName()] = false;
-        }
-    }
+    /** @var array  */
+    private $mutes = [];
 
     /**
      * Tell if the is Muted or not
@@ -1272,7 +1258,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isMuted(Player $player){
-        return $this->mutes[$player->getName()];
+        return in_array($player->getName(), $this->mutes);
     }
 
     /**

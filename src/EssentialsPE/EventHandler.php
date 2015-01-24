@@ -45,7 +45,6 @@ class EventHandler implements Listener{
             $event->getPlayer()->setBanned(false);
         }
         // Session configure:
-        $this->plugin->muteSessionCreate($event->getPlayer());
         $this->plugin->createSession($event->getPlayer());
         // Nick and NameTag set:
         $this->plugin->setNick($event->getPlayer(), $this->plugin->getNick($event->getPlayer()), false);
@@ -209,10 +208,8 @@ class EventHandler implements Listener{
      * @return bool
      */
     public function onBlockTap(PlayerInteractEvent $event){// PowerTool
-        if($event->getItem()->isPlaceable()){
-            if($this->plugin->executePowerTool($event->getPlayer(), $event->getItem())){
-                $event->setCancelled(true);
-            }
+        if($this->plugin->executePowerTool($event->getPlayer(), $event->getItem())){
+            $event->setCancelled(true);
         }
 
 
