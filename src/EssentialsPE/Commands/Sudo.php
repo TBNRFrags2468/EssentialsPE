@@ -39,7 +39,7 @@ class Sudo extends BaseCommand{
                 $this->getPlugin()->getServer()->broadcastMessage(\sprintf($ev->getFormat(), $ev->getPlayer()->getDisplayName(), $ev->getMessage()), $ev->getRecipients());
             }
         }else{
-            $sender->sendMessage(TextFormat::AQUA . "Command ran has " . $name);
+            $sender->sendMessage(TextFormat::AQUA . "Command ran as " . $name);
             $this->getPlugin()->getServer()->dispatchCommand($player, $v);
         }
         return true;
