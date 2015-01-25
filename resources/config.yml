@@ -10,7 +10,7 @@ afk:
   auto-set: 300
   # Time until a player is kicked for being AFK
   # You can disable this feature by assigning a value lower to 0
-  aut-kick: 300
+  auto-kick: 300
   # Allow the broadcasting of the AFK status of a player
   broadcast: true
 
