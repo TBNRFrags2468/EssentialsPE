@@ -60,6 +60,9 @@ use EssentialsPE\Commands\Warp\DelWarp;
 use EssentialsPE\Commands\Warp\Setwarp;
 use EssentialsPE\Commands\Warp\Warp;
 use EssentialsPE\Commands\World;
+use EssentialsPE\EventHandlers\OtherEvents;
+use EssentialsPE\EventHandlers\PlayerEvents;
+use EssentialsPE\EventHandlers\SignEvents;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
@@ -110,7 +113,7 @@ class Loader extends PluginBase{
         $this->checkConfig();
         $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
-        $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
+        $this->registerEvents();
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){
@@ -142,6 +145,15 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Function to register all the Event Hanlders that EssentialsPE provide
+     */
+    public function registerEvents(){
+        $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerEvents($this), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SignEvents($this), $this);
+    }
+
+    /**
      * Function to easily disable commands
      *
      * @param array $commands
@@ -168,8 +180,7 @@ class Loader extends PluginBase{
         ]);
 
         //Register the new commands
-        $cmdmap = $this->getServer()->getCommandMap();
-        $cmdmap->registerAll("essentialspe", [
+        $$this->getServer()->getCommandMap()->registerAll("essentialspe", [
             new AFK($this),
             new Antioch($this),
             new Back($this),

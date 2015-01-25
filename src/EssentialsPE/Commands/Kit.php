@@ -53,6 +53,7 @@ class Kit extends BaseCommand{
                     return false;
                 }
                 $this->giveItems($player, $kit);
+                $sender->sendMessage(TextFormat::AQUA . "Getting kit " . $args[0] . "...");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $this->getUsage());

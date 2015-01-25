@@ -1,219 +1,28 @@
 <?php
-namespace EssentialsPE;
 
+namespace EssentialsPE\EventHandlers;
+
+use EssentialsPE\Loader;
 use pocketmine\event\block\BlockBreakEvent;
-use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\block\SignChangeEvent;
-use pocketmine\event\entity\EntityDamageByEntityEvent;
-use pocketmine\event\entity\EntityDamageEvent;
-use pocketmine\event\entity\EntityExplodeEvent;
-use pocketmine\event\entity\EntityLevelChangeEvent;
-use pocketmine\event\entity\EntityTeleportEvent;
 use pocketmine\event\Listener;
-use pocketmine\event\player\PlayerBedEnterEvent;
-use pocketmine\event\player\PlayerChatEvent;
-use pocketmine\event\player\PlayerCommandPreprocessEvent;
-use pocketmine\event\player\PlayerDeathEvent;
 use pocketmine\event\player\PlayerInteractEvent;
-use pocketmine\event\player\PlayerJoinEvent;
-use pocketmine\event\player\PlayerMoveEvent;
-use pocketmine\event\player\PlayerPreLoginEvent;
-use pocketmine\event\player\PlayerQuitEvent;
-use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\math\Vector3;
-use pocketmine\Player;
 use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
-class EventHandler implements Listener{
+class SignEvents implements Listener{
     /** @var Loader */
     public $plugin;
-
+    
     public function __construct(Loader $plugin){
         $this->plugin = $plugin;
     }
 
     /**
-     * @param PlayerPreLoginEvent $event
-     *
-     * @priority MONITOR
-     * @ignoreCancelled true
-     */
-    public function onPlayerPreLogin(PlayerPreLoginEvent $event){
-        // Ban remove:
-        if($event->getPlayer()->isBanned() && $event->getPlayer()->hasPermission("essentials.ban.exempt")){
-            $event->getPlayer()->setBanned(false);
-        }
-        // Session configure:
-        $this->plugin->createSession($event->getPlayer());
-        // Nick and NameTag set:
-        $this->plugin->setNick($event->getPlayer(), $this->plugin->getNick($event->getPlayer()), false);
-    }
-
-    /**
-     * @param PlayerJoinEvent $event
-     */
-    public function onPlayerJoin(PlayerJoinEvent $event){
-        // Nick and NameTag set:
-        $event->setJoinMessage(TextFormat::GREEN . $event->getPlayer()->getDisplayName() . " joined the game");
-        // Hide vanished players
-        foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
-            if($this->plugin->isVanished($p)){
-                $event->getPlayer()->hidePlayer($p);
-            }
-        }
-        //$this->plugin->setPlayerBalance($event->getPlayer(), $this->plugin->getDefaultBalance()); TODO
-    }
-
-    /**
-     * @param PlayerQuitEvent $event
-     */
-    public function onPlayerQuit(PlayerQuitEvent $event){
-        // Quit message (nick):
-        $event->setQuitMessage(TextFormat::YELLOW . $event->getPlayer()->getDisplayName() . " left the game");
-        // Nick and NameTag restore:
-        $this->plugin->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
-
-        // Sessions
-        if($this->plugin->sessionExists($event->getPlayer())){
-            // Remove teleport requests
-            $this->plugin->removeTPRequest($event->getPlayer());
-            // Session destroy:
-            $this->plugin->removeSession($event->getPlayer());
-        }
-    }
-
-    /**
-     * @param PlayerChatEvent $event
-     */
-    public function onPlayerChat(PlayerChatEvent $event){
-        if($this->plugin->isAFK($event->getPlayer())){
-            $this->plugin->setAFKMode($event->getPlayer(), false, true);
-        }
-        if($this->plugin->isMuted($event->getPlayer())){
-            $event->setCancelled(true);
-        }
-    }
-
-    /**
-     * @param PlayerCommandPreprocessEvent $event
-     */
-    public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
-        $command = $this->plugin->colorMessage($event->getMessage(), $event->getPlayer());
-        if($command === false){
-            $event->setCancelled(true);
-        }
-        $event->setMessage($command);
-    }
-
-    /**
-     * @param ServerCommandEvent $event
-     */
-    public function onServerCommand(ServerCommandEvent $event){
-        $command = $this->plugin->colorMessage($event->getCommand());
-        if($command === false){
-            $event->setCancelled(true);
-        }
-        $event->setCommand($command);
-    }
-
-    /**
-     * @param PlayerMoveEvent $event
-     */
-    public function onPlayerMove(PlayerMoveEvent $event){
-        $entity = $event->getPlayer();
-        if($this->plugin->isAFK($entity)){
-            $this->plugin->setAFKMode($entity, false, true);
-        }
-
-        $this->plugin->setLastPlayerMovement($entity, time());
-    }
-
-    /**
-     * @param EntityTeleportEvent $event
-     */
-    public function onEntityTeleport(EntityTeleportEvent $event){
-        $entity = $event->getEntity();
-        if($entity instanceof Player){
-            $this->plugin->setPlayerLastPosition($entity, $entity->getPosition(), $entity->getYaw(), $entity->getPitch());
-        }
-    }
-
-    /**
-     * @param EntityLevelChangeEvent $event
-     *
-     * @priority HIGHEST
-     */
-    public function onEntityLevelChange(EntityLevelChangeEvent $event){
-        $entity = $event->getEntity();
-        if($entity instanceof Player){
-            $this->plugin->switchLevelVanish($entity, $event->getOrigin(), $event->getTarget());
-        }
-    }
-
-    /**
-     * @param PlayerBedEnterEvent $event
-     */
-    public function onPlayerSleep(PlayerBedEnterEvent $event){
-        if($event->getPlayer()->hasPermission("essentials.home.bed")){
-            $this->plugin->setHome($event->getPlayer(), "bed", $event->getPlayer()->getPosition());
-        }
-    }
-
-    /**
-     * @param EntityDamageEvent $event
-     *
-     * @priority HIGH
-     */
-    public function onEntityDamageByEntity(EntityDamageEvent $event){
-        $victim = $event->getEntity();
-        if($victim instanceof Player){
-            if($this->plugin->isGod($victim) || ($this->plugin->isAFK($victim)) && $this->plugin->getConfig()->getNested("afk.safe")){
-                $event->setCancelled(true);
-            }
-
-            if($event instanceof EntityDamageByEntityEvent){
-                $issuer = $event->getDamager();
-                if($issuer instanceof Player){
-                    if(!($s = $this->plugin->isPvPEnabled($issuer)) || !$this->plugin->isPvPEnabled($victim)){
-                        $issuer->sendMessage(TextFormat::RED . (!$s ? "You have" : $victim->getDisplayName() . " has") . " PvP disabled!");
-                        $event->setCancelled(true);
-                    }
-
-                    if($this->plugin->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
-                        $event->setCancelled(true);
-                    }
-
-                    if($this->plugin->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
-                        $event->setCancelled(true);
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * @param PlayerDeathEvent $event
-     */
-    public function onPlayerDeath(PlayerDeathEvent $event){
-        if($event->getEntity()->hasPermission("essentials.back.ondeath")){
-            $this->plugin->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getPosition(), $event->getEntity()->getYaw(), $event->getEntity()->getPitch());
-        }else{
-            $this->plugin->removePlayerLastPosition($event->getEntity());
-        }
-    }
-
-    /**
      * @param PlayerInteractEvent $event
-     * @return bool
      */
-    public function onBlockTap(PlayerInteractEvent $event){// PowerTool
-        if($this->plugin->executePowerTool($event->getPlayer(), $event->getItem())){
-            $event->setCancelled(true);
-        }
-
-
-        // Special Signs
+    public function onSignTap(PlayerInteractEvent $event){
         $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
         if($tile instanceof Sign){
             // Free sign
@@ -222,10 +31,10 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.free")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
+               }else{
                     if($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
-                        return false;
+                        return;
                     }
 
                     $item_name = $tile->getText()[1];
@@ -234,7 +43,7 @@ class EventHandler implements Listener{
                     $item = $this->plugin->getItem($item_name . ":" . $damage);
 
                     $event->getPlayer()->getInventory()->addItem($item);
-                    $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED .( $item->getName() === "Unknown" ? $item_name : $item->getName()));
+                    $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . ($item->getName() === "Unknown" ? $item_name : $item->getName()));
                 }
             }
 
@@ -244,7 +53,7 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.gamemode")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
+               }else{
                     $v = strtolower($tile->getText()[1]);
                     if($v === "survival"){
                         $event->getPlayer()->setGamemode(0);
@@ -266,11 +75,47 @@ class EventHandler implements Listener{
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                 }elseif($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
-                    return false;
-                }else{
-
+                    return;
+               }else{
                     $event->getPlayer()->heal($event->getPlayer()->getMaxHealth());
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "You have been healed!");
+                }
+            }
+            
+            // Kit sign
+            // TODO: Implement costs
+            elseif($tile->getText()[0] === "[Kit]"){
+                $event->setCancelled(true);
+                if(!$event->getPlayer()->hasPermission("essentials.sign.use.kit")){
+                    $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
+                }elseif($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
+                    $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
+                    return;
+                }else{
+                    if(!$event->getPlayer()->hasPermission("essentials.kits." . strtolower($tile->getText()[1]))){
+                        $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You don't have permissions to get this kit");
+                        return;
+                    }elseif(!$this->plugin->getKit($tile->getText()[1])){
+                        $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exists");
+                        return;
+                    }else{
+                        foreach($tile->getText()[1] as $k){
+                            $k = explode(" ", $k);
+                            if(count($k) > 1){
+                                $amount = $k[1];
+                            }else{
+                                $amount = 1;
+                            }
+                            $item_name = $k[0];
+                            $item = $this->plugin->getItem($item_name);
+                            if($item->getID() === 0) {
+                                return;
+                            }
+                            $item->setCount($amount);
+                            $event->getPlayer()->getInventory()->setItem($event->getPlayer()->getInventory()->firstEmpty(), $item);
+                        }
+                        $event->getPlayer()->sendMessage(TextFormat::GREEN . "Getting kit " . $tile->getText()[1] . "...");
+                    }
                 }
             }
 
@@ -282,20 +127,20 @@ class EventHandler implements Listener{
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                 }elseif($event->getPlayer()->getGamemode() === 1 || $event->getPlayer()->getGamemode() === 3){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
-                    return false;
-                }else{
+                    return;
+               }else{
                     if(($v = $tile->getText()[1]) === "Hand"){
                         if($this->plugin->isReparable($item = $event->getPlayer()->getInventory()->getItemInHand())){
                             $item->setDamage(0);
                             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         }
                     }elseif($v === "All"){
-                        foreach($event->getPlayer()->getInventory()->getContents() as $item){
+                        foreach ($event->getPlayer()->getInventory()->getContents() as $item){
                             if($this->plugin->isReparable($item)){
                                 $item->setDamage(0);
                             }
                         }
-                        foreach($event->getPlayer()->getInventory()->getArmorContents() as $item){
+                        foreach ($event->getPlayer()->getInventory()->getArmorContents() as $item){
                             if($this->plugin->isReparable($item)){
                                 $item->setDamage(0);
                             }
@@ -311,7 +156,7 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.time")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
+               }else{
                     if(($v = $tile->getText()[1]) === "Day"){
                         $event->getPlayer()->getLevel()->setTime(0);
                         $event->getPlayer()->sendMessage(TextFormat::GREEN . "Time set to \"Day\"");
@@ -328,7 +173,7 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.teleport")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
+               }else{
                     $event->getPlayer()->teleport(new Vector3($x = $tile->getText()[1], $y = $tile->getText()[2], $z = $tile->getText()[3]));
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "Teleporting to " . TextFormat::AQUA . $x . TextFormat::GREEN . ", " . TextFormat::AQUA . $y . TextFormat::GREEN . ", " . TextFormat::AQUA . $z);
                 }
@@ -340,15 +185,15 @@ class EventHandler implements Listener{
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.warp")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
+               }else{
                     $warp = $this->plugin->getWarp($tile->getText()[1]);
                     if(!$warp){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
-                        return false;
+                        return;
                     }
                     if(!$event->getPlayer()->hasPermission("essentials.warps.*") && !$event->getPlayer()->hasPermission("essentials.warps." . $tile->getText()[1])){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
-                        return false;
+                        return;
                     }
                     $event->getPlayer()->teleport($warp[0], $warp[1], $warp[2]);
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "Warping to " . $tile->getText()[1] . "...");
@@ -361,39 +206,19 @@ class EventHandler implements Listener{
 
             // Balance sign
             /**elseif($tile->getText()[0] === "[Balance]"){
-                $event->setCancelled(true);
-                if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
-                    $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
-                }else{
-                    $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->plugin->getCurrencySymbol() . $this->plugin->getPlayerBalance($event->getPlayer()));
-                }
-            }*/
+             * $event->setCancelled(true);
+             * if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
+             * $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
+             * }else{
+             * $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->plugin->getCurrencySymbol() . $this->plugin->getPlayerBalance($event->getPlayer()));
+             * }
+             * }*/
 
             /**
              * TODO Implement:
              * - Buy sign
              * - Sell sign
              */
-        }
-        return true;
-    }
-
-    /**
-     * @param BlockPlaceEvent $event
-     *
-     * @priority HIGH
-     */
-    public function onBlockPlace(BlockPlaceEvent $event){
-        // PowerTool
-        if($this->plugin->executePowerTool($event->getPlayer(), $event->getItem())){
-            $event->setCancelled(true);
-        }
-
-        // Unlimited block placing
-        elseif($this->plugin->isUnlimitedEnabled($event->getPlayer())){
-            $event->setCancelled(true);
-            $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
-            $event->getPlayer()->getLevel()->setBlock($pos, $event->getBlock(), true);
         }
     }
 
@@ -403,57 +228,21 @@ class EventHandler implements Listener{
      * @priority HIGH
      */
     public function onBlockBreak(BlockBreakEvent $event){
-        // Special Signs
         $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
         if($tile instanceof Sign){
-
-            // Free sign
-            if($tile->getText()[0] === "[Free]" && !$event->getPlayer()->hasPermission("essentials.sign.break.free")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Gamemode sign
-            elseif($tile->getText()[0] === "[Gamemode]" && !$event->getPlayer()->hasPermission("essentials.sign.break.gamemode")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Heal sign
-            elseif($tile->getText()[0] === "[Heal]" && !$event->getPlayer()->hasPermission("essentials.sign.break.heal")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Repair sign
-            elseif($tile->getText()[0] === "[Repair]" && !$event->getPlayer()->hasPermission("essentials.sign.break.repair")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Time sign
-            elseif($tile->getText()[0] === "[Time]" && !$event->getPlayer()->hasPermission("essentials.sign.break.time")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Teleport sign
-            elseif($tile->getText()[0] === "[Teleport]" && !$event->getPlayer()->hasPermission("essentials.sign.break.teleport")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
-            }
-
-            // Warp sign
-            elseif($tile->getText()[0] === "[Warp]" && !$event->getPlayer()->hasPermission("essentials.sign.break.warp")){
-                $event->setCancelled(true);
-                $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
+            $key = ["Free", "Gamemode", "Heal", "Kit", "Repair", "Time", "Teleport", "Warp"];
+            foreach($key as $k){
+                if($tile->getText()[0] === "[" . $k . "]" && !$event->getPlayer()->hasPermission("essentials.sign.break." . strtolower($k))){
+                    $event->setCancelled(true);
+                    $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to break this sign");
+                    break;
+                }
             }
         }
     }
 
     /**
      * @param SignChangeEvent $event
-     * @return bool
      */
     public function onSignChange(SignChangeEvent $event){
         // Colored Sign
@@ -465,7 +254,6 @@ class EventHandler implements Listener{
         }
 
         // Special Signs
-
         // Free sign
         if(strtolower($event->getLine(0)) === "[free]" && $event->getPlayer()->hasPermission("essentials.sign.create.free")){
             if(trim($event->getLine(1)) !== "" || $event->getLine(1) !== null){
@@ -517,7 +305,7 @@ class EventHandler implements Listener{
                 default:
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Unknown Gamemode, you should use \"Survival\", \"Creative\", \"Adventure\" or \"Spectator\"");
                     $event->setCancelled(true);
-                    return false;
+                    return;
                     break;
             }
             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Gamemode sign successfully created!");
@@ -528,6 +316,16 @@ class EventHandler implements Listener{
         elseif(strtolower($event->getLine(0)) === "[heal]" && $event->getPlayer()->hasPermission("essentials.sign.create.heal")){
             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Heal sign successfully created!");
             $event->setLine(0, "[Heal]");
+        }
+
+        // Kit sign
+        elseif(strtolower($event->getLine(0)) === "[kit]" && $event->getPlayer()->hasPermission("essentials.sign.create.kit")){
+            if(!$this->plugin->kitExists($event->getLine(1))){
+                $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exist");
+                return;
+            }
+            $event->getPlayer()->sendMessage(TextFormat::GREEN . "Kit sign successfully created!");
+            $event->setLine(0, "[Kit]");
         }
 
         // Repair sign
@@ -542,7 +340,7 @@ class EventHandler implements Listener{
                 default:
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid argument, you should use \"Hand\" or \"All\"");
                     $event->setCancelled(true);
-                    return false;
+                    return;
                     break;
             }
             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Repair sign successfully created!");
@@ -561,7 +359,7 @@ class EventHandler implements Listener{
                 default:
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid time, you should use \"Day\" or \"Night\"");
                     $event->setCancelled(true);
-                    return false;
+                    return;
                     break;
             }
             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Time sign successfully created!");
@@ -598,16 +396,6 @@ class EventHandler implements Listener{
                 $event->getPlayer()->sendMessage(TextFormat::GREEN . "Warp sign successfully created!");
                 $event->setLine(0, "[Warp]");
             }
-        }
-        return true;
-    }
-
-    /**
-     * @param EntityExplodeEvent $event
-     */
-    public function onTNTExplode(EntityExplodeEvent $event){
-        if($event->getEntity()->namedtag->getName() === "EssNuke"){
-            $event->setBlockList([]);
         }
     }
 }
