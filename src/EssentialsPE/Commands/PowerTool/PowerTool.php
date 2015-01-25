@@ -29,7 +29,7 @@ class PowerTool extends BaseCommand{
         }
 
         if(count($args) === 0){
-            if(!$this->getPlugin()->getPowerToolItemCommand($sender, $item) && $this->getPlugin()->getPowerToolItemCommands($sender, $item) && !$this->getPlugin()->getPowerToolItemChatMacro($sender, $item)){
+            if(!$this->getPlugin()->getPowerToolItemCommand($sender, $item) && !$this->getPlugin()->getPowerToolItemCommands($sender, $item) && !$this->getPlugin()->getPowerToolItemChatMacro($sender, $item)){
                 $sender->sendMessage(TextFormat::RED . $this->getUsage());
                 return false;
             }
