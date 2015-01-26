@@ -25,6 +25,9 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
      - [x] Fix the _Fetcher_
      - [x] Fix the _Downloader_
 
+###### PowerTool:
+    - [ ] Handle air touch
+
 ###### Economy:
   - [ ] Implement Commands:
      - [x] Balance.
@@ -44,3 +47,4 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 
 #### TODO (Multi-Language Update)
 - [ ] Add option for _Join_ and _Leave_ messages.
+- [ ] Add 'Messages' API
