@@ -23,9 +23,11 @@ class World extends BaseCommand{
         }
         if(count($args) !== 1){
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            return false;
         }
         if(!$sender->hasPermission("essentials.worlds.*") || !$sender->hasPermission("essentials.worlds." . strtolower($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to this world.");
+            return false;
         }
         if(!$sender->getServer()->isLevelGenerated($args[0])){
             $sender->sendMessage(TextFormat::RED . "[Error] World doesn't exists");
