@@ -26,7 +26,7 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
      - [x] Fix the _Downloader_
 
 ###### PowerTool:
-    - [ ] Handle air touch
+  - [ ] Handle air touch
 
 ###### Economy:
   - [ ] Implement Commands:
