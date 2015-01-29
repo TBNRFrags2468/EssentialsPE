@@ -180,7 +180,7 @@ class Loader extends PluginBase{
         ]);
 
         //Register the new commands
-        $$this->getServer()->getCommandMap()->registerAll("essentialspe", [
+        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
             new AFK($this),
             new Antioch($this),
             new Back($this),
