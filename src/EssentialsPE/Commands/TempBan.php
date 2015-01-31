@@ -35,29 +35,26 @@ class TempBan extends BaseCommand{
             if(strpos($t, "s")){
                 $time = substr($t, -2);
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "m")){
+            }elseif(strpos($t, "m")){
                 $time = substr($t, -2) * 60;
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "h")){
+            }elseif(strpos($t, "h")){
                 $time = substr($t, -2) * 60 * 60;
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "d")){
+            }elseif(strpos($t, "d")){
                 $time = substr($t, -2) * 24 * 60 * 60;
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "w")){
+            }elseif(strpos($t, "w")){
                 $time = substr($t, -2) * 7 * 24 * 60 * 60;
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "mo")){
+            }elseif(strpos($t, "mo")){
                 $time = substr($t, -3) * 30 * 24 * 60 * 60;
                 $seconds += (is_numeric($time) ? $time : 0);
-            }
-            if(strpos($t, "y")){
+            }elseif(strpos($t, "y")){
                 $time = substr($t, -2) * 365 * 24 * 60 * 60;
+                $seconds += (is_numeric($time) ? $time : 0);
+            }else{
+                $time = substr($t, -2);
                 $seconds += (is_numeric($time) ? $time : 0);
             }
         }

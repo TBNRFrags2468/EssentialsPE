@@ -61,6 +61,9 @@ use EssentialsPE\Commands\Warp\DelWarp;
 use EssentialsPE\Commands\Warp\Setwarp;
 use EssentialsPE\Commands\Warp\Warp;
 use EssentialsPE\Commands\World;
+use EssentialsPE\EventHandlers\OtherEvents;
+use EssentialsPE\EventHandlers\PlayerEvents;
+use EssentialsPE\EventHandlers\SignEvents;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
@@ -112,14 +115,13 @@ class Loader extends PluginBase{
         $this->checkConfig();
         $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
-        $this->getServer()->getPluginManager()->registerEvents(new EventHandler($this), $this);
+        $this->registerEvents();
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){
             //Nicks
             $this->setNick($p, $this->getNick($p), false);
             //Sessions & Mute
-            $this->muteSessionCreate($p);
             $this->createSession($p);
         }
 
@@ -142,6 +144,15 @@ class Loader extends PluginBase{
             //Sessions
             $this->removeSession($p);
         }
+    }
+
+    /**
+     * Function to register all the Event Hanlders that EssentialsPE provide
+     */
+    public function registerEvents(){
+        $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerEvents($this), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SignEvents($this), $this);
     }
 
     /**
@@ -172,8 +183,7 @@ class Loader extends PluginBase{
         ]);
 
         //Register the new commands
-        $cmdmap = $this->getServer()->getCommandMap();
-        $cmdmap->registerAll("essentialspe", [
+        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
             new AFK($this),
             new Antioch($this),
             new Back($this),
@@ -258,10 +268,10 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
-        $booleans = ["safe-afk", "enable-custom-colors"];
+        $booleans = ["enable-custom-colors"];
         foreach($booleans as $key){
+            $value = null;
             if(!$cfg->exists($key) || !is_bool($cfg->get($key))){
-                $value = false;
                 switch($key){
                     // Properties to auto set true
                     case "safe-afk":
@@ -272,14 +282,16 @@ class Loader extends PluginBase{
                         $value = false;
                         break;
                 }
-                $cfg->set($key, $value);
+                if($value !== null){
+                    $cfg->set($key, $value);
+                }
             }
         }
 
-        $numerics = ["auto-afk-kick", "oversized-stacks", "near-radius-limit", "near-default-radius"];
+        $numerics = ["oversized-stacks", "near-radius-limit", "near-default-radius"];
         foreach($numerics as $key){
+            $value = null;
             if(!is_numeric($cfg->get($key))){
-                $value = 0;
                 switch($key){
                     case "auto-afk-kick":
                         $value = 300;
@@ -294,14 +306,37 @@ class Loader extends PluginBase{
                         $value = 100;
                         break;
                 }
-                $cfg->set($key, $value);
+                if($value !== null){
+                    $cfg->set($key, $value);
+                }
             }
+        }
+
+        $afk = ["safe", "auto-set", "auto-kick", "broadcast"];
+        foreach($afk as $key){
+            $value = null;
+            $k = $this->getConfig()->getNested("afk." . $key);
+            switch($key){
+                case "safe":
+                case "broadcast":
+                    if(!is_bool($k)){
+                        $value = true;
+                    }
+                    break;
+                case "auto-set":
+                case "auto-kick":
+                    if(!is_int($k)){
+                        $value = 300;
+                    }
+                    break;
+            }
+            $this->getConfig()->setNested("afk." . $key, $value);
         }
 
         $updater = ["enabled", "time-interval", "warn-console", "warn-players", "stable"];
         foreach($updater as $key){
-            $k = $this->getConfig()->getNested("updater." . $key);
             $value = null;
+            $k = $this->getConfig()->getNested("updater." . $key);
             switch($key){
                 case "time-interval":
                     if(!is_int($k)){
@@ -442,7 +477,7 @@ class Loader extends PluginBase{
 
             /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
         ];
-        return !isset($IDs[$item->getId()]);
+        return in_array($item->getId(), $IDs);
     }
 
     /**
@@ -533,8 +568,6 @@ class Loader extends PluginBase{
 
     /** @var array  */
     private $sessions = [];
-    /** @var array  */
-    private $mutes = [];
 
     /**
      * Tell if a session exists for a specific player
@@ -628,25 +661,29 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param bool $state
+     * @param bool $broadcast
      * @return bool
      */
-    public function setAFKMode(Player $player, $state){
+    public function setAFKMode(Player $player, $state, $broadcast = true){
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state));
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerAFKModeChangeEvent($this, $player, $state, $broadcast));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->getAFKMode();
         $this->getSession($player)->setAFK($state);
-        $time = $this->getConfig()->get("auto-afk-kick");
+        $time = $this->getConfig()->getNested("afk.auto-kick");
         if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID($player)) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->getSession($player)->removeAFKKickTaskID($player);
         }elseif($state === true and (is_int($time) and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
+        }
+        if($ev->getBroadcast()){
+            $this->broadcastAFKStatus($player);
         }
         return true;
     }
@@ -655,9 +692,10 @@ class Loader extends PluginBase{
      * Automatically switch the AFK mode on/off
      *
      * @param Player $player
+     * @param bool $broadcast
      */
-    public function switchAFKMode(Player $player){
-        $this->setAFKMode($player, ($this->isAFK($player) ? false : true));
+    public function switchAFKMode(Player $player, $broadcast = true){
+        $this->setAFKMode($player, ($this->isAFK($player) ? false : true), $broadcast);
     }
 
     /**
@@ -666,7 +704,7 @@ class Loader extends PluginBase{
      * This function schedules the global Auto-AFK setter
      */
     public function scheduleAutoAFKSetter(){
-        if($this->getConfig()->get("auto-afk-set") > 0){
+        if($this->getConfig()->getNested("afk.auto-set") > 0){
             $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKSetterTask($this), (600)); // Check every 30 seconds...
         }
     }
@@ -688,9 +726,7 @@ class Loader extends PluginBase{
      * @param int $time
      */
     public function setLastPlayerMovement(Player $player, $time){
-        if(!$player->hasPermission("essentials.afk.preventauto")){
-            $this->getSession($player)->setLastMovement($time);
-        }
+        $this->getSession($player)->setLastMovement($time);
     }
 
     /**
@@ -699,6 +735,9 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function broadcastAFKStatus(Player $player){
+        if(!$this->getConfig()->getNested("afk.broadcast")){
+            return;
+        }
         $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
         $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->isAFK($player) ? "now" : "no longer") . " AFK";
         $this->getServer()->getLogger()->info($message);
@@ -792,7 +831,7 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Gets the max balance that a player can own
+     * Get the max balance that a player can own
      *
      * @return bool|mixed
      */
@@ -800,6 +839,11 @@ class Loader extends PluginBase{
         return $this->economy->get("max-money");
     }
 
+    /**
+     * Gets the minium balance that a player can own
+     *
+     * @return bool|mixed
+     */
     public function getMinBalance(){
         return $this->economy->get("min-money");
     }
@@ -1196,6 +1240,8 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Get a list of all available kits
+     *
      * @param bool $inArray
      * @return array|bool|string
      */
@@ -1275,19 +1321,8 @@ class Loader extends PluginBase{
      *  |_|  |_|\__,_|\__\___|
      */
 
-    /**
-     * Create the mute session for a player
-     *
-     * The mute session is handled separately of other Sessions because
-     * using it separately, players can't be unmuted by leaving and joining again...
-     *
-     * @param Player $player
-     */
-    public function muteSessionCreate(Player $player){
-        if(!isset($this->mutes[$player->getName()])){
-            $this->mutes[$player->getName()] = false;
-        }
-    }
+    /** @var array  */
+    private $mutes = [];
 
     /**
      * Tell if the is Muted or not
@@ -1296,7 +1331,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isMuted(Player $player){
-        return $this->mutes[$player->getName()];
+        return in_array($player->getName(), $this->mutes);
     }
 
     /**

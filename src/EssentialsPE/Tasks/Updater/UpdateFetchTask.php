@@ -87,7 +87,7 @@ class UpdateFetchTask extends AsyncTask{
         curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 10);
-        curl_exec($ch);
+        file_put_contents($server->getPluginPath() . "EssentialsPE.phar", curl_exec($ch));
         curl_close($ch);
         fclose($file);
     }
