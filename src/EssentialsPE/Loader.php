@@ -35,6 +35,7 @@ use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\Override\Kill;
+use EssentialsPE\Commands\Override\Msg;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
 use EssentialsPE\Commands\PTime;
@@ -73,6 +74,7 @@ use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
+use pocketmine\command\CommandSender;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -165,7 +167,8 @@ class Loader extends PluginBase{
         //Unregister commands to override
         $this->unregisterCommands([
            //"gamemode", // TODO: ReWrite
-            "kill"
+            "kill",
+            "tell"
         ]);
 
         //Register the new commands
@@ -192,6 +195,7 @@ class Loader extends PluginBase{
             new KickAll($this),
             new Kit($this),
             new More($this),
+            new Msg($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
@@ -555,6 +559,7 @@ class Loader extends PluginBase{
             "lastPosition" => null,
             "lastRotation" => null,
             "isGod" => false,
+            "quickReply" => false,
             "ptCommands" => false,
             "ptChatMacros" => false,
             "isPvPEnabled" => true,
@@ -1203,6 +1208,63 @@ class Loader extends PluginBase{
             return wordwrap(implode(", ", $list), 30, "\n", true);
         }
         return $list;
+    }
+
+    /**  __  __
+     *  |  \/  |
+     *  | \  / |___  __ _
+     *  | |\/| / __|/ _` |
+     *  | |  | \__ | (_| |
+     *  |_|  |_|___/\__, |
+     *               __/ |
+     *              |___/
+     */
+
+    private $quickReply = [
+        "console" => false,
+        "rcon" => false
+    ];
+
+    /**
+     * Get the target for QuickReply, in string...
+     *
+     * @param CommandSender $sender
+     * @return bool|string
+     */
+    public function getQuickReply(CommandSender $sender){
+        if($sender instanceof Player){
+            $q = $this->getSession($sender)->getQuickReply();
+        }else{
+            $q = $this->quickReply[strtolower($sender->getName())];
+        }
+        return $q;
+    }
+
+    /**
+     * Assign a player to use with QuickReply
+     *
+     * @param CommandSender $messaged, The player that got the message
+     * @param CommandSender $messenger, The player that sent the message
+     */
+    public function setQuickReply(CommandSender $messaged, CommandSender $messenger){
+        if($messaged instanceof Player){
+            $this->getSession($messaged)->setQuickReply($messenger);
+        }else{
+            $this->quickReply[strtolower($messaged->getName())] = $messenger->getName();
+        }
+    }
+
+    /**
+     * Removes QuickReply
+     *
+     * @param CommandSender $sender
+     */
+    public function removeQuickReply(CommandSender $sender){
+        if($sender instanceof Player){
+            $this->getSession($sender)->removeQuickReply();
+        }else{
+            $this->quickReply[strtolower($sender)] = false;
+        }
     }
 
     /**  __  __       _

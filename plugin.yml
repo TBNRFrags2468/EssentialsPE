@@ -164,6 +164,9 @@ permissions:
             essentials.more:
                 default: op
                 description: "Get a stack of the item you're holding"
+            essentials.msg:
+                default: true
+                description: "Send private messages to other players"
             essentials.mute:
                 default: op
                 description: "Mute a player from the chat"
@@ -231,6 +234,9 @@ permissions:
                     essentials.repair.armor:
                         default: op
                         description: "Let your repair the equiped armor while using /repair all"
+            essentials.reply:
+                default: true
+                description: "Allow the player to quick reply to the last player that messaged him"
             essentials.seen:
                 default: op
                 description: "Check player's last online time"

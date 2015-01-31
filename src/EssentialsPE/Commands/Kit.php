@@ -32,6 +32,10 @@ class Kit extends BaseCommand{
         }
         switch(count($args)){
             case 1:
+                if(!$sender instanceof Player){
+                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a player to give the kit");
+                    return false;
+                }
                 if(!$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
                     return false;

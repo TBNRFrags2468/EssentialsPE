@@ -1,6 +1,7 @@
 <?php
 namespace EssentialsPE;
 
+use pocketmine\command\CommandSender;
 use pocketmine\level\Position;
 
 class BaseSession {
@@ -159,6 +160,36 @@ class BaseSession {
         }
         $this->isGod = $mode;
         return true;
+    }
+
+    /**  __  __
+     *  |  \/  |
+     *  | \  / |___  __ _
+     *  | |\/| / __|/ _` |
+     *  | |  | \__ | (_| |
+     *  |_|  |_|___/\__, |
+     *               __/ |
+     *              |___/
+     */
+
+    private $quickReply = false;
+
+    /**
+     * @return bool|string
+     */
+    public function getQuickReply(){
+        return $this->quickReply;
+    }
+
+    /**
+     * @param CommandSender $sender
+     */
+    public function setQuickReply(CommandSender $sender){
+        $this->quickReply = $sender->getName();
+    }
+
+    public function removeQuickReply(){
+        $this->quickReply = false;
     }
 
     /**  _____                    _______          _
