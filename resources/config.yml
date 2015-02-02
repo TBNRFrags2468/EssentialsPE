@@ -1,6 +1,9 @@
 # EssentialsPE configuration
 # This configuration flie let you modify how EssentialsPE work with some features
 
+# DO NOT EDIT THIS PROPERTY! For internal use ONLY
+version: 1.1.0
+
 # Edit different parts of the AFK feature!
 afk:
   # Players that are AFK can, or not, be damaged

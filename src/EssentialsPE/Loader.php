@@ -267,10 +267,17 @@ class Loader extends PluginBase{
     }
 
     public function checkConfig(){
-        $this->saveDefaultConfig();
+        if(!file_exists($this->getDataFolder() . "config.yml")){
+            $this->saveDefaultConfig();
+        }
         //$this->saveResource("Economy.yml");
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
+
+        if(!$cfg->exists("version")){
+            unlink($this->getDataFolder() . "config.yml");
+            $this->saveDefaultConfig();
+        }
 
         $booleans = ["enable-custom-colors"];
         foreach($booleans as $key){
@@ -334,7 +341,9 @@ class Loader extends PluginBase{
                     }
                     break;
             }
-            $this->getConfig()->setNested("afk." . $key, $value);
+            if($value !== null){
+                $this->getConfig()->setNested("afk." . $key, $value);
+            }
         }
 
         $updater = ["enabled", "time-interval", "warn-console", "warn-players", "stable"];
@@ -362,7 +371,6 @@ class Loader extends PluginBase{
         }
 
         $cfg->save();
-        $cfg->reload();
     }
 
     private function saveConfigs(){
