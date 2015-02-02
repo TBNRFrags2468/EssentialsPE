@@ -439,7 +439,11 @@ class Loader extends PluginBase{
         if($found === null){
             $found = false;
         }
-        // Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
+        /*
+         * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
+         *
+         * ALL THE RIGHTS FROM THE FOLLOWING CODE BELONGS TO POCKETMINE-MP
+         */
         if(!$found){
             $name = \strtolower($player);
             $delta = \PHP_INT_MAX;
