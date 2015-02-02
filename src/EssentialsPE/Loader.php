@@ -424,13 +424,39 @@ class Loader extends PluginBase{
      */
     public function getPlayer($player){
         $player = strtolower($player);
+        $found = false;
         foreach($this->getServer()->getOnlinePlayers() as $p){
             if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
-                return $p;
+                $found = $p;
                 break;
             }
         }
-        return false;
+        // If cannot get the exact player name/nick, try with portions of it
+        if(!$found){
+            $found = $this->getServer()->getPlayer($player); // PocketMine function to get from portions of name
+        }
+        // Due to above function return null, and we only return bool xD
+        if($found === null){
+            $found = false;
+        }
+        // Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
+        if(!$found){
+            $name = \strtolower($player);
+            $delta = \PHP_INT_MAX;
+            foreach($this->getServer()->getOnlinePlayers() as $player){
+                if(\stripos($player->getDisplayName(), $name) === 0){
+                    $curDelta = \strlen($player->getName()) - \strlen($name);
+                    if($curDelta < $delta){
+                        $found = $player;
+                        $delta = $curDelta;
+                    }
+                    if($curDelta === 0){
+                        break;
+                    }
+                }
+            }
+        }
+        return $found;
     }
 
     /**
