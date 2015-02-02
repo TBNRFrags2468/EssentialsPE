@@ -6,8 +6,10 @@ use pocketmine\event\block\BlockPlaceEvent;
 use pocketmine\event\entity\EntityExplodeEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
+use pocketmine\event\server\DataPacketReceiveEvent;
 use pocketmine\event\server\ServerCommandEvent;
 use pocketmine\math\Vector3;
+use pocketmine\network\protocol\UseItemPacket;
 
 class OtherEvents implements Listener{
     /** @var Loader */
@@ -64,6 +66,18 @@ class OtherEvents implements Listener{
             $event->setCancelled(true);
             $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
             $event->getPlayer()->getLevel()->setBlock($pos, $event->getBlock(), true);
+        }
+    }
+
+    /**
+     * @param DataPacketReceiveEvent $event
+     *
+     * Special thanks to @PEMapModder for the information!
+     */
+    public function onPacketReceive(DataPacketReceiveEvent $event){
+        $packet = $event->getPacket();
+        if(($packet instanceof UseItemPacket && $packet->face ===  0xff) && $this->plugin->executePowerTool($event->getPlayer(), $this->plugin->getItem($packet->item))){
+            $event->setCancelled(true);
         }
     }
 }
