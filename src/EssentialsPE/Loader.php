@@ -10,12 +10,12 @@ use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
 use EssentialsPE\Commands\Depth;
-use EssentialsPE\Commands\Economy\Balance;
-use EssentialsPE\Commands\Economy\Eco;
-use EssentialsPE\Commands\Economy\Pay;
-use EssentialsPE\Commands\Economy\Sell;
-use EssentialsPE\Commands\Economy\SetWorth;
-use EssentialsPE\Commands\Economy\Worth;
+#use EssentialsPE\Commands\Economy\Balance;
+#use EssentialsPE\Commands\Economy\Eco;
+#use EssentialsPE\Commands\Economy\Pay;
+#use EssentialsPE\Commands\Economy\Sell;
+#use EssentialsPE\Commands\Economy\SetWorth;
+#use EssentialsPE\Commands\Economy\Worth;
 use EssentialsPE\Commands\EssentialsPE;
 use EssentialsPE\Commands\Extinguish;
 use EssentialsPE\Commands\GetPos;
@@ -593,6 +593,7 @@ class Loader extends PluginBase{
             "lastRotation" => null,
             "isGod" => false,
             "quickReply" => false,
+            "isMuted" => false,
             "ptCommands" => false,
             "ptChatMacros" => false,
             "isPvPEnabled" => true,
@@ -604,7 +605,20 @@ class Loader extends PluginBase{
             "isUnlimitedEnabled" => false,
             "isVanished" => false
         ]));
-        $this->sessions[$player->getName()] = new BaseSession($ev->getValues());
+        $values = $ev->getValues();
+
+        // It's required to do this movement because "Mute" is handled separately from normal Sessions
+        $i = $values["isMuted"];
+        $this->setMute($player, $i);
+        unset($values["isMuted"]);
+        // Skip this code after the session creation, to handle correctly the player
+        $i = $values["isVanished"];
+        unset($values["isVanished"]);
+
+        $this->sessions[$player->getName()] = new BaseSession($values);
+
+        // This is also required, extra work is need to be done for "Vanish" to work
+        $this->setVanish($player, $i);
 
         //Enable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
