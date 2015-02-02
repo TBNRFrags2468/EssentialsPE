@@ -28,10 +28,10 @@ class Reply extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] No target available for QuickReply");
             return false;
         }
-        if(strtolower($t) !== "console" || strtolower($t) !== "rcon"){
+        if(strtolower($t) !== "console" && strtolower($t) !== "rcon"){
             $t = $this->getPlugin()->getPlayer($t);
             if(!$t){
-                $sender->sendMessage(TextFormat::RED . "[Error] No target available for QuickReply");
+                $sender->sendMessage(TextFormat::RED . "[Error] No player available for QuickReply");
                 $this->getPlugin()->removeQuickReply($sender);
                 return false;
             }

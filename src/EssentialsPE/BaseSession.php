@@ -222,7 +222,7 @@ class BaseSession {
         if(!is_int((int) $itemId) || (int) $itemId === 0){
             return false;
         }
-        if(!is_array($this->ptCommands[$itemId])){
+        if(!is_array($this->ptCommands) || !isset($this->ptCommands[$itemId]) || !is_array($this->ptCommands[$itemId])){
             $this->ptCommands[$itemId] = $command;
         }else{
             $this->ptCommands[$itemId][] = $command;

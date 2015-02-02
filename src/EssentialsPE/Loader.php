@@ -42,6 +42,7 @@ use EssentialsPE\Commands\PTime;
 use EssentialsPE\Commands\PvP;
 use EssentialsPE\Commands\RealName;
 use EssentialsPE\Commands\Repair;
+use EssentialsPE\Commands\Reply;
 use EssentialsPE\Commands\Seen;
 use EssentialsPE\Commands\SetSpawn;
 use EssentialsPE\Commands\Spawn;
@@ -205,7 +206,6 @@ class Loader extends PluginBase{
             new KickAll($this),
             new Kit($this),
             new More($this),
-            new Msg($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
@@ -238,6 +238,10 @@ class Loader extends PluginBase{
             new DelHome($this),
             new Home($this),
             new SetHome($this),
+
+            // Messages
+            new Msg($this),
+            new Reply($this),
 
             //PowerTool
             new PowerTool($this),

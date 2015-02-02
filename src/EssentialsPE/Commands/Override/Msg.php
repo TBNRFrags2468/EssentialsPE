@@ -24,7 +24,7 @@ class Msg extends BaseCommand{
             return false;
         }
         $t = array_shift($args);
-        if(strtolower($t) !== "console" || strtolower($t) !== "rcon"){
+        if(strtolower($t) !== "console" && strtolower($t) !== "rcon"){
             $t = $this->getPlugin()->getPlayer($t);
             if(!$t){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
