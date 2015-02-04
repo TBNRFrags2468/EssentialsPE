@@ -5,7 +5,6 @@ use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class Gamemode extends BaseCommand{
@@ -18,95 +17,99 @@ class Gamemode extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        $gm = 0;
-        switch(count($args)){
-            case 0:
-                case "gma":
-                case "adventure":
-                    $gm = 2;
-                    break;
-                case "gmc":
-                case "creative":
-                    $gm = 1;
-                    break;
-                case "gms":
+        if(strtolower($alias) !== "gamemode" && strtolower($alias) !== "gm"){
+            if(isset($args[0])){
+                $args[1] = $args[0];
+            }
+            switch(strtolower($alias)){
                 case "survival":
-                    $gm = 0;
+                case "gms":
+                    $args[0] = "survival";
                     break;
-                case "gmt":
+                case "creative":
+                case "gmc":
+                    $args[0] = "creative";
+                    break;
+                case "adventure":
+                case "gma":
+                    $args[0] = "adventure";
+                    break;
                 case "spectator":
                 case "viewer":
-                    $gm = 3;
+                case "gmt":
+                    $args[0] = "spectator";
                     break;
-            case 1:
-            case 2:
-                if(!$sender instanceof Player && !isset($arg[1])){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /gamemode <mode> <player>");
+                default:
                     return false;
-                }
-                switch($alias){
-                    case "gamemode":
-                    case "gm":
-                        switch(strtolower($args[0])){
-                            case "adventure":
-                            case "a":
-                            case 2:
-                                $gm = 2;
-                                break;
-                            case "cretive":
-                            case "c":
-                            case 1:
-                                $gm = 1;
-                                break;
-                            case "survival":
-                            case "s":
-                            case 0:
-                                $gm = 0;
-                                break;
-                            case "spectator":
-                            case "t":
-                            case 3:
-                                $gm = 3;
-                                break;
-                            default:
-                                $sender->sendMessage(TextFormat::RED . "[Error] Invalid gamemode");
-                                return false;
-                                break;
-                        }
-                        break;
-                }
-                break;
-            default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /gamemode <mode> <player>"));
-                return false;
-                break;
+                    break;
+            }
         }
-        $gmstring = strtolower($sender->getServer()->getGamemodeString($gm));
-        if($alias === "gm" || $alias === "gamemode"){
-            $arg = 1;
-        }else{
-            $arg = 0;
+        $player = $sender;
+        if(!$player instanceof Player && !isset($args[1])){
+            $player->sendMessage(TextFormat::RED . "Usage: /gamemode <mode> <player>");
+            return false;
         }
-        if(isset($args[$arg])){
-            $player = $this->getPlugin()->getPlayer($args[$arg]);
+        if(isset($args[1])){
+            $player = $this->getPlugin()->getPlayer($args[1]);
             if(!$player){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                 return false;
             }
-            if($player->getGamemode() !== $gm){
-                $sender->getServer()->broadcast(TextFormat::GREEN . "Setting " . $args[$arg] . (substr($args[$arg], -1, 1) === "s" ? "'" : "'s") . " gamemode to " . $gmstring, Server::BROADCAST_CHANNEL_ADMINISTRATIVE);
-                $player->sendMessage("Changing your gamemode to " . $gmstring);
-                $player->setGamemode($gm);
-            }else{
-                $sender->sendMessage(TextFormat::RED . "[Error] " . $args[$arg] . " is already on " . $sender->getServer()->getGamemodeString($gm) . " mode");
+        }
+
+        /**
+         * The following switch is applied when the user execute:
+         * /gamemode <MODE>
+         */
+        if(is_int($args[0])){
+            switch($args[0]){
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    $gm = $args[0];
+                    break;
+                default:
+                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");
+                    return false;
+                    break;
             }
         }else{
-            if($sender->getGamemode() !== $gm){
-                $this->broadcastCommandMessage($sender, "Set own gamemode to " . $gmstring . " mode");
-                $sender->sendMessage("Changing your gamemode to " . $gmstring . " mode");
-                $sender->setGamemode($gm);
+            switch(strtolower($args[0])){
+                case "survival":
+                case "s":
+                    $gm = 0;
+                    break;
+                case "creative":
+                case "c":
+                    $gm = 1;
+                    break;
+                case "adventure":
+                case "a":
+                    $gm = 2;
+                    break;
+                case "spectator":
+                case "viewer":
+                case "view":
+                case "v":
+                case "t":
+                    $gm = 3;
+                    break;
+                default:
+                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");
+                    return false;
+                    break;
             }
         }
+        $gmstring = $this->getPlugin()->getServer()->getGamemodeString($gm);
+        if($player->getGamemode() === $gm){
+            $player->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "You're" : $args[1] . " is") . " already in " . $gmstring . " mode");
+            return false;
+        }
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . $args[1] . " is now on " . $gmstring . " mode");
+        }
+        $player->setGamemode($gm);
         return true;
     }
 } 

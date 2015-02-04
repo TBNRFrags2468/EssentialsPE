@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{
@@ -21,58 +22,43 @@ class TempBan extends BaseCommand{
             return false;
         }
         $player = $this->getPlugin()->getPlayer($name = array_shift($args));
-        /**
-         * s = Seconds (with leading zeros)
-         * i = Minutes
-         * h = Hour (12 hours format with leading zeros)
-         * j = Day number (1 - 30/31)
-         * m = Month number
-         * Y = Year in 4 digits (1999)
-         */
-        $seconds = 0;
-        $v = explode(",", array_shift($args));
-        foreach($v as $t){
+
+        $date = new \DateTime();
+        foreach(explode(",", array_shift($args)) as $t){
             if(strpos($t, "s")){
-                $time = substr($t, -2);
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
             }elseif(strpos($t, "m")){
-                $time = substr($t, -2) * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("PT" . strtoupper($t)));
             }elseif(strpos($t, "h")){
-                $time = substr($t, -2) * 60 * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
             }elseif(strpos($t, "d")){
-                $time = substr($t, -2) * 24 * 60 * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
             }elseif(strpos($t, "w")){
-                $time = substr($t, -2) * 7 * 24 * 60 * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
             }elseif(strpos($t, "mo")){
-                $time = substr($t, -3) * 30 * 24 * 60 * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
             }elseif(strpos($t, "y")){
-                $time = substr($t, -2) * 365 * 24 * 60 * 60;
-                $seconds += (is_numeric($time) ? $time : 0);
+                $date->add(new \DateInterval("P" . strtoupper($t)));
+            }elseif(is_int((int) $t)){
+                $date->add(new \DateInterval("P" . $t . "S"));
             }else{
-                $time = substr($t, -2);
-                $seconds += (is_numeric($time) ? $time : 0);
+                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                return false;
             }
         }
         $reason = implode(" ", $args);
-        $date = new \DateTime();
-        $date->setTimestamp($time = time() + $seconds);
         if($player !== false){
             if($player->hasPermission("essentials.banexempt")){
                 $sender->sendMessage(TextFormat::RED . "[Error] ". $name . " can't be banned");
                 return false;
             }else{
                 $name = $player->getName();
-                $player->kick(TextFormat::RED . "Banned until " . TextFormat::AQUA . date("l, F j, Y", $time) . TextFormat::RED . " at " . TextFormat::AQUA . date("h:1a", $time));
+                $player->kick(TextFormat::RED . "Banned until " . TextFormat::AQUA . $date->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $date->format("h:ia"));
             }
         }
         $sender->getServer()->getNameBans()->addBan($name, ($reason !== "" ? $reason : null), $date, "essentialspe");
 
-        $this->broadcastCommandMessage($sender, "Banned player " . $name);
+        $this->broadcastCommandMessage($sender, "Banned player " . $name . " until " . $date->format("l, F j, Y") . " at " . $date->format("h:ia"));
         return true;
     }
 }

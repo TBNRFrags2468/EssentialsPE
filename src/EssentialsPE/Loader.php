@@ -34,6 +34,7 @@ use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
 use EssentialsPE\Commands\Nick;
 use EssentialsPE\Commands\Nuke;
+use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\Override\Msg;
 use EssentialsPE\Commands\PowerTool\PowerTool;
@@ -178,7 +179,7 @@ class Loader extends PluginBase{
     private function registerCommands(){
         //Unregister commands to override
         $this->unregisterCommands([
-           //"gamemode", // TODO: ReWrite
+           "gamemode",
             "kill",
             "tell"
         ]);
@@ -261,7 +262,7 @@ class Loader extends PluginBase{
             new Warp($this),
 
             //Override
-            //new Gamemode($this), // TODO: ReWrite
+            new Gamemode($this),
             new Kill($this)
         ]);
     }
