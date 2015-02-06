@@ -275,7 +275,8 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
-        if(!$cfg->exists("version")){
+        if(!$cfg->exists("version") || $cfg->get("version") !== "1.1.0"){
+            $this->getLogger()->debug(TextFormat::RED . "An invalid config file was found, generating a new one...");
             unlink($this->getDataFolder() . "config.yml");
             $this->saveDefaultConfig();
         }
@@ -370,8 +371,6 @@ class Loader extends PluginBase{
                 $this->getConfig()->setNested("updater." . $key, $value);
             }
         }
-
-        $cfg->save();
     }
 
     private function saveConfigs(){
@@ -761,7 +760,7 @@ class Loader extends PluginBase{
      * This function schedules the global Auto-AFK setter
      */
     public function scheduleAutoAFKSetter(){
-        if($this->getConfig()->getNested("afk.auto-set") > 0){
+        if(is_int($v = $this->getConfig()->getNested("afk.auto-set")) && $v > 0){
             $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKSetterTask($this), (600)); // Check every 30 seconds...
         }
     }
