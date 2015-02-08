@@ -107,7 +107,7 @@ class Gamemode extends BaseCommand{
             return false;
         }
         if($player !== $sender){
-            $sender->sendMessage(TextFormat::GREEN . $args[1] . " is now on " . $gmstring . " mode");
+            $sender->sendMessage(TextFormat::GREEN . $args[1] . " is now in " . $gmstring . " mode");
         }
         $player->setGamemode($gm);
         return true;
