@@ -48,7 +48,7 @@ class TempBan extends BaseCommand{
         }
         $reason = implode(" ", $args);
         if($player !== false){
-            if($player->hasPermission("essentials.banexempt")){
+            if($player->hasPermission("essentials.ban.exempt")){
                 $sender->sendMessage(TextFormat::RED . "[Error] ". $name . " can't be banned");
                 return false;
             }else{
