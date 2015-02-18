@@ -27,7 +27,7 @@ class ItemDB extends BaseCommand{
                 $sender->sendMessage(TextFormat::AQUA . "This item " . ($this->getPlugin()->isReparable($item) ? "has " . TextFormat::RED . $item->getDamage() . TextFormat::AQUA . " points of damage" : "metadata is " . TextFormat::RED . $item->getDamage()));
                 break;
             case 1:
-                switch(strtolower($args)){
+                switch(strtolower($args[0])){
                     case "name":
                         $sender->sendMessage(TextFormat::AQUA . "This item is named: " . TextFormat::RED . $item->getName());
                         break;
