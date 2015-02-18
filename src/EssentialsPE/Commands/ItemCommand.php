@@ -37,7 +37,7 @@ class ItemCommand extends BaseCommand{
         if($item->getID() === 0){
             $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $item_name . "\"");
             return false;
-        }elseif(!$sender->hasPermission("essentials.itemspawn.item-all") || !$sender->hasPermission("essentials.itemspawn.item-" . $item->getName() || !$sender->hasPermission("essentials.itemspawn.item-" . $item->getID()))){
+        }elseif(!$sender->hasPermission("essentials.itemspawn.item-all") && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getName() && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getID()))){
             $sender->sendMessage(TextFormat::RED . "You can't spawn this item");
             return false;
         }
