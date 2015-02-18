@@ -2002,7 +2002,9 @@ class Loader extends PluginBase{
             }
         }else{
             foreach($player->getLevel()->getPlayers() as $p){
-                $p->hidePlayer($player);
+                if(!in_array($p->getName(), $ev->getHiddenFor())){
+                    $p->hidePlayer($player);
+                }
             }
         }
         return true;

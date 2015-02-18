@@ -13,8 +13,10 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
     protected $player;
     /** @var bool  */
     protected $isVanished;
-    /** @var  bool */
+    /** @var bool */
     protected $willVanish;
+    /** @var array */
+    protected $keepHiddenFor = [];
 
     /**
      * @param Loader $plugin
@@ -68,5 +70,26 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
         if(is_bool($value)){
             $this->willVanish = $value;
         }
+    }
+
+    /**
+     * This method will allow you to keep a player
+     * hidden to other players, but EssentialsPE
+     * will no longer consider it has "Vanished"
+     *
+     * @param Player $player
+     */
+    public function keepHiddenFor(Player $player){
+        $this->keepHiddenFor[] = $player->getName();
+    }
+
+    /**
+     * Return a list with all the players that
+     * will not see the "unVanished" player
+     *
+     * @return array
+     */
+    public function getHiddenFor(){
+        return $this->keepHiddenFor;
     }
 } 
