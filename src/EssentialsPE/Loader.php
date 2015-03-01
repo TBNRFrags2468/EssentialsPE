@@ -301,8 +301,8 @@ class Loader extends PluginBase{
             }
         }
 
-        $numerics = ["oversized-stacks", "near-radius-limit", "near-default-radius"];
-        foreach($numerics as $key){
+        $integers = ["oversized-stacks", "near-radius-limit", "near-default-radius"];
+        foreach($integers as $key){
             $value = null;
             if(!is_numeric($cfg->get($key))){
                 switch($key){
