@@ -157,7 +157,7 @@ permissions:
             essentials.kill:
                 default: op
                 description: "Kill other players"
-            essntials.kit:
+            essentials.kit:
                 default: true
                 description: "Access to the /kit command"
                 children:
