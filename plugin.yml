@@ -284,6 +284,9 @@ permissions:
                             essentials.sign.break.teleport:
                                 default: op
                                 description: "Allow to remove Teleport signs"
+                            essentials.sign.break.warp:
+                                default: op
+                                description: "Allow to remove Teleport signs"
                     essentials.sign.color:
                         default: op
                         description: "Allow to create colored signs"
@@ -309,6 +312,9 @@ permissions:
                             essentials.sign.create.teleport:
                                 default: op
                                 description: "Allow to create Teleport signs"
+                            essentials.sign.create.warp:
+                                default: op
+                                description: "Allow to create Teleport signs"
                     essentials.sign.use:
                         default: op
                         description: "Allow to use special signs"
@@ -329,6 +335,9 @@ permissions:
                                 default: op
                                 description: "Allow to use Time signs"
                             essentials.sign.use.teleport:
+                                default: op
+                                description: "Allow to use Teleport signs"
+                            essentials.sign.use.warp:
                                 default: op
                                 description: "Allow to use Teleport signs"
             essentials.spawn:
