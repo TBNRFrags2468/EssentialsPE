@@ -1,6 +1,7 @@
 <?php
-namespace EssentialsPE;
+namespace EssentialsPE\BaseFiles;
 
+use EssentialsPE\Loader;
 use pocketmine\scheduler\PluginTask;
 
 abstract class BaseTask extends PluginTask{

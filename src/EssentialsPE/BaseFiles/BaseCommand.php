@@ -1,6 +1,7 @@
 <?php
-namespace EssentialsPE;
+namespace EssentialsPE\BaseFiles;
 
+use EssentialsPE\Loader;
 use pocketmine\command\Command;
 use pocketmine\command\PluginIdentifiableCommand;
 

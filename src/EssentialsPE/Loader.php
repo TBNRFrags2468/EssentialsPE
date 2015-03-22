@@ -1,6 +1,7 @@
 <?php
 namespace EssentialsPE;
 
+use EssentialsPE\BaseFiles\BaseSession;
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Antioch;
 use EssentialsPE\Commands\Back;
@@ -295,9 +296,9 @@ class Loader extends PluginBase{
                         $value = false;
                         break;
                 }
-                if($value !== null){
-                    $cfg->set($key, $value);
-                }
+            }
+            if($value !== null){
+                $cfg->set($key, $value);
             }
         }
 
@@ -319,9 +320,9 @@ class Loader extends PluginBase{
                         $value = 100;
                         break;
                 }
-                if($value !== null){
-                    $cfg->set($key, $value);
-                }
+            }
+            if($value !== null){
+                $cfg->set($key, $value);
             }
         }
 
@@ -618,7 +619,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function sessionExists(Player $player){
-        return isset($this->sessions[$player->getName()]);
+        return isset($this->sessions[spl_object_hash($player)]);
     }
 
     /**
@@ -657,7 +658,7 @@ class Loader extends PluginBase{
         $i = $values["isVanished"];
         unset($values["isVanished"]);
 
-        $this->sessions[$player->getName()] = new BaseSession($values);
+        $this->sessions[spl_object_hash($player)] = new BaseSession($values);
 
         // This is also required, extra work is need to be done for "Vanish" to work
         $this->setVanish($player, $i);
@@ -674,7 +675,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function removeSession(Player $player){
-        unset($this->sessions[$player->getName()]);
+        unset($this->sessions[spl_object_hash($player)]);
 
         //Disable Custom Colored Chat
         if($this->getConfig()->get("enable-custom-colors") === true){
@@ -690,7 +691,7 @@ class Loader extends PluginBase{
         if(!$this->sessionExists($player)){
             $this->createSession($player);
         }
-        return $this->sessions[$player->getName()];
+        return $this->sessions[spl_object_hash($player)];
     }
 
     /**

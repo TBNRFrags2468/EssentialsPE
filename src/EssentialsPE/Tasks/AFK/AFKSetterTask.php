@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Tasks\AFK;
 
-use EssentialsPE\BaseTask;
+use EssentialsPE\BaseFiles\BaseTask;
 use EssentialsPE\Loader;
 use pocketmine\utils\TextFormat;
 

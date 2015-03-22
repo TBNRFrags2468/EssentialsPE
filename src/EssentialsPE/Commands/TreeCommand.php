@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Commands;
 
-use EssentialsPE\BaseCommand;
+use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;

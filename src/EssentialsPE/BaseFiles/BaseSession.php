@@ -1,5 +1,5 @@
 <?php
-namespace EssentialsPE;
+namespace EssentialsPE\BaseFiles;
 
 use pocketmine\command\CommandSender;
 use pocketmine\level\Position;

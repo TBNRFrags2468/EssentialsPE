@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Tasks;
 
-use EssentialsPE\BaseTask;
+use EssentialsPE\BaseFiles\BaseTask;
 use EssentialsPE\Loader;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
