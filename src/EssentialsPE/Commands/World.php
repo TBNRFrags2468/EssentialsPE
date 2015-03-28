@@ -25,7 +25,7 @@ class World extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        if(!$sender->hasPermission("essentials.world." . strtolower($args[0]))){
+        if(!$sender->hasPermission("essentials.worlds.*") || !$sender->hasPermission("essentials.worlds." . strtolower($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to this world.");
             return false;
         }
