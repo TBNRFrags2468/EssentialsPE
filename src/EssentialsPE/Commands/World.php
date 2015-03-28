@@ -30,7 +30,7 @@ class World extends BaseCommand{
             return false;
         }
         if(!$sender->getServer()->isLevelGenerated($args[0])){
-            $sender->sendMessage(TextFormat::RED . "[Error] World doesn't exists");
+            $sender->sendMessage(TextFormat::RED . "[Error] World doesn't exist");
             return false;
         }elseif(!$sender->getServer()->isLevelLoaded($args[0])){
             $sender->sendMessage(TextFormat::YELLOW . "Level is not loaded yet. Loading...");
