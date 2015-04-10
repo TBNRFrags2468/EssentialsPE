@@ -81,6 +81,7 @@ use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use pocketmine\command\CommandSender;
+use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
@@ -91,6 +92,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
+use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -1970,6 +1972,9 @@ class Loader extends PluginBase{
      *      \/ \__,_|_| |_|_|___|_| |_|
      */
 
+    /** @var null|Effect */
+    private $invisibilityEffect = null;
+
     /**
      * Tell if a player is Vanished, or not
      *
@@ -1991,23 +1996,43 @@ class Loader extends PluginBase{
         if(!is_bool($state)){
             return false;
         }
+        if($this->invisibilityEffect === null){
+            $effect = Effect::getEffect(Effect::INVISIBILITY);
+            $effect->setDuration(1728000); // 24 hours... Well... No one will play more than this, so I think its OK xD
+        }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->willVanish();
         $this->getSession($player)->setVanish($state);
-        if($state === false){
+        /** @var Player[] $pl */
+        $pl = [];
+        if(!$state){
+            $pk = new MobEffectPacket();
+            $pk->eid = $player->getId();
+            $pk->effectId = $this->invisibilityEffect->getId();
+            $pk->amplifier = $this->invisibilityEffect->getAmplifier();
+            $pk->particles = $this->invisibilityEffect->isVisible();
+            $pk->duration = $this->invisibilityEffect->getDuration();
+            $pk->eventId = MobEffectPacket::EVENT_ADD;
             foreach($player->getLevel()->getPlayers() as $p){
-                $p->showPlayer($player);
+                if($p !== $player){
+                    $pl[] = $p;
+                }
             }
         }else{
+            $pk = new MobEffectPacket();
+            $pk->eid = $player->getId();
+            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
+            $pk->effectId = $this->invisibilityEffect->getId();
             foreach($player->getLevel()->getPlayers() as $p){
-                if(!in_array($p->getName(), $ev->getHiddenFor())){
-                    $p->hidePlayer($player);
+                if($p !== $player && !in_array($p->getName(), $ev->getHiddenFor())){
+                    $pl[] = $p;
                 }
             }
         }
+        Server::broadcastPacket($pl, $pk);
         return true;
     }
 
