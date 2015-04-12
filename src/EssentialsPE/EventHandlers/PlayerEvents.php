@@ -50,12 +50,13 @@ class PlayerEvents implements Listener{
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
         $event->setJoinMessage(TextFormat::GREEN . $event->getPlayer()->getDisplayName() . " joined the game");
-        // Hide vanished players
-        foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
+
+        // Hide vanished players | TODO: Remove
+        /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
             if($this->plugin->isVanished($p)){
                 $event->getPlayer()->hidePlayer($p);
             }
-        }
+        }*/
         //$this->plugin->setPlayerBalance($event->getPlayer(), $this->plugin->getDefaultBalance()); TODO
     }
 
