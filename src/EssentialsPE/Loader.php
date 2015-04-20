@@ -1997,8 +1997,10 @@ class Loader extends PluginBase{
             return false;
         }
         if($this->invisibilityEffect === null){
+            //$effect = new Effect(Effect::INVISIBILITY, "Vanish", 127, 131, 146);
             $effect = Effect::getEffect(Effect::INVISIBILITY);
             $effect->setDuration(1728000); // 24 hours... Well... No one will play more than this, so I think its OK xD
+            $this->invisibilityEffect = $effect;
         }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
         if($ev->isCancelled()){
@@ -2006,6 +2008,8 @@ class Loader extends PluginBase{
         }
         $state = $ev->willVanish();
         $this->getSession($player)->setVanish($state);
+        $player->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, $state);
+        $player->setDataProperty(Entity::DATA_SHOW_NAMETAG, Entity::DATA_TYPE_BYTE, ($state ? 0 : 1));
         /** @var Player[] $pl */
         $pl = [];
         if(!$state){

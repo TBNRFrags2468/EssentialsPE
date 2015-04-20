@@ -49,13 +49,14 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
-        $event->setJoinMessage(TextFormat::GREEN . $event->getPlayer()->getDisplayName() . " joined the game");
-        // Hide vanished players
-        foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
+        $event->setJoinMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(),$event->getJoinMessage()));
+
+        // Hide vanished players | TODO: Remove
+        /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
             if($this->plugin->isVanished($p)){
                 $event->getPlayer()->hidePlayer($p);
             }
-        }
+        }*/
         //$this->plugin->setPlayerBalance($event->getPlayer(), $this->plugin->getDefaultBalance()); TODO
     }
 
@@ -64,7 +65,7 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerQuit(PlayerQuitEvent $event){
         // Quit message (nick):
-        $event->setQuitMessage(TextFormat::YELLOW . $event->getPlayer()->getDisplayName() . " left the game");
+        $event->setQuitMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(),$event->getQuitMessage()));
         // Nick and NameTag restore:
         $this->plugin->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
 
