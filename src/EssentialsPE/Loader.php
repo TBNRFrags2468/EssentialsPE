@@ -2016,20 +2016,15 @@ class Loader extends PluginBase{
             $pk->particles = $this->invisibilityEffect->isVisible();
             $pk->duration = $this->invisibilityEffect->getDuration();
             $pk->eventId = MobEffectPacket::EVENT_ADD;
-            foreach($player->getLevel()->getPlayers() as $p){
-                if($p !== $player){
-                    $pl[] = $p;
-                }
-            }
         }else{
             $pk = new MobEffectPacket();
             $pk->eid = $player->getId();
             $pk->eventId = MobEffectPacket::EVENT_REMOVE;
             $pk->effectId = $this->invisibilityEffect->getId();
-            foreach($player->getLevel()->getPlayers() as $p){
-                if($p !== $player && !in_array($p->getName(), $ev->getHiddenFor())){
-                    $pl[] = $p;
-                }
+        }
+        foreach($player->getLevel()->getPlayers() as $p){
+            if($p !== $player && ($state || (!$state && !in_array($p->getName(), $ev->getHiddenFor())))){
+                $pl[] = $p;
             }
         }
         Server::broadcastPacket($pl, $pk);
@@ -2056,14 +2051,35 @@ class Loader extends PluginBase{
      */
     public function switchLevelVanish(Player $player, Level $origin, Level $target){
         if($origin->getName() !== $target->getName() && $this->isVanished($player)){
+            // Add player packet
+            $pk = new MobEffectPacket();
+            $pk->eid = $player->getId();
+            $pk->effectId = $this->invisibilityEffect->getId();
+            $pk->amplifier = $this->invisibilityEffect->getAmplifier();
+            $pk->particles = $this->invisibilityEffect->isVisible();
+            $pk->duration = $this->invisibilityEffect->getDuration();
+            $pk->eventId = MobEffectPacket::EVENT_ADD;
             foreach($origin->getPlayers() as $p){
-                $p->showPlayer($player);
-                $player->showPlayer($p);
+                if($p !== $player){
+                    $p->showPlayer($player);
+                    $pk->eid = $p->getId();
+                    $player->dataPacket($pk);
+                    $pk->eid = $player->getId();
+                }
             }
+            // Remove player packet
+            $pk = new MobEffectPacket();
+            $pk->eid = $player->getId();
+            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
+            $pk->effectId = $this->invisibilityEffect->getId();
             foreach($target->getPlayers() as $p){
-                $p->hidePlayer($player);
-                if($this->isVanished($p)){
-                    $player->hidePlayer($p);
+                if($p !== $player){
+                    $p->dataPacket($pk);
+                    if($this->isVanished($p)){
+                        $pk->eid = $p->getId();
+                        $player->dataPacket($pk);
+                        $pk->eid = $player->getId();
+                    }
                 }
             }
         }
