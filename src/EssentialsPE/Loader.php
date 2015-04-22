@@ -483,12 +483,13 @@ class Loader extends PluginBase{
      * @return bool|string
      */
     public function colorMessage($message, $player = null){
-        $search = ["&0","&1","&2","&3","&4","&5","&6","&7","&8","&9","&a", "&b", "&c", "&d", "&e", "&f", "&k", "&l", "&m", "&n", "&o", "&r"];
-        foreach($search as $s){
-            $f = str_replace("&", "§", $s);
-            $message = str_replace($s, $f, $message);
-            $message = str_replace("\\" . $f, $s, $message);
-        }
+        $message = preg_replace_callback(
+            "/(\\\&|\&)[0-9a-fk-or]/",
+            function(array $matches){
+                return str_replace("\\§", "&", str_replace("&", "§", $matches[0]));
+            },
+            $message
+        );
         if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
             $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
             return false;
