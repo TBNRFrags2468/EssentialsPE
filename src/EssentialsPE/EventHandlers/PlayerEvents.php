@@ -49,7 +49,7 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
-        $event->setJoinMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(),$event->getJoinMessage()));
+        $event->setJoinMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $event->getJoinMessage()));
 
         // Hide vanished players | TODO: Remove
         /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
