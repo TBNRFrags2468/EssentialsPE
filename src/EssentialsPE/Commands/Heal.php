@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -23,7 +24,7 @@ class Heal extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "Usage: /heal <player>");
                     return false;
                 }
-                $sender->heal($sender->getMaxHealth());
+                $sender->heal($sender->getMaxHealth(), new EntityRegainHealthEvent($sender, $sender->getMaxHealth() - $sender->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
                 $sender->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             case 1:
@@ -36,7 +37,7 @@ class Heal extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $player->heal($player->getMaxHealth());
+                $player->heal($player->getMaxHealth(), new EntityRegainHealthEvent($player, $player->getMaxHealth() - $player->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
                 $sender->sendMessage(TextFormat::GREEN . $args[0] . " has been healed!");
                 $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;

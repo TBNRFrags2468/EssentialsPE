@@ -19,6 +19,7 @@ use EssentialsPE\Commands\Depth;
 #use EssentialsPE\Commands\Economy\Worth;
 use EssentialsPE\Commands\EssentialsPE;
 use EssentialsPE\Commands\Extinguish;
+use EssentialsPE\Commands\Fly;
 use EssentialsPE\Commands\GetPos;
 use EssentialsPE\Commands\God;
 use EssentialsPE\Commands\Heal;
@@ -68,6 +69,7 @@ use EssentialsPE\EventHandlers\OtherEvents;
 use EssentialsPE\EventHandlers\PlayerEvents;
 use EssentialsPE\EventHandlers\SignEvents;
 use EssentialsPE\Events\PlayerAFKModeChangeEvent;
+use EssentialsPE\Events\PlayerFlyModeChangeEvent;
 use EssentialsPE\Events\PlayerGodModeChangeEvent;
 use EssentialsPE\Events\PlayerMuteEvent;
 use EssentialsPE\Events\PlayerNickChangeEvent;
@@ -201,6 +203,7 @@ class Loader extends PluginBase{
             new Depth($this),
             new EssentialsPE($this),
             new Extinguish($this),
+            new Fly($this),
             new GetPos($this),
             new God($this),
             new Heal($this),
@@ -755,7 +758,7 @@ class Loader extends PluginBase{
      * @param bool $broadcast
      */
     public function switchAFKMode(Player $player, $broadcast = true){
-        $this->setAFKMode($player, ($this->isAFK($player) ? false : true), $broadcast);
+        $this->setAFKMode($player, !$this->isAFK($player), $broadcast);
     }
 
     /**
@@ -1101,6 +1104,51 @@ class Loader extends PluginBase{
         $entity->spawnToAll();
     }
 
+    /**  ______ _
+     *  |  ____| |
+     *  | |__  | |_   _
+     *  |  __| | | | | |
+     *  | |    | | |_| |
+     *  |_|    |_|\__, |
+     *             __/ |
+     *            |___/
+     */
+
+    /**
+     * Get the "Can fly" status of a player
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function canFly(Player $player){
+        return $player->getAllowFlight();
+    }
+
+    /**
+     * Set the "flying" allowed status to a player
+     *
+     * @param Player $player
+     * @param bool $mode
+     * @return bool
+     */
+    public function setFlying(Player $player, $mode){
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerFlyModeChangeEvent($this, $player, $mode));
+        if($ev->isCancelled()){
+            return false;
+        }
+        $player->setAllowFlight($ev->willFly());
+        return true;
+    }
+
+    /**
+     * Automatically switch a player between "Can" and "Can't" fly
+     *
+     * @param Player $player
+     */
+    public function switchCanFly(Player $player){
+        $this->setFlying($player, !$this->canFly($player));
+    }
+
     /**   _____           _
      *   / ____|         | |
      *  | |  __  ___   __| |
@@ -1144,7 +1192,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function switchGodMode(Player $player){
-        $this->setGodMode($player, ($this->isGod($player) ? false : true));
+        $this->setGodMode($player, !$this->isGod($player));
     }
 
     /**  _    _
@@ -1419,7 +1467,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function switchMute(Player $player){
-        $this->setMute($player, ($this->isMuted($player) ? false : true));
+        $this->setMute($player, !$this->isMuted($player));
     }
 
     /**  _   _ _      _
@@ -1695,7 +1743,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function switchPvP(Player $player){
-        $this->setPvP($player, ($this->isPvPEnabled($player) ? false : true));
+        $this->setPvP($player, !$this->isPvPEnabled($player));
     }
 
     /**  _______ _____  _____                           _
@@ -1880,7 +1928,7 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function switchUnlimited(Player $player){
-        $this->setUnlimited($player, ($this->isUnlimitedEnabled($player) ? false : true));
+        $this->setUnlimited($player, !$this->isUnlimitedEnabled($player));
     }
 
     /**  _    _           _       _
@@ -2043,7 +2091,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function switchVanish(Player $player){
-        $this->setVanish($player, ($this->isVanished($player) ? false : true));
+        $this->setVanish($player, !$this->isVanished($player));
     }
 
     /**

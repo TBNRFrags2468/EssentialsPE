@@ -98,6 +98,13 @@ permissions:
                     essentials.extinguish.other:
                         default: op
                         description: "Extinguish other players"
+            essentials.fly:
+                default: op
+                description: "Fly in Survival or Adventure mode!"
+                children:
+                    essentials.fly.others:
+                        default: op
+                        description: "Make other players fly!"
             essentials.gamemode:
                 deault: op
                 description: "Change your gamemode!"
