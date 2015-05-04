@@ -22,24 +22,24 @@ class Sudo extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($name = array_shift($args));
+        $player = $this->getPlugin()->getPlayer(array_shift($args));
         if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }elseif($player->hasPermission("essentials.sudo.exempt")){
-            $sender->sendMessage(TextFormat::RED . "[Error] " . $name . " cannot be sudo'ed");
+            $sender->sendMessage(TextFormat::RED . "[Error] " . $player->getName() . " cannot be sudo'ed");
             return false;
         }
 
         $v = implode(" ", $args);
         if(substr($v, 0, 2) === "c:"){
-            $sender->sendMessage(TextFormat::GREEN . "Sending message as " . $name);
+            $sender->sendMessage(TextFormat::GREEN . "Sending message as " . $player->getName());
             $this->getPlugin()->getServer()->getPluginManager()->callEvent($ev = new PlayerChatEvent($player, substr($v, 2)));
             if(!$ev->isCancelled()){
                 $this->getPlugin()->getServer()->broadcastMessage(\sprintf($ev->getFormat(), $ev->getPlayer()->getDisplayName(), $ev->getMessage()), $ev->getRecipients());
             }
         }else{
-            $sender->sendMessage(TextFormat::AQUA . "Command ran as " . $name);
+            $sender->sendMessage(TextFormat::AQUA . "Command ran as " . $player->getName());
             $this->getPlugin()->getServer()->dispatchCommand($player, $v);
         }
         return true;
