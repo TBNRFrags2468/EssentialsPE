@@ -44,11 +44,11 @@ class TPDeny extends BaseCommand{
                     return false;
                 }
                 if(!($request = $this->getPlugin()->hasARequestFrom($sender, $player))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $args[0]);
+                    $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $player->getName());
                     return false;
                 }
                 $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::RED . " denied your teleport request");
-                $sender->sendMessage(TextFormat::GREEN . "Denied " . TextFormat::AQUA . $player->getName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . TextFormat::RED . " teleport request");
+                $sender->sendMessage(TextFormat::GREEN . "Denied " . TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . TextFormat::RED . " teleport request");
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;
             default:

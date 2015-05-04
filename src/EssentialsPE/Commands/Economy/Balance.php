@@ -35,7 +35,7 @@ class Balance extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $sender->sendMessage(TextFormat::AQUA . $args[0] . " has " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($player));
+                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($player));
                 break;
         }
         return true;

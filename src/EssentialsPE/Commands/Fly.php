@@ -38,7 +38,7 @@ class Fly extends BaseCommand{
                 }
                 $this->getPlugin()->switchCanFly($player);
                 $player->sendMessage(TextFormat::YELLOW . "Flying mode " . ($this->getPlugin()->canFly($player) ? "enabled" : "disabled") . "!");
-                $sender->sendMessage(TextFormat::YELLOW . "Flying mode " . ($this->getPlugin()->canFly($player) ? "enabled" : "disabled") . " for " . $args[0]);
+                $sender->sendMessage(TextFormat::YELLOW . "Flying mode " . ($this->getPlugin()->canFly($player) ? "enabled" : "disabled") . " for " . $player->getDisplayName());
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /fly <player>"));

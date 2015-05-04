@@ -38,7 +38,7 @@ class Heal extends BaseCommand{
                     return false;
                 }
                 $player->heal($player->getMaxHealth(), new EntityRegainHealthEvent($player, $player->getMaxHealth() - $player->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
-                $sender->sendMessage(TextFormat::GREEN . $args[0] . " has been healed!");
+                $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " has been healed!");
                 $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             default:

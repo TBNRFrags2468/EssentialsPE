@@ -32,7 +32,7 @@ class TPHere extends BaseCommand{
         }
         $player->teleport($sender->getPosition());
         $player->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
-        $sender->sendMessage(TextFormat::YELLOW . "Teleporting $args[0] to you...");
+        $sender->sendMessage(TextFormat::YELLOW . "Teleporting " . $player->getDisplayName() . " to you...");
         return true;
     }
 } 

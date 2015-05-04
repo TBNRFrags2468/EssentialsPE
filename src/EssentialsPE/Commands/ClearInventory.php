@@ -43,11 +43,11 @@ class ClearInventory extends BaseCommand{
                 }
                 $gm = $player->getGamemode();
                 if($gm === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] " . $args[0] . " is on " . ($gm === 1 ? "creative" : "adventure") . " mode");
+                    $sender->sendMessage(TextFormat::RED . "[Error] " . $player->getDisplayName() . " is on " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
                 $player->getInventory()->clearAll();
-                $sender->sendMessage(TextFormat::AQUA . $args[0] . (substr($args[0], -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
+                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . ($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
                 $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
                 break;
             default:

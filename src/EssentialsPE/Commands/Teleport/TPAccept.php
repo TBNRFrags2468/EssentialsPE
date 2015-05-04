@@ -49,7 +49,7 @@ class TPAccept extends BaseCommand{
                     return false;
                 }
                 if(!($request = $this->getPlugin()->hasARequestFrom($sender, $player))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $args[0]);
+                    $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $player->getDisplayName());
                     return false;
                 }
                 $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::GREEN . " accepted your teleport request! Teleporting...");

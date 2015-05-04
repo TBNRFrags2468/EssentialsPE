@@ -27,7 +27,7 @@ class Seen extends BaseCommand{
             return false;
         }
         if(!is_numeric($sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed())){
-            $sender->sendMessage(TextFormat::RED . $args[0] . " never played on this server.");
+            $sender->sendMessage(TextFormat::RED .  $player->getDisplayName() . " has never played on this server.");
             return false;
         }
         /**
@@ -40,7 +40,7 @@ class Seen extends BaseCommand{
          * Y = Year in 4 digits (1999)
          */
         $ptime = $sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed() / 1000;
-        $sender->sendMessage(TextFormat::AQUA . $args[0] ." was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
+        $sender->sendMessage(TextFormat::AQUA .  $player->getDisplayName() ." was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
         return true;
     }
 }

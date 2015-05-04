@@ -36,7 +36,7 @@ class TPA extends BaseCommand{
         }
         $this->getPlugin()->requestTPTo($sender, $player);
         $player->sendMessage(TextFormat::AQUA . $sender->getName() . TextFormat::GREEN . " wants to teleport to you, please use:\n/tpaccept to accepts the request\n/tpdeny to decline the invitation");
-        $sender->sendMessage(TextFormat::GREEN . "Teleport request sent to " . $args[0] . "!");
+        $sender->sendMessage(TextFormat::GREEN . "Teleport request sent to " . $player->getDisplayName() . "!");
         return true;
     }
 } 

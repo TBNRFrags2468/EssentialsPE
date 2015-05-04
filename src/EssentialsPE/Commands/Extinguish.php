@@ -37,7 +37,7 @@ class Extinguish extends BaseCommand{
                     return false;
                 }
                 $player->extinguish();
-                $sender->sendMessage(TextFormat::AQUA . $args[0] . " has been extinguished!");
+                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has been extinguished!");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /extinguish <player>"));

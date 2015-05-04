@@ -37,7 +37,7 @@ class GetPos extends BaseCommand{
                     return false;
                 }
                 $pos = $player->getPosition();
-                $sender->sendMessage(TextFormat::YELLOW . $args[0] . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
+                $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /getpos <player>"));

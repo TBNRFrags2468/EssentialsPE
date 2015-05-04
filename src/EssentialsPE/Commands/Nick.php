@@ -39,7 +39,7 @@ class Nick extends BaseCommand{
                 }
                 $nickname = $args[0];
                 $nickname === "off" ? $this->getPlugin()->removeNick($player, true) : $this->getPlugin()->setNick($player, $nickname, true);
-                $sender->sendMessage(TextFormat::GREEN . $args[1] . (substr($args[1], -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
+                $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             default:

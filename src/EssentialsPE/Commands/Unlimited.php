@@ -43,11 +43,11 @@ class Unlimited extends BaseCommand{
                 }
                 $gm = $player->getGamemode();
                 if($gm === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] " . $args[0] . " is in " . ($gm === 1 ? "creative" : "adventure") . " mode");
+                    $sender->sendMessage(TextFormat::RED . "[Error] " .  $player->getDisplayName() . " is in " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }
                 $this->getPlugin()->switchUnlimited($player);
-                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled" : "disabled") . " for player " . $args[0]);
+                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled" : "disabled") . " for player " .  $player->getDisplayName());
                 $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled!" : "disabled!"));
                 break;
             default:
