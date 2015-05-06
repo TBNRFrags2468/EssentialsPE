@@ -5,6 +5,7 @@ namespace EssentialsPE\EventHandlers;
 use EssentialsPE\Loader;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\SignChangeEvent;
+use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
@@ -77,7 +78,7 @@ class SignEvents implements Listener{
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
                     return;
                }else{
-                    $event->getPlayer()->heal($event->getPlayer()->getMaxHealth());
+                    $event->getPlayer()->heal($event->getPlayer()->getMaxHealth(), new EntityRegainHealthEvent($event->getPlayer(), $event->getPlayer()->getMaxHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "You have been healed!");
                 }
             }
