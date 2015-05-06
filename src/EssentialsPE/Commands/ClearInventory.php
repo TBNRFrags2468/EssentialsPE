@@ -47,7 +47,7 @@ class ClearInventory extends BaseCommand{
                     return false;
                 }
                 $player->getInventory()->clearAll();
-                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . ($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
+                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
                 $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
                 break;
             default:

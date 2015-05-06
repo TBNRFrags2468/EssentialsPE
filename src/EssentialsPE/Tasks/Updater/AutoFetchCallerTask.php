@@ -6,7 +6,6 @@ use EssentialsPE\Loader;
 use pocketmine\utils\TextFormat;
 
 class AutoFetchCallerTask extends BaseTask{
-
     public function __construct(Loader $plugin){
         parent::__construct($plugin);
     }

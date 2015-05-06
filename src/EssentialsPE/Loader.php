@@ -1981,6 +1981,7 @@ class Loader extends PluginBase{
         if($this->updaterTask !== null && $this->updaterTask->isRunning()){
             return false;
         }
+        $this->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's UpdateFetchTask");
         $this->getServer()->getScheduler()->scheduleAsyncTask($task = new UpdateFetchTask($this->getUpdateBuild(), $install));
         $this->updaterTask = $task;
         return true;
@@ -2002,7 +2003,7 @@ class Loader extends PluginBase{
      */
     public function broadcastUpdateAvailability($message){
         if($this->getConfig()->getNested("updater.warn-console")){
-            $this->getLogger()->info($message);
+            $this->getServer()->getLogger()->info($message);
         }
         if($this->getConfig()->getNested("updater.warn-players")){
             foreach($this->getServer()->getOnlinePlayers() as $p){
