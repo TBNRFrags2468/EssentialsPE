@@ -25,7 +25,14 @@ class AFKSetterTask extends BaseTask{
         foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
             if(!$this->getPlugin()->isAFK($p) && ($last = $this->getPlugin()->getLastPlayerMovement($p)) !== null && !$p->hasPermission("essentials.afk.preventauto")){
                 if(time() - $last >= ($default = $this->getPlugin()->getConfig()->get("afk-auto-set")) || $default - (time() - $last) <= 15){
-                    $this->getPlugin()->setAFKMode($p, true, true);
+                    $this->getPlugin()->setAFKMode($p, true, false);
+                    $message = TextFormat::YELLOW . $p->getDisplayName() . " is no longer AFK";
+                    $this->getPlugin()->getServer()->getLogger()->info($message);
+                    foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p2){
+                        if($p !== $p2){
+                            $p->sendMessage($message);
+                        }
+                    }
                 }
             }
         }
