@@ -28,7 +28,7 @@ class Spawn extends BaseCommand{
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.spawn.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                    $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to spawn");
                     return false;
                 }
                 $player = $this->getPlugin()->getPlayer($args[0]);
