@@ -61,27 +61,33 @@ class Gamemode extends BaseCommand{
          * The following switch is applied when the user execute:
          * /gamemode <MODE>
          */
-        if(!isset($args[0])){
-            $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");
-            return false;
+        if(is_int($args[0])){
+            switch($args[0]){
+                case 0:
+                case 1:
+                case 2:
+                case 3:
+                    $gm = $args[0];
+                    break;
+                default:
+                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");
+                    return false;
+                    break;
+            }
         }else{
             switch(strtolower($args[0])){
-                case 0:
                 case "survival":
                 case "s":
                     $gm = 0;
                     break;
-                case 1:
                 case "creative":
                 case "c":
                     $gm = 1;
                     break;
-                case 2:
                 case "adventure":
                 case "a":
                     $gm = 2;
                     break;
-                case 3:
                 case "spectator":
                 case "viewer":
                 case "view":
