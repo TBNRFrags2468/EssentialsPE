@@ -88,6 +88,7 @@ use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
 use pocketmine\level\Level;
+use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
 use pocketmine\nbt\tag\Byte;
@@ -2085,7 +2086,7 @@ class Loader extends PluginBase{
                 $pl[] = $p;
             }
         }
-        Server::broadcastPacket($pl, $pk);
+        $this->getServer()->broadcastPacket($pl, $pk);
         return true;
     }
 
@@ -2164,11 +2165,11 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Get an array with all the warp information
+     * Get a Location object of the warp
      * If the function returns "false", it means that the warp doesn't exists
      *
      * @param string $warp
-     * @return bool|array
+     * @return bool|Location
      */
     public function getWarp($warp){
         if(!$this->warpExists($warp)){
@@ -2181,7 +2182,7 @@ class Loader extends PluginBase{
             }
             $this->getServer()->loadLevel($v[3]);
         }
-        return [new Position($v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3])), $v[4], $v[5]];
+        return new Location($v[0], $v[1], $v[2], $v[4], $v[5], $this->getServer()->getLevelByName($v[3]));
     }
 
     /**

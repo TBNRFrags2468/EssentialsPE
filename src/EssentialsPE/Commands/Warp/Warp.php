@@ -40,7 +40,7 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
                     return false;
                 }
-                $sender->teleport($warp[0], $warp[1], $warp[2]);
+                $sender->teleport($warp);
                 $sender->sendMessage(TextFormat::GREEN . "Warping to " . $args[0] . "...");
                 break;
             case 2:
@@ -53,9 +53,9 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to that warp");
                     return false;
                 }
-                $player->teleport($warp[0], $warp[1], $warp[2]);
+                $player->teleport($warp);
                 $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
-                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $args[1] . TextFormat::GREEN . " to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
+                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /warp <name> <player>"));
