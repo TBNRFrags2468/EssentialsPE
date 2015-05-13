@@ -1228,7 +1228,7 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param string $home
-     * @return bool|array
+     * @return bool|Location
      */
     public function getHome(Player $player, $home){
         if(!$this->homeExists($player, $home)){
@@ -1242,7 +1242,7 @@ class Loader extends PluginBase{
             }
             $this->getServer()->loadLevel($v[3]);
         }
-        return [new Position($v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3])), $v[4], $v[5]];
+        return new Location($v[0], $v[1], $v[2], $v[4], $v[5], $this->getServer()->getLevelByName($v[3]));
     }
 
     /**
