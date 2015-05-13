@@ -13,7 +13,7 @@ class UpdateFetchTask extends AsyncTask{
     /** @var bool */
     private $install;
 
-    public function __construct($build, $install = false){
+    public function __construct($build, $install){
         $this->build = $build;
         $this->install = $install;
     }
@@ -54,7 +54,8 @@ class UpdateFetchTask extends AsyncTask{
         }
         $esspe->broadcastUpdateAvailability($message);
         if($continue && $this->install){
-            $server->getScheduler()->scheduleAsyncTask(new UpdateInstallTask($esspe, $this->getResult()["downloadURL"], $server->getPluginPath(), $v));
+            $server->getScheduler()->scheduleAsyncTask($task = new UpdateInstallTask($esspe, $this->getResult()["downloadURL"], $server->getPluginPath(), $v));
+            $esspe->updaterDownloadTask = $task;
         }
     }
 }

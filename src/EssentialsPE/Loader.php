@@ -82,6 +82,7 @@ use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
+use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
@@ -1942,7 +1943,10 @@ class Loader extends PluginBase{
      */
 
     /** @var UpdateFetchTask */
-    private $updaterTask;
+    private $updaterTask = null;
+
+    /** @var UpdateInstallTask */
+    public $updaterDownloadTask = null; // Used to prevent Async Task conflicts with Server's limit :P
 
     /**
      * Tell if the updater is enabled or not
@@ -1978,7 +1982,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function fetchEssentialsPEUpdate($install = false){
-        if($this->updaterTask !== null && $this->updaterTask->isRunning()){
+        if(($this->updaterTask !== null && $this->updaterTask->isRunning()) && ($this->updaterDownloadTask !== null && $this->updaterDownloadTask->isRunning())){
             return false;
         }
         $this->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's UpdateFetchTask");
@@ -2047,8 +2051,8 @@ class Loader extends PluginBase{
             return false;
         }
         if($this->invisibilityEffect === null){
-            //$effect = new Effect(Effect::INVISIBILITY, "Vanish", 127, 131, 146);
-            $effect = Effect::getEffect(Effect::INVISIBILITY);
+            $effect = new Effect(Effect::INVISIBILITY, "Vanish", 127, 131, 146);
+            //$effect = Effect::getEffect(Effect::INVISIBILITY);
             $effect->setDuration(1728000); // 24 hours... Well... No one will play more than this, so I think its OK xD
             $this->invisibilityEffect = $effect;
         }
@@ -2060,8 +2064,6 @@ class Loader extends PluginBase{
         $this->getSession($player)->setVanish($state);
         $player->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, $state);
         $player->setDataProperty(Entity::DATA_SHOW_NAMETAG, Entity::DATA_TYPE_BYTE, ($state ? 0 : 1));
-        /** @var Player[] $pl */
-        $pl = [];
         if(!$state){
             $pk = new MobEffectPacket();
             $pk->eid = $player->getId();
@@ -2076,8 +2078,10 @@ class Loader extends PluginBase{
             $pk->eventId = MobEffectPacket::EVENT_REMOVE;
             $pk->effectId = $this->invisibilityEffect->getId();
         }
+        /** @var Player[] $pl */
+        $pl = [];
         foreach($player->getLevel()->getPlayers() as $p){
-            if($p !== $player && ($state || (!$state && !in_array($p->getName(), $ev->getHiddenFor())))){
+            if($state || (!$state && !in_array($p->getName(), $ev->getHiddenFor()))){
                 $pl[] = $p;
             }
         }
