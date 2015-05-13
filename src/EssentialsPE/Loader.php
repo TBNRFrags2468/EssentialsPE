@@ -1,6 +1,7 @@
 <?php
 namespace EssentialsPE;
 
+use EssentialsPE\BaseFiles\BaseLocation;
 use EssentialsPE\BaseFiles\BaseSession;
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Antioch;
@@ -107,15 +108,15 @@ use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
     /** @var Config */
-    public $economy;
+    private $economy;
+    /** @var array */
+    private $homes;
     /** @var Config */
-    public $homes;
+    private $nicks;
     /** @var Config */
-    public $nicks;
-    /** @var Config */
-    public $kits;
-    /** @var Config */
-    public $warps;
+    private $kits;
+    /** @var array */
+    private $warps;
 
     public function onEnable(){
         if(!is_dir($this->getDataFolder())){
@@ -402,19 +403,51 @@ class Loader extends PluginBase{
             }
         }*/
 
-        $this->homes = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
+        $this->loadhomes();
         $this->kits = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
         $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
-        $this->warps = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+        $this->loadWarps();
+    }
+
+    private function loadHomes(){
+        if($this->homesFile === null) {
+            $this->homesFile = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
+        }
+        $this->homesFile->reload();
+        foreach($this->homesFile->getAll() as $p => $h){
+            foreach($h as $n => $v){
+                if($this->getServer()->isLevelGenerated($v[3])){
+                    if(!$this->getServer()->isLevelLoaded($v[3])){
+                        $this->getServer()->loadLevel($v[3]);
+                    }
+                    $this->warps[$p] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+                }
+            }
+        }
+    }
+
+    private function loadWarps(){
+        if($this->warpsFile === null){
+            $this->warpsFile = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+        }
+        $this->warpsFile->reload();
+        foreach($this->warpsFile->getAll() as $n => $v){
+            if($this->getServer()->isLevelGenerated($v[3])){
+                if(!$this->getServer()->isLevelLoaded($v[3])){
+                    $this->getServer()->loadLevel($v[3]);
+                }
+                $this->warps[$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+            }
+        }
     }
 
     public function reloadFiles(){
         $this->getConfig()->reload();
         //$this->economy->reload();
-        $this->homes->reload();
+        $this->loadHomes();
         $this->kits->reload();
         $this->nicks->reload();
-        $this->warps->reload();
+        $this->loadWarps();
     }
 
     /*
@@ -1205,6 +1238,9 @@ class Loader extends PluginBase{
      *  |_|  |_|\___/|_| |_| |_|\___|___/
      */
 
+    /** @var Config|null */
+    private $homesFile = null;
+
     /**
      * Tell is a player have a specific home by its name
      *
@@ -1213,14 +1249,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function homeExists(Player $player, $home){
-        if(trim($home) === "" || !$this->homes->exists($player->getName())){
-            return false;
-        }
-        $list = $this->homes->get($player->getName());
-        if(!isset($list[strtolower($home)])){
-            return false;
-        }
-        return true;
+        return trim($home) !== "" && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
     }
 
     /**
@@ -1228,21 +1257,13 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param string $home
-     * @return bool|Location
+     * @return bool|BaseLocation
      */
     public function getHome(Player $player, $home){
         if(!$this->homeExists($player, $home)){
             return false;
         }
-
-        $v = $this->homes->getNested($player->getName() . "." . strtolower($home));
-        if(!$this->getServer()->isLevelLoaded($v[3])){
-            if(!$this->getServer()->isLevelGenerated($v[3])){
-                return false;
-            }
-            $this->getServer()->loadLevel($v[3]);
-        }
-        return new Location($v[0], $v[1], $v[2], $v[4], $v[5], $this->getServer()->getLevelByName($v[3]));
+        return $this->homes[$player->getName()][$home];
     }
 
     /**
@@ -1259,11 +1280,11 @@ class Loader extends PluginBase{
         if(trim($home) === ""){
             return false;
         }
-
-        if($this->homeExists($player, $home)){
-            $this->removeHome($player, $home);
+        if($pos instanceof Location){
+            $yaw = $pos->getYaw();
+            $pitch = $pos->getPitch();
         }
-        $this->homes->setNested($player->getName() . "." . strtolower($home), [
+        $this->homesFile->setNested($player->getName() . "." . strtolower($home), [
             $pos->getX(),
             $pos->getY(),
             $pos->getZ(),
@@ -1271,7 +1292,8 @@ class Loader extends PluginBase{
             $yaw,
             $pitch
         ]);
-        $this->homes->save();
+        $this->homesFile->save();
+        $this->homes[$player->getName()][$home] = new BaseLocation($home, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $yaw, $pitch);
         return true;
     }
 
@@ -1286,14 +1308,15 @@ class Loader extends PluginBase{
         if(!$this->homeExists($player, $home)){
             return false;
         }
-        $list = $this->homes->get($player->getName());
+        $list = $this->homesFile->get($player->getName());
         unset($list[strtolower($home)]);
         if(count($list) > 0){
-            $this->homes->set($player->getName(), $list);
+            $this->homesFile->set($player->getName(), $list);
         }else{
-            $this->homes->remove($player->getName());
+            $this->homesFile->remove($player->getName());
         }
-        $this->homes->save();
+        $this->homesFile->save();
+        unset($this->homes[$player->getName()][$home]);
         return true;
     }
 
@@ -1305,15 +1328,15 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function homesList(Player $player, $inArray = false){
-        if(!$this->homes->exists($player->getName())){
+        if(!$this->homesFile->exists($player->getName())){
             return false;
         }
-        $list = array_keys($this->homes->get($player->getName()));
+        $list = array_keys($this->homesFile->get($player->getName()));
         if(count($list) < 1){
             return false;
         }
         if(!$inArray){
-            return wordwrap(implode(", ", $list), 30, "\n", true);
+            return wordwrap(implode(", ", $list), 30, "\n", true); // TODO: Check if *WHOLE* word wrap is needed with MCPE 0.11 :P
         }
         return $list;
     }
@@ -2154,6 +2177,9 @@ class Loader extends PluginBase{
      *                       |_|
      */
 
+    /** @var Config|null */
+    private $warpsFile = null;
+
     /**
      * Tell if a warp exists
      *
@@ -2161,7 +2187,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function warpExists($warp){
-        return $this->warps->exists(strtolower($warp));
+        return trim($warp) !== "" && isset($this->warps[$warp]);
     }
 
     /**
@@ -2175,14 +2201,7 @@ class Loader extends PluginBase{
         if(!$this->warpExists($warp)){
             return false;
         }
-        $v = $this->warps->get(strtolower($warp));
-        if(!$this->getServer()->isLevelLoaded($v[3])){
-            if(!$this->getServer()->isLevelGenerated($v[3])){
-                return false;
-            }
-            $this->getServer()->loadLevel($v[3]);
-        }
-        return new Location($v[0], $v[1], $v[2], $v[4], $v[5], $this->getServer()->getLevelByName($v[3]));
+        return $this->warps[$warp];
     }
 
     /**
@@ -2198,7 +2217,11 @@ class Loader extends PluginBase{
         if(trim($warp) === ""){
             return false;
         }
-        $this->warps->set(strtolower($warp), [
+        if($pos instanceof Location){
+            $yaw = $pos->getYaw();
+            $pitch = $pos->getPitch();
+        }
+        $this->warpsFile->set(strtolower($warp), [
             $pos->getX(),
             $pos->getY(),
             $pos->getZ(),
@@ -2206,7 +2229,8 @@ class Loader extends PluginBase{
             $yaw,
             $pitch
         ]);
-        $this->warps->save();
+        $this->warpsFile->save();
+        $this->warps[$warp] = new BaseLocation($warp, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $yaw, $pitch);
         return true;
     }
 
@@ -2221,8 +2245,9 @@ class Loader extends PluginBase{
         if(!$this->warpExists($warp)){
             return false;
         }
-        $this->warps->remove(strtolower($warp));
-        $this->warps->save();
+        $this->warpsFile->remove(strtolower($warp));
+        $this->warpsFile->save();
+        unset($this->warps[$warp]);
         return true;
     }
 
@@ -2233,12 +2258,12 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function warpList($inArray = false){
-        $list = $this->warps->getAll(true);
+        $list = $this->warpsFile->getAll(true);
         if(!$list || count($list) < 1){
             return false;
         }
         if(!$inArray){
-            return wordwrap(implode(", ", $list), 30, "\n", true);
+            return wordwrap(implode(", ", $list), 30, "\n", true); // TODO: Check if *WHOLE* word wrap is needed with MCPE 0.11 :P
         }
         return $list;
     }
