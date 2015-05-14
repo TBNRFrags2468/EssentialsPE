@@ -16,6 +16,7 @@ use pocketmine\event\player\PlayerJoinEvent;
 use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
+use pocketmine\event\TextContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -49,7 +50,13 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
-        $event->setJoinMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $event->getJoinMessage()));
+        $message = $event->getJoinMessage();
+        if($message instanceof TextContainer){
+            $message->setText(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message->getText()));
+        }else{
+            $message = str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message);
+        }
+        $event->setJoinMessage($message);
 
         // Hide vanished players | TODO: Remove
         /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
@@ -65,7 +72,13 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerQuit(PlayerQuitEvent $event){
         // Quit message (nick):
-        $event->setQuitMessage(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(),$event->getQuitMessage()));
+        $message = $event->getQuitMessage();
+        if($message instanceof TextContainer){
+            $message->setText(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message->getText()));
+        }else{
+            $message = str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message);
+        }
+        $event->setQuitMessage($message);
         // Nick and NameTag restore:
         $this->plugin->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
 
