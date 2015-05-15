@@ -2,6 +2,7 @@
 namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseFiles\BaseCommand;
+use EssentialsPE\BaseFiles\BaseKit;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -36,7 +37,7 @@ class Kit extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify a player to give the kit");
                     return false;
                 }
-                if(!$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
+                if(!$sender->hasPermission("essentials.kits.*") && !$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
                     return false;
                 }
@@ -47,17 +48,17 @@ class Kit extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
+                if(!$sender->hasPermission("essentials.kits.*") && !$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
+                    return false;
+                }
                 $player = $this->getPlugin()->getPlayer($args[1]);
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                if(!$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
-                    return false;
-                }
                 $this->giveItems($player, $kit);
-                $sender->sendMessage(TextFormat::AQUA . "Getting kit " . $player->getDisplayName() . "...");
+                $sender->sendMessage(TextFormat::AQUA . "Getting kit " . $kit->getName() . "...");
                 break;
             default:
                 $sender->sendMessage(TextFormat::RED . $this->getUsage());
@@ -67,21 +68,14 @@ class Kit extends BaseCommand{
         return true;
     }
 
-    private function giveItems(Player $player, $kit){
-        foreach($kit as $k){
-            $k = explode(" ", $k);
-            if(count($k) > 1){
-                $amount = $k[1];
-            }else{
-                $amount = 1;
-            }
-            $item_name = $k[0];
-            $item = $this->getPlugin()->getItem($item_name);
-            if($item->getID() === 0) {
-                return false;
-            }
-            $item->setCount($amount);
-            $player->getInventory()->setItem($player->getInventory()->firstEmpty(), $item);
+    /**
+     * @param Player $player
+     * @param BaseKit $kit
+     * @return bool
+     */
+    private function giveItems(Player $player, BaseKit $kit){
+        foreach($kit->getItems() as $k){
+            $player->getInventory()->setItem($player->getInventory()->firstEmpty(), $k);
         }
         return true;
     }

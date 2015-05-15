@@ -1,6 +1,7 @@
 <?php
 namespace EssentialsPE;
 
+use EssentialsPE\BaseFiles\BaseKit;
 use EssentialsPE\BaseFiles\BaseLocation;
 use EssentialsPE\BaseFiles\BaseSession;
 use EssentialsPE\Commands\AFK;
@@ -99,6 +100,7 @@ use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
+use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
@@ -404,7 +406,7 @@ class Loader extends PluginBase{
         }*/
 
         $this->loadhomes();
-        $this->kits = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
+        $this->loadKits();
         $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->loadWarps();
     }
@@ -426,19 +428,35 @@ class Loader extends PluginBase{
         }
     }
 
+    private function loadKits(){
+        if($this->kitsFile === null){
+            $this->kitsFile = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
+        }
+        $this->kitsFile->reload();
+        $children = [];
+        foreach($this->kitsFile->getAll() as $n => $i){
+            $this->kits[$n] = new BaseKit($n, $i);
+            $children[] = new Permission("essentials.kits." . $n);
+        }
+        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.kits", null, null, $children));
+    }
+
     private function loadWarps(){
         if($this->warpsFile === null){
             $this->warpsFile = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
         }
         $this->warpsFile->reload();
+        $children = [];
         foreach($this->warpsFile->getAll() as $n => $v){
             if($this->getServer()->isLevelGenerated($v[3])){
                 if(!$this->getServer()->isLevelLoaded($v[3])){
                     $this->getServer()->loadLevel($v[3]);
                 }
                 $this->warps[$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+                $children[] = new Permission("essentials.warps." . $n);
             }
         }
+        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.warps", null, null, $children));
     }
 
     public function reloadFiles(){
@@ -1331,7 +1349,7 @@ class Loader extends PluginBase{
         if(!$this->homesFile->exists($player->getName())){
             return false;
         }
-        $list = array_keys($this->homesFile->get($player->getName()));
+        $list = array_keys($this->homes);
         if(count($list) < 1){
             return false;
         }
@@ -1349,6 +1367,9 @@ class Loader extends PluginBase{
      *  |_|\_|_|\__|___/
      */
 
+    /** @var Config|null */
+    private $kitsFile = null;
+
     /**
      * Check if a kit exists
      *
@@ -1356,20 +1377,20 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function kitExists($kit){
-        return $this->kits->exists(($kit));
+        return isset($this->kits[$kit]);
     }
 
     /**
      * Return the contents of a kit, if existent
      *
      * @param $kit
-     * @return bool|array
+     * @return bool|BaseKit
      */
     public function getKit($kit){
         if(!$this->kitExists($kit)){
             return false;
         }
-        return $this->kits->get($kit);
+        return $this->kits[$kit];
     }
 
     /**
@@ -1379,8 +1400,8 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function kitList($inArray = false){
-        $list = $this->kits->getAll(true);
-        if(!$list || count($list) < 1){
+        $list = array_keys($this->kits);
+        if(count($list) < 1){
             return false;
         }
         if(!$inArray){
@@ -2258,7 +2279,7 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function warpList($inArray = false){
-        $list = $this->warpsFile->getAll(true);
+        $list = array_keys($this->warps);
         if(!$list || count($list) < 1){
             return false;
         }
