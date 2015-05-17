@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class ItemDB extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "itemdb", "Display the information attached to the item you hold", "/itemdb [name, id, meta]", ["itemno", "durability", "dura"]);
+        parent::__construct($plugin, "itemdb", "Display the information attached to the item you hold", "/itemdb [name|id|meta]", false, ["itemno", "durability", "dura"]);
         $this->setPermission("essentials.itemdb");
     }
 
@@ -18,7 +18,7 @@ class ItemDB extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Pleas run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
@@ -43,7 +43,7 @@ class ItemDB extends BaseCommand{
                 }
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $sender->sendMessage($this->getUsage());
                 return false;
                 break;
         }

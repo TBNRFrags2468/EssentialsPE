@@ -16,13 +16,11 @@ class KickAll extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-
         if(count($args) < 1){
             $reason = "Unknown";
         }else{
             $reason = implode(" ", $args);
         }
-
         foreach($sender->getServer()->getOnlinePlayers() as $p){
             if($p != $sender){
                 $p->kick($reason);

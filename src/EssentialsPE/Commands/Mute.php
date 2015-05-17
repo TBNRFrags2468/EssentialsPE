@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Mute extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "mute", "Prevent a player from chatting", "/mute <player>", ["silence"]);
+        parent::__construct($plugin, "mute", "Prevent a player from chatting", "/mute <player>", null, ["silence"]);
         $this->setPermission("essentials.mute");
     }
 
@@ -18,7 +18,7 @@ class Mute extends BaseCommand{
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

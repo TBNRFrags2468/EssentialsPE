@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Vanish extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "vanish", "Hide from other players!", "/vanish [player]", ["v"]);
+        parent::__construct($plugin, "vanish", "Hide from other players!", "/vanish [player]", null, ["v"]);
         $this->setPermission("essentials.vanish");
     }
 
@@ -20,7 +20,7 @@ class Vanish extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /vanish <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $this->getPlugin()->switchVanish($sender);
@@ -37,7 +37,7 @@ class Vanish extends BaseCommand{
                 $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!"));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /vanish <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Depth extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "depth", "Display your depth related to sea-level", "/depth", ["height"]);
+        parent::__construct($plugin, "depth", "Display your depth related to sea-level", "/depth", false, ["height"]);
         $this->setPermission("essentials.depth");
     }
 
@@ -18,11 +18,11 @@ class Depth extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $pos = $sender->getFloorY() - 63;

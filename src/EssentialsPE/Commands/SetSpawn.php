@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class SetSpawn extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setspawn", "Change your server main spawn point", "/setspawn");
+        parent::__construct($plugin, "setspawn", "Change your server main spawn point", "/setspawn", false);
         $this->setPermission("essentials.setspawn");
     }
 
@@ -19,7 +19,7 @@ class SetSpawn extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) != 0){

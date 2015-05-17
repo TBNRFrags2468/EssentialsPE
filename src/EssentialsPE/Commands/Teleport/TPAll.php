@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPAll extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "/tpall [player]");
         $this->setPermission("essentials.tpall");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
@@ -20,7 +29,7 @@ class TPAll extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /tpall <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
@@ -42,7 +51,7 @@ class TPAll extends BaseCommand{
                 $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /tpall <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

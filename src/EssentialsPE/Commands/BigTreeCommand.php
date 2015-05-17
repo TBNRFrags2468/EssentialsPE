@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class BigTreeCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "bigtree", "Spawns a big tree", "/bigtree <tree|redwood|jungle");
+        parent::__construct($plugin, "bigtree", "Spawns a big tree", "/bigtree <tree|redwood|jungle>", false);
         $this->setPermission("essentials.bigtree");
     }
 
@@ -20,11 +20,11 @@ class BigTreeCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $transparent = [];

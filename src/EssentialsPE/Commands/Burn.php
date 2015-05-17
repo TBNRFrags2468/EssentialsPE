@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Burn extends BaseCommand{
@@ -17,7 +18,7 @@ class Burn extends BaseCommand{
             return false;
         }
         if(count($args) != 2){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

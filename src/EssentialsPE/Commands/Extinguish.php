@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Extinguish extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "extinguish", "Extinguish a player", "/extinguish [player]", ["ext"]);
+        parent::__construct($plugin, "extinguish", "Extinguish a player", "/extinguish [player]", null, ["ext"]);
         $this->setPermission("essentials.extinguish");
     }
 
@@ -20,7 +20,7 @@ class Extinguish extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /extinguish <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $sender->extinguish();
@@ -40,7 +40,7 @@ class Extinguish extends BaseCommand{
                 $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has been extinguished!");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /extinguish <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

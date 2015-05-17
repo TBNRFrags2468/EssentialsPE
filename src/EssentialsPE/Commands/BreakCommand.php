@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class BreakCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "break", "Breaks the block you're looking at", "/break");
+        parent::__construct($plugin, "break", "Breaks the block you're looking at", "/break", false);
         $this->setPermission("essentials.break");
     }
 
@@ -19,11 +19,11 @@ class BreakCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class TPHere extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tphere", "Teleport a player to you", "/tphere <player>", ["s"]);
+        parent::__construct($plugin, "tphere", "Teleport a player to you", "/tphere <player>", false, ["s"]);
         $this->setPermission("essentials.tphere");
     }
 
@@ -18,7 +18,7 @@ class TPHere extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 1){

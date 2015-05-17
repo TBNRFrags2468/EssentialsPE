@@ -21,7 +21,7 @@ class Heal extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /heal <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $sender->heal($sender->getMaxHealth(), new EntityRegainHealthEvent($sender, $sender->getMaxHealth() - $sender->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
@@ -42,7 +42,7 @@ class Heal extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /heal <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

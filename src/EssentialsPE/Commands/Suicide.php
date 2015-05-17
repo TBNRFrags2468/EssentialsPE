@@ -6,11 +6,10 @@ use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class Suicide extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "suicide", "Kill yourself", "/suicide");
+        parent::__construct($plugin, "suicide", "Kill yourself", "/suicide", false);
         $this->setPermission("essentials.suicide");
     }
 
@@ -19,11 +18,11 @@ class Suicide extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, ($sender->getHealth())));

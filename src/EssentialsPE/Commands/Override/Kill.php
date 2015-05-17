@@ -9,17 +9,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Kill extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "kill", "Kill other people", "/kill <player>");
         $this->setPermission("essentials.kill");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

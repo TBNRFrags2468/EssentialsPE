@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class TreeCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <tree|birch|redwood|jungle>");
+        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <tree|birch|redwood|jungle>", false);
         $this->setPermission("essentials.tree");
     }
 
@@ -20,11 +20,11 @@ class TreeCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);

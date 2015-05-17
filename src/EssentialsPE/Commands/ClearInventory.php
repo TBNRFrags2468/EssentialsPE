@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class ClearInventory extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", ["ci", "clean", "clearinvent"]);
+        parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", null, ["ci", "clean", "clearinvent"]);
         $this->setPermission("essentials.clearinventory");
     }
 
@@ -20,7 +20,7 @@ class ClearInventory extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /clearinventory <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $gm = $sender->getGamemode();
@@ -51,7 +51,7 @@ class ClearInventory extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /clearinventory <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

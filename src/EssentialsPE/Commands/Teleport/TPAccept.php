@@ -8,17 +8,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPAccept extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpaccept", "Accept a teleport request", "/tpaccept [player]", ["tpyes"]);
+        parent::__construct($plugin, "tpaccept", "Accept a teleport request", "/tpaccept [player]", false, ["tpyes"]);
         $this->setPermission("essentials.tpaccept");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!($sender instanceof Player)){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+        if(!$sender instanceof Player){
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         $request = $this->getPlugin()->hasARequest($sender);

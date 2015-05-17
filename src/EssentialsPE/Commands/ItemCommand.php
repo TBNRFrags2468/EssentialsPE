@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class ItemCommand extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "item", "Gives yourself an item", "/item <item[:damage]> [amount]", ["i"]);
+        parent::__construct($plugin, "item", "Gives yourself an item", "/item <item[:damage]> [amount]", false, ["i"]);
         $this->setPermission("essentials.item");
     }
 
@@ -18,7 +18,7 @@ class ItemCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(($gm = $sender->getServer()->getGamemodeString($sender->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
@@ -26,7 +26,7 @@ class ItemCommand extends BaseCommand{
             return false;
         }
         if(count($args) < 1 || count($args) > 2){
-            $sender->sendMessage(TextFormat::RED . "Usage: " . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
 

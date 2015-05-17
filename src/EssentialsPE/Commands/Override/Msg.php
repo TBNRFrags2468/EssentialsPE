@@ -10,17 +10,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Msg extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "Msg", "Send private messages to other players", "/msg <player> <message ...>", ["tell", "m", "t", "whisper"]);
+        parent::__construct($plugin, "Msg", "Send private messages to other players", "/msg <player> <message ...>", null, ["tell", "m", "t", "whisper"]);
         $this->setPermission("essentials.msg");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(count($args) < 2){
-            $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $t = array_shift($args);

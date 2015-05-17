@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Back extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "back", "Teleport to your previous location", "/back", ["return"]);
+        parent::__construct($plugin, "back", "Teleport to your previous location", "/back", false, ["return"]);
         $this->setPermission("essentials.back");
     }
 
@@ -18,11 +18,11 @@ class Back extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         if(!$this->getPlugin()->returnPlayerToLastKnownPosition($sender)){

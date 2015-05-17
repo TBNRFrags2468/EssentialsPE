@@ -9,17 +9,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Sell extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sell", "Sell the specified item", "/sell <item|hand> [amount]");
+        parent::__construct($plugin, "sell", "Sell the specified item", "/sell <item|hand> [amount]", false);
         $this->setPermission("essentials.sell");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if($sender->getGamemode() === 1 || $sender->getGamemode() === 3){

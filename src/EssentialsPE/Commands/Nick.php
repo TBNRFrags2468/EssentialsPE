@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Nick extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nick", "Change your in-game name", "/nick <new nick|off> [player]", ["nickname"]);
+        parent::__construct($plugin, "nick", "Change your in-game name", "/nick <new nick|off> [player]", null, ["nickname"]);
         $this->setPermission("essentials.nick");
     }
 
@@ -20,7 +20,7 @@ class Nick extends BaseCommand{
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /nick <new nick|off> <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $nickname = $args[0];
@@ -43,7 +43,7 @@ class Nick extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $sender instanceof Player ? $this->getUsage() : "Usage: /nick <new nick|off> <player>");
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

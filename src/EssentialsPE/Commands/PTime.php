@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class PTime extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "ptime", "Changes the time of a player", "/ptime <time> [player]", ["playertime"]);
+        parent::__construct($plugin, "ptime", "Changes the time of a player", "/ptime <time> [player]", null, ["playertime"]);
         $this->setPermission("essentials.ptime");
     }
 
@@ -63,7 +63,7 @@ class PTime extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Setting player time...");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /ptime <list|time> <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

@@ -8,17 +8,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Pay extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "pay", "Pays a player from your balance", "/pay <player> <amount>");
+        parent::__construct($plugin, "pay", "Pays a player from your balance", "/pay <player> <amount>", false);
         $this->setPermission("essentials.pay");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "[Error] Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 2){

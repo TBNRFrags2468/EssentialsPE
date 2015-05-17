@@ -19,7 +19,7 @@ class Sudo extends BaseCommand{
             return false;
         }
         if(count($args) < 1){
-            $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $player = $this->getPlugin()->getPlayer(array_shift($args));

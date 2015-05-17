@@ -9,17 +9,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class PowerTool extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command|c:chat macro> <arguments...>", ["pt"]);
+        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command|c:chat macro> <arguments...>", false, ["pt"]);
         $this->setPermission("essentials.powertool");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();

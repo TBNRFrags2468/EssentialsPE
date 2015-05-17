@@ -18,7 +18,7 @@ class TempBan extends BaseCommand{
             return false;
         }
         if(count($args) < 2){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $player = $this->getPlugin()->getPlayer($name = array_shift($args));

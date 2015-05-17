@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Spawn extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "/spawn [player]");
+        parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "/spawn [player]", null);
         $this->setPermission("essentials.spawn");
     }
 
@@ -20,7 +20,7 @@ class Spawn extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /spawn <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $sender->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
@@ -40,7 +40,7 @@ class Spawn extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "Teleporting...");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /spawn <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

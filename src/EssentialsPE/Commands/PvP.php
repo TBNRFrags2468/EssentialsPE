@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class PvP extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "pvp", "Toggle PvP on/off", "/pvp <on|off>");
+        parent::__construct($plugin, "pvp", "Toggle PvP on/off", "/pvp <on|off>", false);
         $this->setPermission("essentials.pvp");
     }
 
@@ -18,10 +18,10 @@ class PvP extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }elseif(count($args) != 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
 
@@ -32,7 +32,7 @@ class PvP extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "PvP " . (strtolower($args[0]) === "on" ? "enabled!" : "disabled!"));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $sender->sendMessage($this->getUsage());
                 return false;
                 break;
         }

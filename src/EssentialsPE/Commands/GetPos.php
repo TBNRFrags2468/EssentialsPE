@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class GetPos extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "getpos", "Get your/other's position", "/getpos [player]", ["coords", "position", "whereami", "getlocation", "getloc"]);
+        parent::__construct($plugin, "getpos", "Get your/other's position", "/getpos [player]", null, ["coords", "position", "whereami", "getlocation", "getloc"]);
         $this->setPermission("essentials.getpos");
     }
 
@@ -20,7 +20,7 @@ class GetPos extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /getpos <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $pos = $sender->getPosition();
@@ -40,7 +40,7 @@ class GetPos extends BaseCommand{
                 $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /getpos <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

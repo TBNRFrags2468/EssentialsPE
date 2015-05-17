@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class More extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "more", "Get a stack of the item you're holding", "/more");
+        parent::__construct($plugin, "more", "Get a stack of the item you're holding", "/more", false);
         $this->setPermission("essentials.more");
     }
 
@@ -18,7 +18,7 @@ class More extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         $gm = $sender->getGamemode();

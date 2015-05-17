@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class Kit extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kit", "Get a pre-defined kit!", "/kit [name] [player]", ["kits"]);
+        parent::__construct($plugin, "kit", "Get a pre-defined kit!", "/kit [name] [player]", "/kit [name <player>]", ["kits"]);
         $this->setPermission("essentials.kit");
     }
 
@@ -34,7 +34,7 @@ class Kit extends BaseCommand{
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a player to give the kit");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 if(!$sender->hasPermission("essentials.kits.*") && !$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
@@ -61,7 +61,7 @@ class Kit extends BaseCommand{
                 $sender->sendMessage(TextFormat::AQUA . "Getting kit " . $kit->getName() . "...");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Antioch extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "antioch", "Holy hand grenade", "/antioch", ["grenade", "tnt"]);
+        parent::__construct($plugin, "antioch", "Holy hand grenade", "/antioch", false, ["grenade", "tnt"]);
         $this->setPermission("essentials.antioch");
     }
 
@@ -18,11 +18,11 @@ class Antioch extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
         }
         if(!$this->getPlugin()->antioch($sender)){
             $sender->sendMessage(TextFormat::RED . "[Error] Cannot throw the grenade, there isn't a near valid block");

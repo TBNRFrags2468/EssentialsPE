@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class Top extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "top", "Teleport to the highest block above you", "/top");
+        parent::__construct($plugin, "top", "Teleport to the highest block above you", "/top", false);
         $this->setPermission("essentials.top");
     }
 
@@ -19,11 +19,11 @@ class Top extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
         $block = $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ());

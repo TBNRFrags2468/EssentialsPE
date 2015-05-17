@@ -11,7 +11,7 @@ use pocketmine\utils\TextFormat;
 
 class Reply extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "/reply <message ...>", ["r"]);
+        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "/reply <message ...>", null, ["r"]);
         $this->setPermission("essentials.reply");
     }
 
@@ -20,7 +20,7 @@ class Reply extends BaseCommand{
             return false;
         }
         if(count($args) < 1){
-            $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         $t = $this->getPlugin()->getQuickReply($sender);

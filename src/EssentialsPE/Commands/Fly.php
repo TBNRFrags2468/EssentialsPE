@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Fly extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "fly", "Fly in Survival or Adventure mode!", "/fly [player]");
+        parent::__construct($plugin, "fly", "Fly in Survival or Adventure mode!", "/fly [player]", null);
         $this->setPermission("essentials.fly");
     }
 
@@ -20,7 +20,7 @@ class Fly extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /fly <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $this->getPlugin()->switchCanFly($sender);
@@ -41,7 +41,7 @@ class Fly extends BaseCommand{
                 $sender->sendMessage(TextFormat::YELLOW . "Flying mode " . ($this->getPlugin()->canFly($player) ? "enabled" : "disabled") . " for " . $player->getDisplayName());
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /fly <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

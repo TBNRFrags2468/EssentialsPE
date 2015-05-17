@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Gamemode extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "gamemode", "Change player gamemode", "/gamemode <mode> [player]", ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
+        parent::__construct($plugin, "gamemode", "Change player gamemode", "/gamemode <mode> [player]", null, ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
         $this->setPermission("essentials.gamemode");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
@@ -46,7 +55,7 @@ class Gamemode extends BaseCommand{
         }
         $player = $sender;
         if(!$player instanceof Player && !isset($args[1])){
-            $player->sendMessage(TextFormat::RED . "Usage: /gamemode <mode> <player>");
+            $player->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(isset($args[1])){

@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class EssentialsPE extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [update]", ["essentials", "ess", "esspe"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [update <check|install>]", null, ["essentials", "ess", "esspe"]);
         $this->setPermission("essential.essentials");
     }
 
@@ -40,20 +40,20 @@ class EssentialsPE extends BaseCommand{
                             }
                             return true;
                         }
-                        $sender->sendMessage(TextFormat::YELLOW . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|install>");
+                        $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . "/essentialspe update <check|install>");
                         break;
                     case "version":
                     case "v":
                     $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::YELLOW . "v" . TextFormat::GREEN . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
                         break;
                     default:
-                        $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                        $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                         return false;
                         break;
                 }
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

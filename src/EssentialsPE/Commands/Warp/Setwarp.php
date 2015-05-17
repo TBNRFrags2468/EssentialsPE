@@ -8,17 +8,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Setwarp extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "/setwarp <name>", ["openwarp", "createwarp"]);
+        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "/setwarp <name>", false, ["openwarp", "createwarp"]);
         $this->setPermission("essentials.setwarp");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 1){

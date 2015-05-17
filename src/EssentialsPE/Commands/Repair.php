@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Repair extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", ["fix"]);
+        parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", false, ["fix"]);
         $this->setPermission("essentials.repair");
     }
 
@@ -18,7 +18,7 @@ class Repair extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game.");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         switch(count($args)){
@@ -64,7 +64,7 @@ class Repair extends BaseCommand{
                         $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         break;
                     default:
-                        $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                        $sender->sendMessage($this->getUsage());
                         return false;
                         break;
                 }

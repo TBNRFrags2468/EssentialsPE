@@ -8,17 +8,26 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetHome extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sethome", "Create or update a home position", "/sethome <name>", ["createhome"]);
+        parent::__construct($plugin, "sethome", "Create or update a home position", "/sethome <name>", false, ["createhome"]);
         $this->setPermission("essentials.sethome");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please use this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 1){

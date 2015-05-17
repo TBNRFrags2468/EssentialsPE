@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "eco", "Sets the balance of a player", "/eco <give|take|set|reset> <player> [amount]", ["economy"]);
+        parent::__construct($plugin, "eco", "Sets the balance of a player", "/eco <give|take|set|reset> <player> [amount]", null, ["economy"]);
         $this->setPermission("essentials.eco");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
@@ -57,7 +66,7 @@ class Eco extends BaseCommand{
                 }
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 break;
         }
         return true;

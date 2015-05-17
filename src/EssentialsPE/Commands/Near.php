@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Near extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "near", "List the players near to you", "/near [player]", ["nearby"]);
+        parent::__construct($plugin, "near", "List the players near to you", "/near [player]", null, ["nearby"]);
         $this->setPermission("essentials.near");
     }
 
@@ -20,7 +20,7 @@ class Near extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /near <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $sender->sendMessage($this->broadcastPlayers($sender, "you"));
@@ -38,7 +38,7 @@ class Near extends BaseCommand{
                 $sender->sendMessage($this->broadcastPlayers($player, $args[0]));
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /near <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

@@ -9,23 +9,32 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Worth extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "worth", "Get the price of an item", "/worth <hand|item>");
+        parent::__construct($plugin, "worth", "Get the price of an item", "/worth <hand|item>", "/worth <item>");
         $this->setPermission("essentials.worth");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /worth <item>"));
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
         switch(strtolower($args[0])){
             case "hand":
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /worth <item>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $id = $sender->getInventory()->getItemInHand()->getId();

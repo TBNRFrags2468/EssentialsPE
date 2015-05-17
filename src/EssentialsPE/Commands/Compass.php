@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Compass extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "compass", "Display your current bearing direction", "/compass", ["direction"]);
+        parent::__construct($plugin, "compass", "Display your current bearing direction", "/compass", false, ["direction"]);
         $this->setPermission("essentials.compass");
     }
 
@@ -18,11 +18,11 @@ class Compass extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage(TextFormat::RED . "Please run this command in-game");
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $sender->sendMessage($this->getUsage());
             return false;
         }
 
@@ -39,7 +39,7 @@ class Compass extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Oops, there was an error while getting your face direction");
         }
 
-        $sender->sendMessage(TextFormat::AQUA . "You're facing " . $direction);
+        $sender->sendMessage(TextFormat::AQUA . "You're facing " . TextFormat::YELLOW . $direction);
         return true;
     }
 }

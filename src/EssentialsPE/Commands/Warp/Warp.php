@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Warp extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "warp", "Teleport to a warp", "/warp <name> [player]", ["warps"]);
+        parent::__construct($plugin, "warp", "Teleport to a warp", "/warp <name> [player]", null, ["warps"]);
         $this->setPermission("essentials.warp");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
@@ -33,7 +42,7 @@ class Warp extends BaseCommand{
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /warp <name> [player]");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps." . strtolower($args[0]))){
@@ -62,7 +71,7 @@ class Warp extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /warp <name> <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }

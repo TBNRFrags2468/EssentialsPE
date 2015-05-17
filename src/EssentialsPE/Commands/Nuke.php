@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Nuke extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nuke", "Thin carpet of bomb", "/nuke [player]");
+        parent::__construct($plugin, "nuke", "Thin carpet of bomb", "/nuke [player]", null);
         $this->setPermission("essentials.nuke");
     }
 
@@ -20,7 +20,7 @@ class Nuke extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage(TextFormat::RED . "Usage: /nuke <player>");
+                    $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
                 $this->getPlugin()->nuke($sender);
@@ -38,7 +38,7 @@ class Nuke extends BaseCommand{
                 $this->getPlugin()->nuke($player);
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? $this->getUsage() : "Usage: /nuke <player>"));
+                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
         }
