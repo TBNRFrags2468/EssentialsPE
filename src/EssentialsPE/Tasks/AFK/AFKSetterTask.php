@@ -24,7 +24,7 @@ class AFKSetterTask extends BaseTask{
         $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AFKSetterTask");
         foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
             if(!$this->getPlugin()->isAFK($p) && ($last = $this->getPlugin()->getLastPlayerMovement($p)) !== null && !$p->hasPermission("essentials.afk.preventauto")){
-                if(time() - $last >= $this->getPlugin()->getConfig()->get("afk-auto-set")){
+                if(time() - $last >= $this->getPlugin()->getConfig()->getNested("afk.auto-set")){
                     $this->getPlugin()->setAFKMode($p, true, false);
                     $message = TextFormat::YELLOW . $p->getDisplayName() . " is now AFK";
                     $this->getPlugin()->getServer()->getLogger()->info($message);
