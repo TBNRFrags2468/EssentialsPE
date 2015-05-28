@@ -4,6 +4,7 @@ namespace EssentialsPE;
 use EssentialsPE\BaseFiles\BaseKit;
 use EssentialsPE\BaseFiles\BaseLocation;
 use EssentialsPE\BaseFiles\BaseSession;
+use EssentialsPE\BaseFiles\MessagesAPI;
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Antioch;
 use EssentialsPE\Commands\Back;
@@ -111,12 +112,25 @@ use pocketmine\utils\TextFormat;
 class Loader extends PluginBase{
     /** @var Config */
     private $economy;
+
+    /** @var Config|null */
+    private $homesFile = null;
     /** @var array */
     private $homes;
+
+    /** @var MessagesAPI */
+    private $messages;
+
     /** @var Config */
     private $nicks;
-    /** @var Config */
+
+    /** @var Config|null */
+    private $kitsFile = null;
+    /** @var array */
     private $kits;
+
+    /** @var Config|null */
+    private $warpsFile = null;
     /** @var array */
     private $warps;
 
@@ -463,7 +477,7 @@ class Loader extends PluginBase{
         $this->getConfig()->reload();
         //$this->economy->reload();
         $this->loadHomes();
-        $this->kits->reload();
+        $this->loadKits();
         $this->nicks->reload();
         $this->loadWarps();
     }
@@ -1256,9 +1270,6 @@ class Loader extends PluginBase{
      *  |_|  |_|\___/|_| |_| |_|\___|___/
      */
 
-    /** @var Config|null */
-    private $homesFile = null;
-
     /**
      * Tell is a player have a specific home by its name
      *
@@ -1367,9 +1378,6 @@ class Loader extends PluginBase{
      *  |_|\_|_|\__|___/
      */
 
-    /** @var Config|null */
-    private $kitsFile = null;
-
     /**
      * Check if a kit exists
      *
@@ -1409,6 +1417,18 @@ class Loader extends PluginBase{
         }
         return $list;
     }
+
+    /**  __  __
+     *  |  \/  |
+     *  | \  / | ___ ___ ___  __ _  __ _  ___ ___
+     *  | |\/| |/ _ / __/ __|/ _` |/ _` |/ _ / __|
+     *  | |  | |  __\__ \__ | (_| | (_| |  __\__ \
+     *  |_|  |_|\___|___|___/\__,_|\__, |\___|___/
+     *                              __/ |
+     *                             |___/
+     */
+
+
 
     /**  __  __
      *  |  \/  |
@@ -2197,9 +2217,6 @@ class Loader extends PluginBase{
      *                       | |
      *                       |_|
      */
-
-    /** @var Config|null */
-    private $warpsFile = null;
 
     /**
      * Tell if a warp exists
