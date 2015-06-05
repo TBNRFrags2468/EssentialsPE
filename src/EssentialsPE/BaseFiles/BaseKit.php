@@ -1,7 +1,9 @@
 <?php
 namespace EssentialsPE\BaseFiles;
 
+use pocketmine\inventory\Inventory;
 use pocketmine\item\Item;
+use pocketmine\Player;
 
 class BaseKit{
     /** @var string */
@@ -62,5 +64,21 @@ class BaseKit{
             return false;
         }
         return $this->items[$id];
+    }
+
+    /**
+     * @param Inventory $inventory
+     */
+    public function addToInventory(Inventory $inventory){
+        foreach($this->getItems() as $i){
+            $inventory->setItem($inventory->firstEmpty(), clone $i);
+        }
+    }
+
+    /**
+     * @param Player $player
+     */
+    public function giveToPlayer(Player $player){
+        $this->addToInventory($player->getInventory());
     }
 }

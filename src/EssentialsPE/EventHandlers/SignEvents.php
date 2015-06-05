@@ -19,7 +19,6 @@ class SignEvents extends BaseEventHandler{
         $tile = $event->getBlock()->getLevel()->getTile(new Vector3($event->getBlock()->getFloorX(), $event->getBlock()->getFloorY(), $event->getBlock()->getFloorZ()));
         if($tile instanceof Sign){
             // Free sign
-            // TODO Implement costs
             if($tile->getText()[0] === "[Free]"){
                 $event->setCancelled(true);
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.free")){
@@ -85,29 +84,15 @@ class SignEvents extends BaseEventHandler{
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
                     return;
                 }else{
-                    if(!$event->getPlayer()->hasPermission("essentials.kits." . strtolower($tile->getText()[1]))){
-                        $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You don't have permissions to get this kit");
-                        return;
-                    }elseif(!$this->getPlugin()->getKit($tile->getText()[1])){
+                    if(!($kit = $this->getPlugin()->getKit($tile->getText()[1]))){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exists");
                         return;
+                    }elseif(!$event->getPlayer()->hasPermission("essentials.kits." . $kit->getName())){
+                        $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You don't have permissions to get this kit");
+                        return;
                     }else{
-                        foreach($tile->getText()[1] as $k){
-                            $k = explode(" ", $k);
-                            if(count($k) > 1){
-                                $amount = $k[1];
-                            }else{
-                                $amount = 1;
-                            }
-                            $item_name = $k[0];
-                            $item = $this->getPlugin()->getItem($item_name);
-                            if($item->getID() === 0) {
-                                return;
-                            }
-                            $item->setCount($amount);
-                            $event->getPlayer()->getInventory()->setItem($event->getPlayer()->getInventory()->firstEmpty(), $item);
-                        }
-                        $event->getPlayer()->sendMessage(TextFormat::GREEN . "Getting kit " . $tile->getText()[1] . "...");
+                        $kit->giveToPlayer($event->getPlayer());
+                        $event->getPlayer()->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
                     }
                 }
             }
@@ -188,7 +173,7 @@ class SignEvents extends BaseEventHandler{
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
                         return;
                     }
-                    $event->getPlayer()->teleport($warp[0], $warp[1], $warp[2]);
+                    $event->getPlayer()->teleport($warp);
                     $event->getPlayer()->sendMessage(TextFormat::GREEN . "Warping to " . $tile->getText()[1] . "...");
                 }
             }

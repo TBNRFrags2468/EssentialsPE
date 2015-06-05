@@ -2,7 +2,6 @@
 namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\BaseFiles\BaseKit;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
@@ -41,7 +40,7 @@ class Kit extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
                     return false;
                 }
-                $this->giveItems($sender, $kit);
+                $kit->giveToPlayer($sender);
                 $sender->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
                 break;
             case 2:
@@ -58,7 +57,7 @@ class Kit extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $this->giveItems($player, $kit);
+                $kit->giveToPlayer($player);
                 $player->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
                 $sender->sendMessage(TextFormat::GREEN . "Giving " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " kit " . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . "...");
                 break;
@@ -66,18 +65,6 @@ class Kit extends BaseCommand{
                 $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
                 return false;
                 break;
-        }
-        return true;
-    }
-
-    /**
-     * @param Player $player
-     * @param BaseKit $kit
-     * @return bool
-     */
-    private function giveItems(Player $player, BaseKit $kit){
-        foreach($kit->getItems() as $k){
-            $player->getInventory()->setItem($player->getInventory()->firstEmpty(), $k);
         }
         return true;
     }

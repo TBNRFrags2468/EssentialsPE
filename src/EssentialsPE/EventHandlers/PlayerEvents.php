@@ -16,6 +16,7 @@ use pocketmine\event\player\PlayerMoveEvent;
 use pocketmine\event\player\PlayerPreLoginEvent;
 use pocketmine\event\player\PlayerQuitEvent;
 use pocketmine\event\TextContainer;
+use pocketmine\event\TranslationContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -43,7 +44,11 @@ class PlayerEvents extends BaseEventHandler{
     public function onPlayerJoin(PlayerJoinEvent $event){
         // Nick and NameTag set:
         $message = $event->getJoinMessage();
-        if($message instanceof TextContainer){
+        if($message instanceof TranslationContainer){
+            foreach($message->getParameters() as $i => $m){
+                $message->setParameter($i, str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $m));
+            }
+        }elseif($message instanceof TextContainer){
             $message->setText(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message->getText()));
         }else{
             $message = str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message);
@@ -65,7 +70,11 @@ class PlayerEvents extends BaseEventHandler{
     public function onPlayerQuit(PlayerQuitEvent $event){
         // Quit message (nick):
         $message = $event->getQuitMessage();
-        if($message instanceof TextContainer){
+        if($message instanceof TranslationContainer){
+            foreach($message->getParameters() as $i => $m){
+                $message->setParameter($i, str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $m));
+            }
+        }elseif($message instanceof TextContainer){
             $message->setText(str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message->getText()));
         }else{
             $message = str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message);
