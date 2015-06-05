@@ -2,9 +2,9 @@
 namespace EssentialsPE\BaseFiles;
 
 use EssentialsPE\Loader;
-use pocketmine\scheduler\PluginTask;
+use pocketmine\event\Listener;
 
-abstract class BaseTask extends PluginTask{
+class BaseEventHandler implements Listener{
     /** @var Loader */
     private $plugin;
 
@@ -12,7 +12,6 @@ abstract class BaseTask extends PluginTask{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin);
         $this->plugin = $plugin;
     }
 

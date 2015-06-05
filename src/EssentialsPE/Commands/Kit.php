@@ -42,6 +42,7 @@ class Kit extends BaseCommand{
                     return false;
                 }
                 $this->giveItems($sender, $kit);
+                $sender->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
                 break;
             case 2:
                 if(!$sender->hasPermission("essentials.kit.other")){
@@ -58,7 +59,8 @@ class Kit extends BaseCommand{
                     return false;
                 }
                 $this->giveItems($player, $kit);
-                $sender->sendMessage(TextFormat::AQUA . "Getting kit " . $kit->getName() . "...");
+                $player->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
+                $sender->sendMessage(TextFormat::GREEN . "Giving " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " kit " . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . "...");
                 break;
             default:
                 $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());

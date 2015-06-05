@@ -50,7 +50,7 @@ class Warp extends BaseCommand{
                     return false;
                 }
                 $sender->teleport($warp);
-                $sender->sendMessage(TextFormat::GREEN . "Warping to " . $args[0] . "...");
+                $sender->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $warp->getName() . "...");
                 break;
             case 2:
                 if(!$sender->hasPermission("essentials.warp.other")){
@@ -67,8 +67,8 @@ class Warp extends BaseCommand{
                     return false;
                 }
                 $player->teleport($warp);
-                $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
-                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
+                $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
+                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
                 break;
             default:
                 $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());

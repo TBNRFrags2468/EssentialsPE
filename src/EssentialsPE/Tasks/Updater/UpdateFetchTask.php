@@ -13,6 +13,10 @@ class UpdateFetchTask extends AsyncTask{
     /** @var bool */
     private $install;
 
+    /**
+     * @param $build
+     * @param $install
+     */
     public function __construct($build, $install){
         $this->build = $build;
         $this->install = $install;
@@ -42,6 +46,9 @@ class UpdateFetchTask extends AsyncTask{
         $this->setResult($r);
     }
 
+    /**
+     * @param Server $server
+     */
     public function onCompletion(Server $server){
         /** @var Loader $esspe */
         $esspe = $server->getPluginManager()->getPlugin("EssentialsPE");

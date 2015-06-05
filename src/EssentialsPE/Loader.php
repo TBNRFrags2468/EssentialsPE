@@ -116,7 +116,7 @@ class Loader extends PluginBase{
     /** @var Config|null */
     private $homesFile = null;
     /** @var array */
-    private $homes;
+    private $homes = [];
 
     /** @var MessagesAPI */
     private $messages;
@@ -127,12 +127,12 @@ class Loader extends PluginBase{
     /** @var Config|null */
     private $kitsFile = null;
     /** @var array */
-    private $kits;
+    private $kits = [];
 
     /** @var Config|null */
     private $warpsFile = null;
     /** @var array */
-    private $warps;
+    private $warps = [];
 
     public function onEnable(){
         if(!is_dir($this->getDataFolder())){
@@ -300,10 +300,11 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
-        if(!$cfg->exists("version") || $cfg->get("version") !== "1.1.0"){
+        if(!$cfg->exists("version") || $cfg->get("version") !== "0.0.1"){
             $this->getLogger()->debug(TextFormat::RED . "An invalid config file was found, generating a new one...");
             unlink($this->getDataFolder() . "config.yml");
             $this->saveDefaultConfig();
+            $cfg = $this->getConfig();
         }
 
         $booleans = ["enable-custom-colors"];
@@ -350,12 +351,13 @@ class Loader extends PluginBase{
             }
         }
 
-        $afk = ["safe", "auto-set", "auto-kick", "broadcast"];
+        $afk = ["safe", "auto-set", "auto-broadcast", "auto-kick", "broadcast"];
         foreach($afk as $key){
             $value = null;
             $k = $this->getConfig()->getNested("afk." . $key);
             switch($key){
                 case "safe":
+                case "auto-broadcast":
                 case "broadcast":
                     if(!is_bool($k)){
                         $value = true;
@@ -436,7 +438,7 @@ class Loader extends PluginBase{
                     if(!$this->getServer()->isLevelLoaded($v[3])){
                         $this->getServer()->loadLevel($v[3]);
                     }
-                    $this->warps[$p] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+                    $this->homes[$p][$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
                 }
             }
         }
@@ -812,6 +814,7 @@ class Loader extends PluginBase{
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
             $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
         }
+        $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
         if($ev->getBroadcast()){
             $this->broadcastAFKStatus($player);
         }
@@ -868,7 +871,6 @@ class Loader extends PluginBase{
         if(!$this->getConfig()->getNested("afk.broadcast")){
             return;
         }
-        $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
         $message = TextFormat::YELLOW . $player->getDisplayName() . " is " . ($this->isAFK($player) ? "now" : "no longer") . " AFK";
         $this->getServer()->getLogger()->info($message);
         foreach($this->getServer()->getOnlinePlayers() as $p){
@@ -890,32 +892,20 @@ class Loader extends PluginBase{
      * Return the last known spot of a player before teleporting
      *
      * @param Player $player
-     * @return bool|Position
+     * @return bool|Location
      */
     public function getLastPlayerPosition(Player $player){
         return $this->getSession($player)->getLastPosition();
     }
 
     /**
-     * Get the last known rotation of a player before teleporting
-     *
-     * @param Player $player
-     * @return array|bool
-     */
-    public function getLastPlayerRotation(Player $player){
-        return $this->getSession($player)->getLastRotation();
-    }
-
-    /**
      * Updates the last position of a player.
      *
      * @param Player $player
-     * @param Position $pos
-     * @param int $yaw
-     * @param int $pitch
+     * @param Location $pos
      */
-    public function setPlayerLastPosition(Player $player, Position $pos, $yaw, $pitch){
-        $this->getSession($player)->setLastPosition($pos, $yaw, $pitch);
+    public function setPlayerLastPosition(Player $player, Location $pos){
+        $this->getSession($player)->setLastPosition($pos);
     }
 
     /**
@@ -923,22 +913,6 @@ class Loader extends PluginBase{
      */
     public function removePlayerLastPosition(Player $player){
         $this->getSession($player)->removeLastPosition();
-    }
-
-    /**
-     * Teleport the target player to its last known spot and set the corresponding rotation
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function returnPlayerToLastKnownPosition(Player $player){
-        $pos = $this->getLastPlayerPosition($player);
-        $rotation = $this->getLastPlayerRotation($player);
-        if(!$pos && !$rotation){
-            return false;
-        }
-        $player->teleport($pos, $rotation[0], $rotation[1]);
-        return true;
     }
 
     /**  ______
@@ -1357,15 +1331,15 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function homesList(Player $player, $inArray = false){
-        if(!$this->homesFile->exists($player->getName())){
+        if(!isset($this->homes[$player->getName()]) || count($this->homes[$player->getName()]) < 1){
             return false;
         }
-        $list = array_keys($this->homes);
+        $list = array_keys($this->homes[$player->getName()]);
         if(count($list) < 1){
             return false;
         }
         if(!$inArray){
-            return wordwrap(implode(", ", $list), 30, "\n", true); // TODO: Check if *WHOLE* word wrap is needed with MCPE 0.11 :P
+            return implode(", ", $list);
         }
         return $list;
     }
@@ -1413,7 +1387,7 @@ class Loader extends PluginBase{
             return false;
         }
         if(!$inArray){
-            return wordwrap(implode(", ", $list), 30, "\n", true);
+            return implode(", ", $list);
         }
         return $list;
     }
@@ -2233,7 +2207,7 @@ class Loader extends PluginBase{
      * If the function returns "false", it means that the warp doesn't exists
      *
      * @param string $warp
-     * @return bool|Location
+     * @return bool|BaseLocation
      */
     public function getWarp($warp){
         if(!$this->warpExists($warp)){
@@ -2297,11 +2271,11 @@ class Loader extends PluginBase{
      */
     public function warpList($inArray = false){
         $list = array_keys($this->warps);
-        if(!$list || count($list) < 1){
+        if(count($list) < 1){
             return false;
         }
         if(!$inArray){
-            return wordwrap(implode(", ", $list), 30, "\n", true); // TODO: Check if *WHOLE* word wrap is needed with MCPE 0.11 :P
+            return implode(", ", $list);
         }
         return $list;
     }

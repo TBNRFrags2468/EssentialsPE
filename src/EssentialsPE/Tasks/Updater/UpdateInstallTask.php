@@ -16,6 +16,12 @@ class UpdateInstallTask extends AsyncTask{
     /** @var Loader */
     private $plugin;
 
+    /**
+     * @param Loader $plugin
+     * @param $url
+     * @param $pluginPath
+     * @param $newVersion
+     */
     public function __construct(Loader $plugin, $url, $pluginPath, $newVersion){
         $this->url = $url;
         $this->pluginPath = $pluginPath;
@@ -45,6 +51,9 @@ class UpdateInstallTask extends AsyncTask{
         fclose($file);
     }
 
+    /**
+     * @param Server $server
+     */
     public function onCompletion(Server $server){
         $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " Successfully updated to version " . TextFormat::GREEN . $this->newVersion . TextFormat::YELLOW . ". To start using the new features, please fully restart your server.");
         $this->plugin->scheduleUpdaterTask();

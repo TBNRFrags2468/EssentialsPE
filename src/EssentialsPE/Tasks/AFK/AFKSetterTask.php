@@ -6,6 +6,10 @@ use EssentialsPE\Loader;
 use pocketmine\utils\TextFormat;
 
 class AFKSetterTask extends BaseTask{
+
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin);
     }
@@ -20,19 +24,15 @@ class AFKSetterTask extends BaseTask{
      * If so, they will be set in AFK mode
      */
 
+    /**
+     * @param int $currentTick
+     */
     public function onRun($currentTick){
         $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AFKSetterTask");
         foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
             if(!$this->getPlugin()->isAFK($p) && ($last = $this->getPlugin()->getLastPlayerMovement($p)) !== null && !$p->hasPermission("essentials.afk.preventauto")){
                 if(time() - $last >= $this->getPlugin()->getConfig()->getNested("afk.auto-set")){
-                    $this->getPlugin()->setAFKMode($p, true, false);
-                    $message = TextFormat::YELLOW . $p->getDisplayName() . " is now AFK";
-                    $this->getPlugin()->getServer()->getLogger()->info($message);
-                    foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p2){
-                        if($p !== $p2){
-                            $p->sendMessage($message);
-                        }
-                    }
+                    $this->getPlugin()->setAFKMode($p, true, $this->getPlugin()->getConfig()->getNested("afk.auto-broadcast"));
                 }
             }
         }

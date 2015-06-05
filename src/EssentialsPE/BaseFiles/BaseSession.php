@@ -2,7 +2,7 @@
 namespace EssentialsPE\BaseFiles;
 
 use pocketmine\command\CommandSender;
-use pocketmine\level\Position;
+use pocketmine\level\Location;
 
 class BaseSession {
 
@@ -13,6 +13,7 @@ class BaseSession {
         foreach($values as $k => $v){
             $this->{$k} = $v;
         }
+        $this->lastMovement = time();
     }
 
     /**
@@ -24,8 +25,11 @@ class BaseSession {
      *  /_/    \_|_|    |_|\_\
      */
 
+    /** @var bool */
     private $isAFK = false;
+    /** @var int|null */
     private $kickAFK = null;
+    /** @var int|null */
     private $lastMovement = null;
 
     /**
@@ -95,42 +99,28 @@ class BaseSession {
      *  |____/ \__,_|\___|_|\_\
      */
 
-    private $lastPosition = null;
-    private $lastRotation = null;
+    /** @var null */
+    private $lastLocation = null;
 
     /**
-     * @return bool|Position
+     * @return bool|Location
      */
     public function getLastPosition(){
-        if(!$this->lastPosition instanceof Position){
+        if(!$this->lastLocation instanceof Location){
             return false;
         }
-        return $this->lastPosition;
+        return $this->lastLocation;
     }
 
     /**
-     * @return array|bool
+     * @param Location $pos
      */
-    public function getLastRotation(){
-        if(!is_array($this->lastRotation) && count($this->lastRotation) !== 2){
-            return false;
-        }
-        return $this->lastRotation;
-    }
-
-    /**
-     * @param Position $position
-     * @param $yaw
-     * @param $pitch
-     */
-    public function setLastPosition(Position $position, $yaw, $pitch){
-        $this->lastPosition = $position;
-        $this->lastRotation = [$yaw, $pitch];
+    public function setLastPosition(Location $pos){
+        $this->lastLocation = $pos;
     }
 
     public function removeLastPosition(){
-        $this->lastPosition = null;
-        $this->lastRotation = null;
+        $this->lastLocation = null;
     }
 
     /**   _____           _

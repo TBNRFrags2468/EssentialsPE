@@ -48,7 +48,7 @@ class Home extends BaseCommand{
             return false;
         }
         $sender->teleport($home);
-        $sender->sendMessage(TextFormat::GREEN . "Teleporting to home " . TextFormat::AQUA . $args[0] . TextFormat::GREEN . "...");
+        $sender->sendMessage(TextFormat::GREEN . "Teleporting to home " . TextFormat::AQUA . $home->getName() . TextFormat::GREEN . "...");
         return true;
     }
 } 

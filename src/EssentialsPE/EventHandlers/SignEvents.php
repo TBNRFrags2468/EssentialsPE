@@ -2,24 +2,16 @@
 
 namespace EssentialsPE\EventHandlers;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseEventHandler;
 use pocketmine\event\block\BlockBreakEvent;
 use pocketmine\event\block\SignChangeEvent;
 use pocketmine\event\entity\EntityRegainHealthEvent;
-use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerInteractEvent;
 use pocketmine\math\Vector3;
 use pocketmine\tile\Sign;
 use pocketmine\utils\TextFormat;
 
-class SignEvents implements Listener{
-    /** @var Loader */
-    public $plugin;
-    
-    public function __construct(Loader $plugin){
-        $this->plugin = $plugin;
-    }
-
+class SignEvents extends BaseEventHandler{
     /**
      * @param PlayerInteractEvent $event
      */
@@ -41,7 +33,7 @@ class SignEvents implements Listener{
                     $item_name = $tile->getText()[1];
                     $damage = $tile->getText()[2];
 
-                    $item = $this->plugin->getItem($item_name . ":" . $damage);
+                    $item = $this->getPlugin()->getItem($item_name . ":" . $damage);
 
                     $event->getPlayer()->getInventory()->addItem($item);
                     $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . ($item->getName() === "Unknown" ? $item_name : $item->getName()));
@@ -96,7 +88,7 @@ class SignEvents implements Listener{
                     if(!$event->getPlayer()->hasPermission("essentials.kits." . strtolower($tile->getText()[1]))){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You don't have permissions to get this kit");
                         return;
-                    }elseif(!$this->plugin->getKit($tile->getText()[1])){
+                    }elseif(!$this->getPlugin()->getKit($tile->getText()[1])){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exists");
                         return;
                     }else{
@@ -108,7 +100,7 @@ class SignEvents implements Listener{
                                 $amount = 1;
                             }
                             $item_name = $k[0];
-                            $item = $this->plugin->getItem($item_name);
+                            $item = $this->getPlugin()->getItem($item_name);
                             if($item->getID() === 0) {
                                 return;
                             }
@@ -131,18 +123,18 @@ class SignEvents implements Listener{
                     return;
                }else{
                     if(($v = $tile->getText()[1]) === "Hand"){
-                        if($this->plugin->isReparable($item = $event->getPlayer()->getInventory()->getItemInHand())){
+                        if($this->getPlugin()->isReparable($item = $event->getPlayer()->getInventory()->getItemInHand())){
                             $item->setDamage(0);
                             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         }
                     }elseif($v === "All"){
                         foreach ($event->getPlayer()->getInventory()->getContents() as $item){
-                            if($this->plugin->isReparable($item)){
+                            if($this->getPlugin()->isReparable($item)){
                                 $item->setDamage(0);
                             }
                         }
                         foreach ($event->getPlayer()->getInventory()->getArmorContents() as $item){
-                            if($this->plugin->isReparable($item)){
+                            if($this->getPlugin()->isReparable($item)){
                                 $item->setDamage(0);
                             }
                         }
@@ -187,7 +179,7 @@ class SignEvents implements Listener{
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.warp")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
-                    $warp = $this->plugin->getWarp($tile->getText()[1]);
+                    $warp = $this->getPlugin()->getWarp($tile->getText()[1]);
                     if(!$warp){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
                         return;
@@ -211,7 +203,7 @@ class SignEvents implements Listener{
              * if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
              * $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
              * }else{
-             * $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->plugin->getCurrencySymbol() . $this->plugin->getPlayerBalance($event->getPlayer()));
+             * $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($event->getPlayer()));
              * }
              * }*/
 
@@ -248,10 +240,10 @@ class SignEvents implements Listener{
     public function onSignChange(SignChangeEvent $event){
         // Colored Sign
         if($event->getPlayer()->hasPermission("essentials.sign.color")){
-            $event->setLine(0, $this->plugin->colorMessage($event->getLine(0)));
-            $event->setLine(1, $this->plugin->colorMessage($event->getLine(1)));
-            $event->setLine(2, $this->plugin->colorMessage($event->getLine(2)));
-            $event->setLine(3, $this->plugin->colorMessage($event->getLine(3)));
+            $event->setLine(0, $this->getPlugin()->colorMessage($event->getLine(0)));
+            $event->setLine(1, $this->getPlugin()->colorMessage($event->getLine(1)));
+            $event->setLine(2, $this->getPlugin()->colorMessage($event->getLine(2)));
+            $event->setLine(3, $this->getPlugin()->colorMessage($event->getLine(3)));
         }
 
         // Special Signs
@@ -266,7 +258,7 @@ class SignEvents implements Listener{
                     $damage = 0;
                 }
 
-                $item = $this->plugin->getItem($item_name . ":" . $damage);
+                $item = $this->getPlugin()->getItem($item_name . ":" . $damage);
 
                 if($item->getID() === 0 || $item->getName() === "Air"){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid item name/ID");
@@ -321,7 +313,7 @@ class SignEvents implements Listener{
 
         // Kit sign
         elseif(strtolower($event->getLine(0)) === "[kit]" && $event->getPlayer()->hasPermission("essentials.sign.create.kit")){
-            if(!$this->plugin->kitExists($event->getLine(1))){
+            if(!$this->getPlugin()->kitExists($event->getLine(1))){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exist");
                 return;
             }
@@ -390,7 +382,7 @@ class SignEvents implements Listener{
         // Warp sign
         elseif(strtolower($event->getLine(0)) === "[warp]" && $event->getPlayer()->hasPermission("essentials.sign.create.warp")){
             $warp = $event->getLine(1);
-            if(!$this->plugin->warpExists($warp)){
+            if(!$this->getPlugin()->warpExists($warp)){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
                 $event->setCancelled(true);
             }else{

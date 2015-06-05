@@ -2,7 +2,7 @@
 # This configuration flie let you modify how EssentialsPE work with some features
 
 # DO NOT EDIT THIS PROPERTY! For internal use ONLY
-version: 1.1.0
+version: 0.0.1
 
 # Edit different parts of the AFK feature!
 afk:
@@ -11,6 +11,9 @@ afk:
   # Time until a player is known as AFK
   # You can disable this feature by assigning a value lower to 0
   auto-set: 300
+  # This option et you enable or disable the "Auto-AFK" broadcast status,
+  # So when someone is automatically set into AFK for idling, it will be broadcasted... Or not
+  auto-broadcast: true
   # Time until a player is kicked for being AFK
   # You can disable this feature by assigning a value lower to 0
   auto-kick: 300

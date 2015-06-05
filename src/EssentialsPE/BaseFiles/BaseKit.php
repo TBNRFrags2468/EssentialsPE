@@ -11,25 +11,25 @@ class BaseKit{
 
     /**
      * @param string $name
-     * @param array $items
+     * @param array|Item[] $items
      */
     public function __construct($name, array $items){
         $this->name = $name;
         foreach($items as $i){
             if(!$i instanceof Item){
                 $i = explode(" ", $i);
-                if(count($i) > 0){
+                if(count($i) > 1){
                     $amount = $i[1];
                     unset($i[1]);
                 }else{
                     $amount = 1;
                 }
-                $i = explode(":", $i);
-                if(count($i) > 0){
+                $i = explode(":", $i[0]);
+                if(count($i) > 1){
                     $id = $i[0];
                     $meta = $i[1];
                 }else{
-                    $id = $i;
+                    $id = $i[0];
                     $meta = 0;
                 }
                 $i = new Item($id, $meta, $amount);

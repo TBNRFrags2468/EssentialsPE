@@ -25,10 +25,11 @@ class Back extends BaseCommand{
             $sender->sendMessage($this->getUsage());
             return false;
         }
-        if(!$this->getPlugin()->returnPlayerToLastKnownPosition($sender)){
+        if(!($pos = $this->getPlugin()->getLastPlayerPosition($sender))){
             $sender->sendMessage(TextFormat::RED . "[Error] No previous position available");
         }else{
             $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
+            $sender->teleport($pos);
         }
         return true;
     }

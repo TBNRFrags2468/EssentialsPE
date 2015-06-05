@@ -2,12 +2,11 @@
 
 namespace EssentialsPE\EventHandlers;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseEventHandler;
 use pocketmine\event\entity\EntityDamageByEntityEvent;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\event\entity\EntityLevelChangeEvent;
 use pocketmine\event\entity\EntityTeleportEvent;
-use pocketmine\event\Listener;
 use pocketmine\event\player\PlayerBedEnterEvent;
 use pocketmine\event\player\PlayerChatEvent;
 use pocketmine\event\player\PlayerCommandPreprocessEvent;
@@ -20,14 +19,7 @@ use pocketmine\event\TextContainer;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class PlayerEvents implements Listener{
-    /** @var Loader */
-    public $plugin;
-
-    public function __construct(Loader $plugin){
-        $this->plugin = $plugin;
-    }
-
+class PlayerEvents extends BaseEventHandler{
     /**
      * @param PlayerPreLoginEvent $event
      *
@@ -40,9 +32,9 @@ class PlayerEvents implements Listener{
             $event->getPlayer()->setBanned(false);
         }
         // Session configure:
-        $this->plugin->createSession($event->getPlayer());
+        $this->getPlugin()->createSession($event->getPlayer());
         // Nick and NameTag set:
-        $this->plugin->setNick($event->getPlayer(), $this->plugin->getNick($event->getPlayer()), false);
+        $this->getPlugin()->setNick($event->getPlayer(), $this->getPlugin()->getNick($event->getPlayer()), false);
     }
 
     /**
@@ -60,11 +52,11 @@ class PlayerEvents implements Listener{
 
         // Hide vanished players | TODO: Remove
         /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
-            if($this->plugin->isVanished($p)){
+            if($this->getPlugin()->isVanished($p)){
                 $event->getPlayer()->hidePlayer($p);
             }
         }*/
-        //$this->plugin->setPlayerBalance($event->getPlayer(), $this->plugin->getDefaultBalance()); TODO
+        //$this->getPlugin()->setPlayerBalance($event->getPlayer(), $this->getPlugin()->getDefaultBalance()); TODO
     }
 
     /**
@@ -80,14 +72,14 @@ class PlayerEvents implements Listener{
         }
         $event->setQuitMessage($message);
         // Nick and NameTag restore:
-        $this->plugin->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
+        $this->getPlugin()->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
 
         // Sessions
-        if($this->plugin->sessionExists($event->getPlayer())){
+        if($this->getPlugin()->sessionExists($event->getPlayer())){
             // Remove teleport requests
-            $this->plugin->removeTPRequest($event->getPlayer());
+            $this->getPlugin()->removeTPRequest($event->getPlayer());
             // Session destroy:
-            $this->plugin->removeSession($event->getPlayer());
+            $this->getPlugin()->removeSession($event->getPlayer());
         }
     }
 
@@ -95,10 +87,10 @@ class PlayerEvents implements Listener{
      * @param PlayerChatEvent $event
      */
     public function onPlayerChat(PlayerChatEvent $event){
-        if($this->plugin->isAFK($event->getPlayer())){
-            $this->plugin->setAFKMode($event->getPlayer(), false, true);
+        if($this->getPlugin()->isAFK($event->getPlayer())){
+            $this->getPlugin()->setAFKMode($event->getPlayer(), false, true);
         }
-        if($this->plugin->isMuted($event->getPlayer())){
+        if($this->getPlugin()->isMuted($event->getPlayer())){
             $event->setCancelled(true);
         }
     }
@@ -107,7 +99,7 @@ class PlayerEvents implements Listener{
      * @param PlayerCommandPreprocessEvent $event
      */
     public function onPlayerCommand(PlayerCommandPreprocessEvent $event){
-        $command = $this->plugin->colorMessage($event->getMessage(), $event->getPlayer());
+        $command = $this->getPlugin()->colorMessage($event->getMessage(), $event->getPlayer());
         if($command === false){
             $event->setCancelled(true);
         }
@@ -119,11 +111,11 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerMove(PlayerMoveEvent $event){
         $entity = $event->getPlayer();
-        if($this->plugin->isAFK($entity)){
-            $this->plugin->setAFKMode($entity, false, true);
+        if($this->getPlugin()->isAFK($entity)){
+            $this->getPlugin()->setAFKMode($entity, false, true);
         }
 
-        $this->plugin->setLastPlayerMovement($entity, time());
+        $this->getPlugin()->setLastPlayerMovement($entity, time());
     }
 
     /**
@@ -132,7 +124,7 @@ class PlayerEvents implements Listener{
     public function onEntityTeleport(EntityTeleportEvent $event){
         $entity = $event->getEntity();
         if($entity instanceof Player){
-            $this->plugin->setPlayerLastPosition($entity, $entity->getPosition(), $entity->getYaw(), $entity->getPitch());
+            $this->getPlugin()->setPlayerLastPosition($entity, $entity->getLocation());
         }
     }
 
@@ -144,7 +136,7 @@ class PlayerEvents implements Listener{
     public function onEntityLevelChange(EntityLevelChangeEvent $event){
         $entity = $event->getEntity();
         if($entity instanceof Player){
-            $this->plugin->switchLevelVanish($entity, $event->getOrigin(), $event->getTarget());
+            $this->getPlugin()->switchLevelVanish($entity, $event->getOrigin(), $event->getTarget());
         }
     }
 
@@ -153,7 +145,7 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerSleep(PlayerBedEnterEvent $event){
         if($event->getPlayer()->hasPermission("essentials.home.bed")){
-            $this->plugin->setHome($event->getPlayer(), "bed", $event->getPlayer()->getPosition());
+            $this->getPlugin()->setHome($event->getPlayer(), "bed", $event->getPlayer()->getPosition());
         }
     }
 
@@ -165,23 +157,23 @@ class PlayerEvents implements Listener{
     public function onEntityDamageByEntity(EntityDamageEvent $event){
         $victim = $event->getEntity();
         if($victim instanceof Player){
-            if($this->plugin->isGod($victim) || ($this->plugin->isAFK($victim)) && $this->plugin->getConfig()->getNested("afk.safe")){
+            if($this->getPlugin()->isGod($victim) || ($this->getPlugin()->isAFK($victim)) && $this->getPlugin()->getConfig()->getNested("afk.safe")){
                 $event->setCancelled(true);
             }
 
             if($event instanceof EntityDamageByEntityEvent){
                 $issuer = $event->getDamager();
                 if($issuer instanceof Player){
-                    if(!($s = $this->plugin->isPvPEnabled($issuer)) || !$this->plugin->isPvPEnabled($victim)){
+                    if(!($s = $this->getPlugin()->isPvPEnabled($issuer)) || !$this->getPlugin()->isPvPEnabled($victim)){
                         $issuer->sendMessage(TextFormat::RED . (!$s ? "You have" : $victim->getDisplayName() . " has") . " PvP disabled!");
                         $event->setCancelled(true);
                     }
 
-                    if($this->plugin->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
+                    if($this->getPlugin()->isGod($issuer) && !$issuer->hasPermission("essentials.god.pvp")){
                         $event->setCancelled(true);
                     }
 
-                    if($this->plugin->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
+                    if($this->getPlugin()->isVanished($issuer) && !$issuer->hasPermission("essentials.vanish.pvp")){
                         $event->setCancelled(true);
                     }
                 }
@@ -194,9 +186,9 @@ class PlayerEvents implements Listener{
      */
     public function onPlayerDeath(PlayerDeathEvent $event){
         if($event->getEntity()->hasPermission("essentials.back.ondeath")){
-            $this->plugin->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getPosition(), $event->getEntity()->getYaw(), $event->getEntity()->getPitch());
+            $this->getPlugin()->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getPosition(), $event->getEntity()->getYaw(), $event->getEntity()->getPitch());
         }else{
-            $this->plugin->removePlayerLastPosition($event->getEntity());
+            $this->getPlugin()->removePlayerLastPosition($event->getEntity());
         }
     }
 }
