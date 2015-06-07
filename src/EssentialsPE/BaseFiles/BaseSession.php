@@ -131,6 +131,7 @@ class BaseSession {
      *   \_____|\___/ \__,_|
      */
 
+    /** @var bool */
     private $isGod = false;
 
     /**
@@ -162,6 +163,7 @@ class BaseSession {
      *              |___/
      */
 
+    /** @var bool|string */
     private $quickReply = false;
 
     /**
@@ -190,7 +192,9 @@ class BaseSession {
      *  |_|   \___/ \_/\_/ \___|_|  |_|\___/ \___/|_|
      */
 
+    /** @var bool|array */
     private $ptCommands = false;
+    /** @var bool|array */
     private $ptChatMacro = false;
 
     /**
@@ -316,6 +320,7 @@ class BaseSession {
      *  |_|      \_/ |_|
      */
 
+    /** @var bool */
     private $isPvPEnabled = true;
 
     /**
@@ -348,8 +353,11 @@ class BaseSession {
      */
 
     //Request to:
+    /** @var bool|string */
     private $requestTo = false;
+    /** @var bool|string */
     private $requestToAction = false;
+    /** @var null|int */
     private $requestToTask = null;
 
     /**
@@ -405,7 +413,9 @@ class BaseSession {
     }
 
     //Requests from:
+    /** @var null|string */
     private $latestRequestFrom = null;
+    /** @var array */
     private $requestsFrom = [];
     /** This is how it works per player:
     *
@@ -463,6 +473,7 @@ class BaseSession {
      *   \____/|_| |_|_|_|_| |_| |_|_|\__\___|\__,_| |_____|\__\___|_| |_| |_|___/
      */
 
+    /** @var bool */
     private $isUnlimitedEnabled = false;
 
     /**
@@ -492,7 +503,15 @@ class BaseSession {
      *      \/ \__,_|_| |_|_|___|_| |_|
      */
 
+    /** @var bool */
     private $isVanished = false;
+
+    /**
+     * If set to true, we will use Player packets instead of Effect ones
+     *
+     * @var bool
+     */
+    private $noPacket = false;
 
     /**
      * @return bool
@@ -503,13 +522,25 @@ class BaseSession {
 
     /**
      * @param bool $mode
+     * @param bool $noPacket
      * @return bool
      */
-    public function setVanish($mode){
+    public function setVanish($mode, $noPacket){
         if(!is_bool($mode)){
             return false;
         }
         $this->isVanished = $mode;
+        if(!is_bool($noPacket)){
+            return false;
+        }
+        $this->noPacket = $noPacket;
         return true;
+    }
+
+    /**
+     * @return bool
+     */
+    public function noPacket(){
+        return $this->noPacket;
     }
 }

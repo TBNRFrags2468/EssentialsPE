@@ -209,7 +209,7 @@ class Loader extends PluginBase{
         ]);
 
         //Register the new commands
-        $this->getServer()->getCommandMap()->registerAll("essentialspe", [
+        $this->getServer()->getCommandMap()->registerAll("EssentialsPE", [
             new AFK($this),
             new Antioch($this),
             new Back($this),
@@ -721,7 +721,8 @@ class Loader extends PluginBase{
             "latestRequestFrom" => null,
             "requestsFrom" => [],
             "isUnlimitedEnabled" => false,
-            "isVanished" => false
+            "isVanished" => false,
+            "noPacket" => false
         ]));
         $values = $ev->getValues();
 
@@ -2079,44 +2080,39 @@ class Loader extends PluginBase{
     }
 
     /**
+     * Tells if the specified player has "noPacket" enabled for vanish
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function hasNoPacket(Player $player){
+        return $this->getSession($player)->noPacket();
+    }
+
+    /**
      * Set the Vanish mode on or off
      *
      * @param Player $player
      * @param bool $state
+     * @param bool $noPacket
      * @return bool
      */
-    public function setVanish(Player $player, $state){
+    public function setVanish(Player $player, $state, $noPacket = false){
         if(!is_bool($state)){
             return false;
         }
         if($this->invisibilityEffect === null){
             $effect = new Effect(Effect::INVISIBILITY, "Vanish", 127, 131, 146);
-            //$effect = Effect::getEffect(Effect::INVISIBILITY);
             $effect->setDuration(1728000); // 24 hours... Well... No one will play more than this, so I think its OK xD
             $this->invisibilityEffect = $effect;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state));
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state, $noPacket));
         if($ev->isCancelled()){
             return false;
         }
         $state = $ev->willVanish();
-        $this->getSession($player)->setVanish($state);
         $player->setDataFlag(Entity::DATA_FLAGS, Entity::DATA_FLAG_INVISIBLE, $state);
         $player->setDataProperty(Entity::DATA_SHOW_NAMETAG, Entity::DATA_TYPE_BYTE, ($state ? 0 : 1));
-        if(!$state){
-            $pk = new MobEffectPacket();
-            $pk->eid = $player->getId();
-            $pk->effectId = $this->invisibilityEffect->getId();
-            $pk->amplifier = $this->invisibilityEffect->getAmplifier();
-            $pk->particles = $this->invisibilityEffect->isVisible();
-            $pk->duration = $this->invisibilityEffect->getDuration();
-            $pk->eventId = MobEffectPacket::EVENT_ADD;
-        }else{
-            $pk = new MobEffectPacket();
-            $pk->eid = $player->getId();
-            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
-            $pk->effectId = $this->invisibilityEffect->getId();
-        }
         /** @var Player[] $pl */
         $pl = [];
         foreach($player->getLevel()->getPlayers() as $p){
@@ -2124,7 +2120,38 @@ class Loader extends PluginBase{
                 $pl[] = $p;
             }
         }
-        $this->getServer()->broadcastPacket($pl, $pk);
+        $noPacket = $ev->noPacket();
+        if($this->isVanished($player) && $ev->noPacket() !== ($priority = $this->hasNoPacket($player))){
+            $noPacket = $priority;
+        }
+        if(!$noPacket){
+            if(!$state){
+                $pk = new MobEffectPacket();
+                $pk->eid = $player->getId();
+                $pk->eventId = MobEffectPacket::EVENT_REMOVE;
+                $pk->effectId = $this->invisibilityEffect->getId();
+            }else{
+                $pk = new MobEffectPacket();
+                $pk->eid = $player->getId();
+                $pk->effectId = $this->invisibilityEffect->getId();
+                $pk->amplifier = $this->invisibilityEffect->getAmplifier();
+                $pk->particles = $this->invisibilityEffect->isVisible();
+                $pk->duration = $this->invisibilityEffect->getDuration();
+                $pk->eventId = MobEffectPacket::EVENT_ADD;
+            }
+            $this->getServer()->broadcastPacket($pl, $pk);
+        }else{
+            if(!$state){
+                foreach($pl as $p){
+                    $p->showPlayer($player);
+                }
+            }else{
+                foreach($pl as $p){
+                    $p->hidePlayer($player);
+                }
+            }
+        }
+        $this->getSession($player)->setVanish($state, !$state ? $ev->noPacket() : $noPacket);
         return true;
     }
 
@@ -2148,34 +2175,59 @@ class Loader extends PluginBase{
      */
     public function switchLevelVanish(Player $player, Level $origin, Level $target){
         if($origin->getName() !== $target->getName() && $this->isVanished($player)){
-            // Add player packet
+
+            // This will be used if the specified player has "noPacket" enabled.
+            // A temporal check will be used for "the other players".
+            $noPacket = $this->hasNoPacket($player);
+
+            // Just as prevention if any player has "noPacket" disabled...
             $pk = new MobEffectPacket();
-            $pk->eid = $player->getId();
             $pk->effectId = $this->invisibilityEffect->getId();
             $pk->amplifier = $this->invisibilityEffect->getAmplifier();
             $pk->particles = $this->invisibilityEffect->isVisible();
             $pk->duration = $this->invisibilityEffect->getDuration();
-            $pk->eventId = MobEffectPacket::EVENT_ADD;
+
+            // Show to origin's players
+            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
             foreach($origin->getPlayers() as $p){
                 if($p !== $player){
-                    $p->showPlayer($player);
-                    $pk->eid = $p->getId();
-                    $player->dataPacket($pk);
-                    $pk->eid = $player->getId();
+                    if($this->isVanished($player)){
+                        if(!$noPacket){
+                            $pk->eid = $player->getId();
+                            $p->dataPacket($pk);
+                        }else{
+                            $p->showPlayer($player);
+                        }
+                    }
+                    if($this->isVanished($p)){
+                        if(!$this->hasNoPacket($p)){
+                            $pk->eid = $p->getId();
+                            $player->dataPacket($pk);
+                        }else{
+                            $player->showPlayer($p);
+                        }
+                    }
                 }
             }
-            // Remove player packet
-            $pk = new MobEffectPacket();
-            $pk->eid = $player->getId();
-            $pk->eventId = MobEffectPacket::EVENT_REMOVE;
-            $pk->effectId = $this->invisibilityEffect->getId();
+            // Hide to target's players
+            $pk->eventId = MobEffectPacket::EVENT_ADD;
             foreach($target->getPlayers() as $p){
                 if($p !== $player){
-                    $p->dataPacket($pk);
+                    if($this->isVanished($player)){
+                        if(!$noPacket){
+                            $pk->eid = $player->getId();
+                            $p->dataPacket($pk);
+                        }else{
+                            $p->hidePlayer($player);
+                        }
+                    }
                     if($this->isVanished($p)){
-                        $pk->eid = $p->getId();
-                        $player->dataPacket($pk);
-                        $pk->eid = $player->getId();
+                        if(!$this->hasNoPacket($p)){
+                            $pk->eid = $p->getId();
+                            $player->dataPacket($pk);
+                        }else{
+                            $player->hidePlayer($p);
+                        }
                     }
                 }
             }

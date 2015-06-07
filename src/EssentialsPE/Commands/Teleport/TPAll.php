@@ -33,8 +33,10 @@ class TPAll extends BaseCommand{
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
-                    $p->teleport($sender->getPosition());
-                    $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
+                    if($p !== $sender){
+                        $p->teleport($sender->getPosition());
+                        $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
+                    }
                 }
                 $sender->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
                 break;
@@ -45,8 +47,10 @@ class TPAll extends BaseCommand{
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
-                    $p->teleport($player->getPosition());
-                    $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
+                    if($p !== $player){
+                        $p->teleport($player->getPosition());
+                        $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
+                    }
                 }
                 $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
                 break;

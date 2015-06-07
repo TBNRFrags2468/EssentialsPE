@@ -55,12 +55,12 @@ class PlayerEvents extends BaseEventHandler{
         }
         $event->setJoinMessage($message);
 
-        // Hide vanished players | TODO: Remove
-        /*foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
-            if($this->getPlugin()->isVanished($p)){
+        // Hide vanished players with "noPacket"
+        foreach($event->getPlayer()->getServer()->getOnlinePlayers() as $p){
+            if($this->getPlugin()->isVanished($p) && $this->getPlugin()->hasNoPacket($p)){
                 $event->getPlayer()->hidePlayer($p);
             }
-        }*/
+        }
         //$this->getPlugin()->setPlayerBalance($event->getPlayer(), $this->getPlugin()->getDefaultBalance()); TODO
     }
 
@@ -140,7 +140,7 @@ class PlayerEvents extends BaseEventHandler{
     /**
      * @param EntityLevelChangeEvent $event
      *
-     * @priority HIGHEST
+     * @priority MONITOR
      */
     public function onEntityLevelChange(EntityLevelChangeEvent $event){
         $entity = $event->getEntity();

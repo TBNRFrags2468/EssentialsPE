@@ -15,6 +15,8 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
     protected $isVanished;
     /** @var bool */
     protected $willVanish;
+    /** @var bool */
+    protected $noPacket;
     /** @var array */
     protected $keepHiddenFor = [];
 
@@ -22,12 +24,14 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
      * @param Loader $plugin
      * @param Player $player
      * @param bool $willVanish
+     * @param bool $noPacket
      */
-    public function __construct(Loader $plugin, Player $player, $willVanish){
+    public function __construct(Loader $plugin, Player $player, $willVanish, $noPacket){
         parent::__construct($plugin);
         $this->player = $player;
         $this->isVanished = $plugin->isVanished($player);
         $this->willVanish = $willVanish;
+        $this->noPacket = $noPacket;
     }
 
     /**
@@ -69,6 +73,30 @@ class PlayerVanishEvent extends PluginEvent implements Cancellable{
     public function setVanished($value){
         if(is_bool($value)){
             $this->willVanish = $value;
+        }
+    }
+
+    /**
+     * Tell if you prefer to use (or not) Player Packets instead of Effect ones.
+     * false = Use Effect Packets
+     * true = Use Player Packets
+     *
+     * @return bool
+     */
+    public function noPacket(){
+        return $this->noPacket;
+    }
+
+    /**
+     * Change the Packets to be used in the event.
+     * false = Use Effect Packets
+     * true = Use Player Packets
+     *
+     * @param bool $state
+     */
+    public function setNoPacket($state){
+        if(is_bool($state)){
+            $this->noPacket = $state;
         }
     }
 
