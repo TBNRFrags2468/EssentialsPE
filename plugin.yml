@@ -282,6 +282,9 @@ permissions:
                             essentials.sign.break.heal:
                                 default: op
                                 description: "Allow to remove heal signs"
+                            essentials.sign.break.kit:
+                                default: op
+                                description: "Allow to remove kit signs"    
                             essentials.sign.break.repair:
                                 default: op
                                 description: "Allow to remove repair signs"
@@ -310,6 +313,9 @@ permissions:
                             essentials.sign.create.heal:
                                 default: op
                                 description: "Allow to create Heal signs"
+                            essentials.sign.create.kit:
+                                default: op
+                                description: "Allow to create Kit signs"
                             essentials.sign.create.repair:
                                 default: op
                                 description: "Allow to create Repair signs"
@@ -335,6 +341,9 @@ permissions:
                             essentials.sign.use.heal:
                                 default: op
                                 description: "Allow to use Heal signs"
+                            essentials.sign.use.kit:
+                                default: op
+                                description: "Allow to use Kit signs"
                             essentials.sign.use.repair:
                                 default: op
                                 description: "Allow to use Repair signs"
