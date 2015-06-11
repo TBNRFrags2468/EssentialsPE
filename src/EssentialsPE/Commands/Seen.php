@@ -26,10 +26,13 @@ class Seen extends BaseCommand{
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
             return false;
         }
-        if(!is_numeric($sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed())){
-            $sender->sendMessage(TextFormat::RED .  $player->getDisplayName() . " has never played on this server.");
-            return false;
-        }
+        else
+        {
+            if(!is_numeric($sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed())){
+                $sender->sendMessage(TextFormat::RED .  $args[0] . " has never played on this server.");
+                return false;
+            }
+        }    
         /**
          * a = am/pm
          * i = Minutes
