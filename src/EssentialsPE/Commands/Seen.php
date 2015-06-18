@@ -24,10 +24,10 @@ class Seen extends BaseCommand{
         $player = $this->getPlugin()->getPlayer($args[0]);
         if($player !== false){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
-            return false;
+            return true;
         }
         if(!is_numeric($sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed())){
-            $sender->sendMessage(TextFormat::RED .  $player->getDisplayName() . " has never played on this server.");
+            $sender->sendMessage(TextFormat::RED .  $args[0] . " has never played on this server.");
             return false;
         }
         /**
