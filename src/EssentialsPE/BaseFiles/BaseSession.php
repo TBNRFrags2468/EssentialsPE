@@ -1,19 +1,108 @@
 <?php
 namespace EssentialsPE\BaseFiles;
 
+use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Location;
+use pocketmine\Player;
+use pocketmine\utils\Config;
 
 class BaseSession {
+    /** @var Loader */
+    private $plugin;
+    /** @var Player */
+    private $player;
+    /** @var Config */
+    private $config;
+    /** @var array */
+    public static $defaults = [
+        "isAFK" => false,
+        "kickAFK" => null,
+        "lastMovement" => null,
+        "lastPosition" => null,
+        "isGod" => false,
+        "quickReply" => false,
+        "isMuted" => false,
+        "mutedUntil" => null,
+        "nick" => null,
+        "ptCommands" => false,
+        "ptChatMacros" => false,
+        "isPvPEnabled" => true,
+        "requestTo" => false,
+        "requestToAction" => false,
+        "requestToTask" => null,
+        "latestRequestFrom" => null,
+        "requestsFrom" => [],
+        "isUnlimitedEnabled" => false,
+        "isVanished" => false,
+        "noPacket" => false
+    ];
+    /** @var array */
+    public static $configDefaults = [
+        "isAFK" => false,
+        "isGod" => false,
+        "isMuted" => false,
+        "mutedUntil" => null,
+        "nick" => null,
+        "ptCommands" => false,
+        "ptChatMacros" => false,
+        "isPvPEnabled" => true,
+        "isUnlimitedEnabled" => false,
+        "isVanished" => false
+    ];
 
     /**
+     * @param Loader $plugin
+     * @param Player $player
      * @param array $values
      */
-    public function __construct($values = []){
+    public function __construct(Loader $plugin, Player $player, Config $config, array $values){
+        $this->plugin = $plugin;
+        $this->player = $player;
+        $this->config = $config;
+        self::$defaults["lastMovement"] = !$player->hasPermission("essentals.afk.preventauto") ? time() : null;
         foreach($values as $k => $v){
             $this->{$k} = $v;
         }
-        $this->lastMovement = time();
+    }
+
+    public function saveSession(){
+        $values = [];
+        foreach(self::$configDefaults as $k => $v){
+            if($k !== "mutedUntil"){
+                $values[$k] = $this->{$k};
+            }else{
+                // Use '$this->{$k}' so we can later implement more time handlers wihtout problems
+                $values[$k] = $this->{$k} instanceof \DateTime ? $this->{$k}->getTimestamp() : $v;
+            }
+        }
+        $this->config->setAll($values);
+        $this->config->save();
+    }
+
+    public function onClose(){
+        $this->saveSession();
+
+        // Let's revert some things to their original state...
+        $this->setNick(null);
+        $this->getPlugin()->removeTPRequest($this->getPlayer());
+        if($this->isVanished()){
+            $this->getPlugin()->setVanish($this->getPlayer(), false, $this->noPacket());
+        }
+    }
+
+    /**
+     * @return Loader
+     */
+    public final function getPlugin(){
+        return $this->plugin;
+    }
+
+    /**
+     * @return Player
+     */
+    public final function getPlayer(){
+        return $this->player->getPlayer();
     }
 
     /**
@@ -40,7 +129,7 @@ class BaseSession {
     }
 
     /**
-     * @param $mode
+     * @param bool $mode
      * @return bool
      */
     public function setAFK($mode){
@@ -182,6 +271,71 @@ class BaseSession {
 
     public function removeQuickReply(){
         $this->quickReply = false;
+    }
+
+    /**  __  __       _
+     *  |  \/  |     | |
+     *  | \  / |_   _| |_ ___
+     *  | |\/| | | | | __/ _ \
+     *  | |  | | |_| | ||  __/
+     *  |_|  |_|\__,_|\__\___|
+     */
+
+    /** @var bool */
+    private $isMuted = false;
+    /** @var \DateTime|null */
+    private $mutedUntil = null;
+
+    /**
+     * @return bool
+     */
+    public function isMuted(){
+        return $this->isMuted;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getMutedUntil(){
+        return $this->mutedUntil;
+    }
+
+    /**
+     * @param bool $state
+     * @param \DateTime|null $expires
+     */
+    public function setMuted($state, \DateTime $expires = null){
+        if(is_bool($state)){
+            $this->isMuted = $state;
+            $this->mutedUntil = $expires;
+        }
+    }
+
+    /**  _   _ _      _
+     *  | \ | (_)    | |
+     *  |  \| |_  ___| | _____
+     *  | . ` | |/ __| |/ / __|
+     *  | |\  | | (__|   <\__ \
+     *  |_| \_|_|\___|_|\_|___/
+     */
+
+    /** @var null|string */
+    private $nick = null;
+
+    /**
+     * @return null|string
+     */
+    public function getNick(){
+        return $this->nick;
+    }
+
+    /**
+     * @param null|string $nick
+     */
+    public function setNick($nick){
+        $this->nick = $nick;
+        $this->getPlayer()->setDisplayName($nick === null ? $this->getPlayer()->getName() : $nick);
+        $this->getPlayer()->setNameTag($nick === null ? $this->getPlayer()->getName() : $nick);
     }
 
     /**  _____                    _______          _

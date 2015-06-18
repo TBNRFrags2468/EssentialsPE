@@ -12,7 +12,7 @@ class TPAll extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "/tpall [player]");
+        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "/tpall [player]", "/tpall <player>");
         $this->setPermission("essentials.tpall");
     }
 
@@ -34,7 +34,7 @@ class TPAll extends BaseCommand{
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
                     if($p !== $sender){
-                        $p->teleport($sender->getPosition());
+                        $p->teleport($sender);
                         $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
                     }
                 }
@@ -48,7 +48,7 @@ class TPAll extends BaseCommand{
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
                     if($p !== $player){
-                        $p->teleport($player->getPosition());
+                        $p->teleport($player);
                         $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
                     }
                 }

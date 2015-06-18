@@ -48,7 +48,7 @@ class Jump extends BaseCommand{
             $side = 5;
         }
         if(!$block->getSide($side)->isSolid()){
-            $sender->teleport($block->add(0));
+            $sender->teleport($block);
         }
         return true;
     }

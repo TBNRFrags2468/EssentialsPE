@@ -73,6 +73,7 @@ class BaseKit{
         foreach($this->getItems() as $i){
             $inventory->setItem($inventory->firstEmpty(), clone $i);
         }
+        // call_user_func_array($inventory->addItem(), $this->getItems());
     }
 
     /**

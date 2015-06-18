@@ -15,17 +15,21 @@ class PlayerMuteEvent extends PluginEvent implements Cancellable{
     protected $isMuted;
     /** @var  bool */
     protected $mode;
+    /** @var \DateTime|null */
+    protected $expires;
 
     /**
      * @param Loader $plugin
      * @param Player $player
      * @param bool $mode
+     * @param \DateTime $expires
      */
-    public function __construct(Loader $plugin, Player $player, $mode){
+    public function __construct(Loader $plugin, Player $player, $mode, \DateTime $expires = null){
         parent::__construct($plugin);
         $this->player = $player;
         $this->isMuted = $plugin->isMuted($player);
         $this->mode = $mode;
+        $this->expires = $expires;
     }
 
     /**
@@ -66,5 +70,27 @@ class PlayerMuteEvent extends PluginEvent implements Cancellable{
         if(is_bool($mode)){
             $this->mode = $mode;
         }
+    }
+
+    /**
+     * Tells the time the mute state will stay
+     * int = "Date Time format" of expiration
+     * null = Will keep forever
+     *
+     * @return \DateTime|null
+     */
+    public function getMutedUntil(){
+        return $this->expires;
+    }
+
+    /**
+     * Set how long the mute will be applied
+     * int = "Date Time format" of expiration
+     * null = Will keep forever
+     *
+     * @param \DateTime|null $expires
+     */
+    public function setMutedUntil(\DateTime $expires = null){
+        $this->expires = $expires;
     }
 } 

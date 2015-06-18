@@ -35,7 +35,7 @@ class Near extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $sender->sendMessage($this->broadcastPlayers($player, $args[0]));
+                $sender->sendMessage($this->broadcastPlayers($player, $player->getDisplayName()));
                 break;
             default:
                 $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());

@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,9 +25,8 @@ class Top extends BaseCommand{
             $sender->sendMessage($this->getUsage());
             return false;
         }
-        $block = $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ());
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
-        $sender->teleport(new Vector3($sender->getX(), ($block + 1), $sender->getZ()));
+        $sender->teleport($sender->add(0, $sender->getLevel()->getHighestBlockAt($sender->getX(), $sender->getZ()) + 1));
         return true;
     }
 }

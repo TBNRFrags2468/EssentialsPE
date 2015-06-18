@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\math\Vector3;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,11 +25,10 @@ class SetSpawn extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . $this->getUsage());
             return false;
         }
-        $level = $sender->getLevel();
-        $level->setSpawnLocation(new Vector3($sender->getFloorX(), $sender->getFloorY(), $sender->getFloorZ()));
-        $sender->getServer()->setDefaultLevel($level);
+        $sender->getLevel()->setSpawnLocation($sender);
+        $sender->getServer()->setDefaultLevel($sender->getLevel());
         $sender->sendMessage(TextFormat::YELLOW . "Server's spawn point changed!");
-        $sender->getServer()->getLogger()->debug(TextFormat::YELLOW . "Server's spawn point set to" . TextFormat::AQUA . $level->getName() . TextFormat::YELLOW . " by " . TextFormat::GREEN . $sender->getName());
+        $sender->getServer()->getLogger()->debug(TextFormat::YELLOW . "Server's spawn point set to" . TextFormat::AQUA . $sender->getLevel()->getName() . TextFormat::YELLOW . " by " . TextFormat::GREEN . $sender->getName());
         return true;
     }
 }

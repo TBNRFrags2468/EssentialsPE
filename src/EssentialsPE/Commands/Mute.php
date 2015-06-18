@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Mute extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "mute", "Prevent a player from chatting", "/mute <player>", null, ["silence"]);
+        parent::__construct($plugin, "mute", "Prevent a player from chatting", "/mute <player> [time...]", null, ["silence"]);
         $this->setPermission("essentials.mute");
     }
 
@@ -17,11 +17,11 @@ class Mute extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) !== 1){
+        if(count($args) < 1){
             $sender->sendMessage($this->getUsage());
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($args[0]);
+        $player = $this->getPlugin()->getPlayer(array_shift($args));
         if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
             return false;
@@ -32,8 +32,13 @@ class Mute extends BaseCommand{
                 return false;
             }
         }
-        $this->getPlugin()->switchMute($player);
-        $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " has been " . ($this->getPlugin()->isMuted($player) ? "muted!" : "unmuted!"));
+        /** @var \DateTime $date */
+        $date = null;
+        if(!is_bool($info = $this->getPlugin()->stringToTimestamp(implode(" ", $args)))){
+            $date = $info[0];
+        }
+        $this->getPlugin()->switchMute($player, $date, true);
+        $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " has been " . ($this->getPlugin()->isMuted($player) ? "muted " . ($date !== null ? "until: " . TextFormat::AQUA . $date->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $date->format("h:ia") : TextFormat::AQUA . "Forever" . TextFormat::YELLOW . "!") : "unmuted!"));
         return true;
     }
 } 

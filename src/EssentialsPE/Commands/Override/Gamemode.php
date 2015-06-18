@@ -29,6 +29,7 @@ class Gamemode extends BaseCommand{
         if(strtolower($alias) !== "gamemode" && strtolower($alias) !== "gm"){
             if(isset($args[0])){
                 $args[1] = $args[0];
+                unset($args[0]);
             }
             switch(strtolower($alias)){
                 case "survival":
@@ -52,6 +53,9 @@ class Gamemode extends BaseCommand{
                     return false;
                     break;
             }
+        }
+        if(count($args) < 1){
+            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
         }
         $player = $sender;
         if(!$player instanceof Player && !isset($args[1])){

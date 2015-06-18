@@ -90,10 +90,12 @@ use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
 use pocketmine\item\Item;
+use pocketmine\item\ItemBlock;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
 use pocketmine\math\AxisAlignedBB;
+use pocketmine\math\Vector3;
 use pocketmine\nbt\tag\Byte;
 use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
@@ -159,8 +161,6 @@ class Loader extends PluginBase{
 
     public function onDisable(){
         foreach($this->getServer()->getOnlinePlayers() as $p){
-            //Nicks
-            $this->setNick($p, $p->getName(), false);
             //Vanish
             if($this->isVanished($p)){
                 foreach($this->getServer()->getOnlinePlayers() as $players){
@@ -428,6 +428,7 @@ class Loader extends PluginBase{
     }
 
     private function loadHomes(){
+        // TODO: Homes updater implementation
         if($this->homesFile === null) {
             $this->homesFile = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
         }
@@ -506,21 +507,20 @@ class Loader extends PluginBase{
      * @return bool|Player
      */
     public function getPlayer($player){
+        if(!$this->validateName($player, false)){
+            return false;
+        }
         $player = strtolower($player);
         $found = false;
         foreach($this->getServer()->getOnlinePlayers() as $p){
-            if(strtolower($p->getDisplayName()) === $player || strtolower($p->getName()) === $player){
+            if(strtolower(TextFormat::clean($p->getDisplayName(), true)) === $player || strtolower($p->getName()) === $player){
                 $found = $p;
                 break;
             }
         }
         // If cannot get the exact player name/nick, try with portions of it
         if(!$found){
-            $found = $this->getServer()->getPlayer($player); // PocketMine function to get from portions of name
-        }
-        // Due to above function return null, and we only return bool xD
-        if($found === null){
-            $found = false;
+            $found = ($f = $this->getServer()->getPlayer($player)) === null ? false : $f; // PocketMine function to get from portions of name
         }
         /*
          * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
@@ -528,13 +528,13 @@ class Loader extends PluginBase{
          * ALL THE RIGHTS FROM THE FOLLOWING CODE BELONGS TO POCKETMINE-MP
          */
         if(!$found){
-            $name = \strtolower($player);
             $delta = \PHP_INT_MAX;
-            foreach($this->getServer()->getOnlinePlayers() as $player){
-                if(\stripos($player->getDisplayName(), $name) === 0){
-                    $curDelta = \strlen($player->getName()) - \strlen($name);
+            foreach($this->getServer()->getOnlinePlayers() as $p){
+                // Clean the Display Name due to colored nicks :S
+                if(\stripos(($n = TextFormat::clean($p->getDisplayName(), true)), $player) === 0){
+                    $curDelta = \strlen($n) - \strlen($player);
                     if($curDelta < $delta){
-                        $found = $player;
+                        $found = $p;
                         $delta = $curDelta;
                     }
                     if($curDelta === 0){
@@ -551,10 +551,10 @@ class Loader extends PluginBase{
      * color code (&a = §a)
      *
      * @param string $message
-     * @param null $player
+     * @param Player|null $player
      * @return bool|string
      */
-    public function colorMessage($message, $player = null){
+    public function colorMessage($message, Player $player = null){
         $message = preg_replace_callback(
             "/(\\\&|\&)[0-9a-fk-or]/",
             function(array $matches){
@@ -612,11 +612,9 @@ class Loader extends PluginBase{
         if(!is_numeric($radius)){
             return false;
         }
-        $radius = new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius);
-        $entities = $player->getLevel()->getNearbyEntities($radius, $player);
         /** @var Player[] $players */
         $players = [];
-        foreach($entities as $e){
+        foreach($player->getLevel()->getNearbyEntities(new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius), $player) as $e){
             if($e instanceof Player){
                 $player[] = $e;
             }
@@ -655,7 +653,7 @@ class Loader extends PluginBase{
      *      '1:1' - or - 'stone:1'
      *
      * @param $item_name
-     * @return Item|\pocketmine\item\ItemBlock
+     * @return Item|ItemBlock
      */
     public function getItem($item_name){
         if(strpos($item_name, ":") !== false){
@@ -674,6 +672,79 @@ class Loader extends PluginBase{
         $item->setDamage($damage);
 
         return $item;
+    }
+
+    /**
+     * Return an array with the following values:
+     * 0 => Timestamp integer
+     * 1 => The rest of the string (removing any "space" between time codes)
+     *
+     * @param string $string
+     * @return array|bool
+     */
+    public function stringToTimestamp($string){
+        /**
+         * Rules:
+         * Integers without suffix are considered as seconds
+         * "s" is for seconds
+         * "m" is for minutes
+         * "h" is for hours
+         * "d" is for days
+         * "w" is for weeks
+         * "mo" is for months
+         * "y" is for years
+         */
+        if(trim($string) === ""){
+            return false;
+        }
+        $t = new \DateTime();
+        preg_match_all("/[0-9]+(y|mo|w|d|h|m|s)|[0-9]+/", $string, $found);
+        if(count($found[0]) < 1){
+            return false;
+        }
+        $found[2] = preg_replace("/[^0-9]/", "", $found[0]);
+        foreach($found[2] as $k => $i){
+            switch($c = $found[1][$k]){
+                case "y":
+                case "w":
+                case "d":
+                    $t->add(new \DateInterval("P" . $i. strtoupper($c)));
+                    break;
+                case "mo":
+                    $t->add(new \DateInterval("P" . $i. strtoupper(substr($c, 0, strlen($c) -1))));
+                    break;
+                case "h":
+                case "m":
+                case "s":
+                    $t->add(new \DateInterval("PT" . $i . strtoupper($c)));
+                    break;
+                default:
+                    $t->add(new \DateInterval("PT" . $i . "S"));
+                    break;
+            }
+            $string = str_replace($found[0][$k], "", $string);
+        }
+        return [$t, ltrim(str_replace($found[0], "", $string))];
+    }
+
+    /**
+     * Checks if a name is valid, it could be a Nick, Home or Warp name
+     *
+     * @param string $string
+     * @param bool $allowColorCodes
+     * @return bool
+     */
+    private function validateName($string, $allowColorCodes = false){
+        $format = [];
+        if($allowColorCodes){
+            $format[] = "/(\&|\§)[0-9a-fk-or]/";
+        }
+        $format[] = "/[a-zA-Z0-9_]/"; // Due to color codes can be allowed, then check for them first, so after, make a normal lookup
+        $s = preg_replace($format, "", $string);
+        if(strlen($s) !== 0){
+            return false;
+        }
+        return true;
     }
 
     /**   _____              _
@@ -701,48 +772,68 @@ class Loader extends PluginBase{
      * Creates a new Sessions for the specified player
      *
      * @param Player $player
+     * @return BaseSession
      */
     public function createSession(Player $player){
-        $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, [
-            "isAFK" => false,
-            "kickAFK" => null,
-            "lastMovement" => (!$player->hasPermission("esssentials.afk.preventauto") ? null : time()),
-            "lastPosition" => null,
-            "lastRotation" => null,
-            "isGod" => false,
-            "quickReply" => false,
-            "isMuted" => false,
-            "ptCommands" => false,
-            "ptChatMacros" => false,
-            "isPvPEnabled" => true,
-            "requestTo" => false,
-            "requestToAction" => false,
-            "requestToTask" => null,
-            "latestRequestFrom" => null,
-            "requestsFrom" => [],
-            "isUnlimitedEnabled" => false,
-            "isVanished" => false,
-            "noPacket" => false
-        ]));
-        $values = $ev->getValues();
-
-        // It's required to do this movement because "Mute" is handled separately from normal Sessions
-        $i = $values["isMuted"];
-        $this->setMute($player, $i);
-        unset($values["isMuted"]);
-        // Skip this code after the session creation, to handle correctly the player
-        $i = $values["isVanished"];
-        unset($values["isVanished"]);
-
-        $this->sessions[spl_object_hash($player)] = new BaseSession($values);
-
-        // This is also required, extra work is need to be done for "Vanish" to work
-        $this->setVanish($player, $i);
-
-        //Enable Custom Colored Chat
-        if($this->getConfig()->get("enable-custom-colors") === true){
-            $player->setRemoveFormat(false);
+        $spl = spl_object_hash($player);
+        if(!isset($this->sessions[$spl])){
+            if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
+                mkdir($dir);
+            }
+            if(!is_dir($dir = $dir . strtolower(substr($player->getName(), 0, 1)) . DIRECTORY_SEPARATOR)){
+                mkdir($dir);
+            }
+            $this->getLogger()->debug("Creating player session file...");
+            $cfg = new Config($dir . strtolower($player->getName()) . ".json", Config::JSON, BaseSession::$configDefaults);
+            $tValues = $cfg->getAll();
+            $values = BaseSession::$defaults;
+            foreach($tValues as $k => $v){
+                $values[$k] = $v;
+            }
+            $this->getLogger()->debug("Creating virtual session...");
+            $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $values));
+            $this->getLogger()->debug("Setting up new values...");
+            $values = $ev->getValues();
+            $m = BaseSession::$defaults["isMuted"];
+            $mU = BaseSession::$defaults["mutedUntil"];
+            if(isset($values["isMuted"])){
+                if(!isset($values["mutedUntil"])){
+                    $values["mutedUntil"] = null;
+                }
+                $m = $values["isMuted"];
+                if(is_int($t = $values["mutedUntil"])){
+                    $date = new \DateTime();
+                    $mU = date_timestamp_set($date, $values["mutedUntil"]);
+                }else{
+                    $mU = $values["mutedUntil"];
+                }
+                unset($values["isMuted"]);
+                unset($values["mutedUntil"]);
+            }
+            $n = $player->getName();
+            if(isset($values["nick"])){
+                $n = $values["nick"];
+                $this->getLogger()->info($player->getName() . " is also known as " . $n);
+                unset($values["nick"]);
+            }
+            $v = BaseSession::$defaults["isVanished"];
+            $vNP = BaseSession::$defaults["noPacket"];
+            if(isset($values["isVanished"])){
+                if(!isset($values["noPacket"])){
+                    $values["noPacket"] = false;
+                }
+                $v = $values["isVanished"];
+                $vNP = $values["noPacket"];
+                unset($values["isVanished"]);
+                unset($values["noPacket"]);
+            }
+            $this->getLogger()->debug("Setting up final values...");
+            $this->sessions[$spl] = new BaseSession($this, $player, $cfg, $values);
+            $this->setMute($player, $m, $mU);
+            $this->setNick($player, $n);
+            $this->setVanish($player, $v, $vNP);
         }
+        return $this->sessions[$spl];
     }
 
     /**
@@ -751,11 +842,10 @@ class Loader extends PluginBase{
      * @param Player $player
      */
     public function removeSession(Player $player){
-        unset($this->sessions[spl_object_hash($player)]);
-
-        //Disable Custom Colored Chat
-        if($this->getConfig()->get("enable-custom-colors") === true){
-            $player->setRemoveFormat(true);
+        $spl = spl_object_hash($player);
+        if(isset($this->sessions[$spl])){
+            $this->getSession($player)->onClose();
+            unset($this->sessions[$spl]);
         }
     }
 
@@ -860,7 +950,9 @@ class Loader extends PluginBase{
      * @param int $time
      */
     public function setLastPlayerMovement(Player $player, $time){
-        $this->getSession($player)->setLastMovement($time);
+        if(!$player->hasPermission("essentials.afk.preventauto")){
+            $this->getSession($player)->setLastMovement($time);
+        }
     }
 
     /**
@@ -1101,8 +1193,7 @@ class Loader extends PluginBase{
     public function nuke(Player $player){
         for($x = -10; $x <= 10; $x += 5){
             for($z = -10; $z <= 10; $z += 5){
-                $pos = new Position($player->getFloorX() + $x, $player->getFloorY(), $player->getFloorZ() + $z, $player->getLevel());
-                $this->createTNT($pos);
+                $this->createTNT($player->add($x, 0, $z), $player->getLevel());
             }
         }
     }
@@ -1116,20 +1207,28 @@ class Loader extends PluginBase{
         if($block === null){
             return false;
         }
-        $this->createTNT(new Position($block->getX(), $block->getY() + 1, $block->getZ(), $player->getLevel()));
+        $this->createTNT($block->add(0, 1), $player->getLevel());
         return true;
     }
 
     /**
-     * @param Position $pos
+     * @param Vector3|Position $pos
+     * @param null|Level $level
      */
-    public function createTNT(Position $pos){
+    public function createTNT(Vector3 $pos, Level $level = null){
+        if($level === null){
+            if($pos instanceof Position){
+                $level = $pos->getLevel();
+            }else{
+                return;
+            }
+        }
         $mot = (new Random())->nextSignedFloat() * M_PI * 2;
-        $entity = Entity::createEntity("PrimedTNT", $pos->getLevel()->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
+        $entity = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
             "Pos" => new Enum("Pos", [
-                new Double("", $pos->x + 0.5),
-                new Double("", $pos->y),
-                new Double("", $pos->z + 0.5)
+                new Double("", $pos->getFloorX() + 0.5),
+                new Double("", $pos->getFloorY()),
+                new Double("", $pos->getFloorZ() + 0.5)
             ]),
             "Motion" => new Enum("Motion", [
                 new Double("", -sin($mot) * 0.02),
@@ -1253,7 +1352,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function homeExists(Player $player, $home){
-        return trim($home) !== "" && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
+        return $player->isOnline() && trim($home) !== "" && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
     }
 
     /**
@@ -1403,7 +1502,7 @@ class Loader extends PluginBase{
      *                             |___/
      */
 
-
+    // TODO: Multi-Language API
 
     /**  __  __
      *  |  \/  |
@@ -1470,9 +1569,6 @@ class Loader extends PluginBase{
      *  |_|  |_|\__,_|\__\___|
      */
 
-    /** @var array  */
-    private $mutes = [];
-
     /**
      * Tell if the is Muted or not
      *
@@ -1480,7 +1576,23 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function isMuted(Player $player){
-        return in_array($player->getName(), $this->mutes);
+        return $this->getSession($player)->isMuted();
+    }
+
+    /**
+     * Tell the time until a player will be muted
+     * false = If player is not muted
+     * \DateTime = DateTime Object with corresponding time
+     * null = Will keep muted forever
+     *
+     * @param Player $player
+     * @return bool|\DateTime|null
+     */
+    public function getMutedUntil(Player $player){
+        if(!$this->isMuted($player)){
+            return false;
+        }
+        return $this->getSession($player)->getMutedUntil();
     }
 
     /**
@@ -1488,17 +1600,22 @@ class Loader extends PluginBase{
      *
      * @param Player $player
      * @param bool $state
+     * @param \DateTime|null $expires
+     * @param bool $notify
      * @return bool
      */
-    public function setMute(Player $player, $state){
+    public function setMute(Player $player, $state, \DateTime $expires = null, $notify = true){
         if(!is_bool($state)){
             return false;
         }
-        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerMuteEvent($this, $player, $state));
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerMuteEvent($this, $player, $state, $expires));
         if($ev->isCancelled()){
             return false;
         }
-        $this->mutes[$player->getName()] = $ev->willMute();
+        $this->getSession($player)->setMuted($ev->willMute(), $ev->getMutedUntil());
+        if($notify && $player->hasPermission("essentials.mute.notify")){
+            $player->sendMessage(TextFormat::YELLOW . "You where " . ($this->isMuted($player) ? "muted " . ($ev->getMutedUntil() !== null ? "until: " . TextFormat::AQUA . $ev->getMutedUntil()->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $ev->getMutedUntil()->format("h:ia") : TextFormat::AQUA . "Forever" . TextFormat::YELLOW . "!") : "unmuted!"));
+        }
         return true;
     }
 
@@ -1506,9 +1623,11 @@ class Loader extends PluginBase{
      * Switch the Mute mode on/off automatically
      *
      * @param Player $player
+     * @param \DateTime|null $expires
+     * @param bool $notify
      */
-    public function switchMute(Player $player){
-        $this->setMute($player, !$this->isMuted($player));
+    public function switchMute(Player $player, \DateTime $expires = null, $notify = true){
+        $this->setMute($player, !$this->isMuted($player), $expires, $notify);
     }
 
     /**  _   _ _      _
@@ -1520,30 +1639,34 @@ class Loader extends PluginBase{
      */
 
     /**
+     * Get players' saved Nicks
+     *
+     * @param Player $player
+     * @return null|string
+     */
+    public function getNick(Player $player){
+        return $this->getSession($player)->getNick();
+    }
+
+    /**
      * Change the player name for chat and even on his NameTag (aka Nick)
      *
      * @param Player $player
      * @param string $nick
-     * @param bool $save
      * @return bool
      */
-    public function setNick(Player $player, $nick, $save = true){
-        $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $nick));
-        if($event->isCancelled()){
+    public function setNick(Player $player, $nick){
+        if(!$this->validateName($nick, true) || !$this->colorMessage($nick, $player)){
             return false;
         }
-        $config = $this->nicks;
-        $nick = $event->getNewNick();
-        $player->setNameTag($event->getNameTag());
-        $player->setDisplayName($nick);
-        if($save == true){
-            if($nick === $player->getName() || $nick === "off"){
-                $config->remove($player->getName());
-            }else{
-                $config->set($player->getName(), $nick);
-            }
-            $config->save();
+        $this->getServer()->getPluginManager()->callEvent($ev = new PlayerNickChangeEvent($this, $player, $this->colorMessage($nick)));
+        if($ev->isCancelled()){
+            return false;
         }
+        if(strtolower($ev->getNewNick()) === strtolower($player->getName()) || $ev->getNewNick() === "off" || trim($ev->getNewNick()) === "" || $ev->getNewNick() === null){
+            $ev->setNick(null);
+        }
+        $this->getSession($player)->setNick($ev->getNewNick());
         return true;
     }
 
@@ -1551,41 +1674,15 @@ class Loader extends PluginBase{
      * Restore the original player name for chat and on his NameTag
      *
      * @param Player $player
-     * @param bool $save
      * @return bool
      */
-    public function removeNick(Player $player, $save = true){
+    public function removeNick(Player $player){
         $this->getServer()->getPluginManager()->callEvent($event = new PlayerNickChangeEvent($this, $player, $player->getName()));
         if($event->isCancelled()){
             return false;
         }
-        $config = $this->nicks;
-        $nick = $event->getNewNick();
-        $player->setNameTag($event->getNameTag());
-        $player->setDisplayName($nick);
-        if($save == true){
-            if($nick === $player->getName() || $nick === "off"){
-                $config->remove($player->getName());
-            }else{
-                $config->set($player->getName(), $nick);
-            }
-            $config->save();
-        }
+        $this->getSession($player)->setNick(null);
         return true;
-    }
-
-    /**
-     * Get players' saved Nicks
-     *
-     * @param Player $player
-     * @return bool|mixed
-     */
-    public function getNick(Player $player){
-        $config = $this->nicks;
-        if(!$config->exists($player->getName())){
-            return $player->getName();
-        }
-        return $config->get($player->getName());
     }
 
     /**  _____                    _______          _

@@ -23,8 +23,7 @@ class GetPos extends BaseCommand{
                     $sender->sendMessage($this->getConsoleUsage());
                     return false;
                 }
-                $pos = $sender->getPosition();
-                $sender->sendMessage(TextFormat::GREEN . "You're in world: " . TextFormat::AQUA . $sender->getLevel()->getName() . "\n" . TextFormat::GREEN . "Your Coordinates are:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
+                $sender->sendMessage(TextFormat::GREEN . "You're in world: " . TextFormat::AQUA . $sender->getLevel()->getName() . "\n" . TextFormat::GREEN . "Your Coordinates are:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . $sender->getFloorX() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . $sender->getFloorY() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . $sender->getFloorZ());
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.getpos.other")){
@@ -36,8 +35,7 @@ class GetPos extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
-                $pos = $player->getPosition();
-                $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . floor($pos->x) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . floor($pos->y) . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . floor($pos->z));
+                $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . $player->getFloorX() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . $player->getFloorY() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . $player->getFloorZ());
                 break;
             default:
                 $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());

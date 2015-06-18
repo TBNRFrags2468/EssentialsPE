@@ -23,7 +23,7 @@ class KickAll extends BaseCommand{
         }
         foreach($sender->getServer()->getOnlinePlayers() as $p){
             if($p != $sender){
-                $p->kick($reason);
+                $p->kick($reason, false);
             }
         }
         $sender->sendMessage(TextFormat::AQUA . "Kicked all the players!");

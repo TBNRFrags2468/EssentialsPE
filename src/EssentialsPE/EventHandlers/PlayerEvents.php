@@ -61,6 +61,10 @@ class PlayerEvents extends BaseEventHandler{
                 $event->getPlayer()->hidePlayer($p);
             }
         }
+        $i = $this->getPlugin()->getMutedUntil($event->getPlayer());
+        if($i instanceof \DateTime && $event->getPlayer()->hasPermission("essentials.mute.notify")){
+            $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Remember that you're muted until " . TextFormat::AQUA . $i->format("l, F j, Y") . TextFormat::YELLOW . " at " . TextFormat::AQUA . $i->format("h:ia"));
+        }
         //$this->getPlugin()->setPlayerBalance($event->getPlayer(), $this->getPlugin()->getDefaultBalance()); TODO
     }
 
@@ -80,14 +84,9 @@ class PlayerEvents extends BaseEventHandler{
             $message = str_replace($event->getPlayer()->getName(), $event->getPlayer()->getDisplayName(), $message);
         }
         $event->setQuitMessage($message);
-        // Nick and NameTag restore:
-        $this->getPlugin()->setNick($event->getPlayer(), $event->getPlayer()->getName(), false);
 
-        // Sessions
+        // Session destroy:
         if($this->getPlugin()->sessionExists($event->getPlayer())){
-            // Remove teleport requests
-            $this->getPlugin()->removeTPRequest($event->getPlayer());
-            // Session destroy:
             $this->getPlugin()->removeSession($event->getPlayer());
         }
     }
@@ -96,11 +95,21 @@ class PlayerEvents extends BaseEventHandler{
      * @param PlayerChatEvent $event
      */
     public function onPlayerChat(PlayerChatEvent $event){
-        if($this->getPlugin()->isAFK($event->getPlayer())){
-            $this->getPlugin()->setAFKMode($event->getPlayer(), false, true);
-        }
         if($this->getPlugin()->isMuted($event->getPlayer())){
-            $event->setCancelled(true);
+            if($event->getPlayer()->hasPermission("essentials.mute.exempt")){
+                $this->getPlugin()->setMute($event->getPlayer(), false, null, false);
+            }elseif(($t = $this->getPlugin()->getMutedUntil($event->getPlayer())) === null){
+                $event->setCancelled(true);
+            }else{
+                $t2 = new \DateTime();
+                if($t < $t2){
+                    $this->getPlugin()->setMute($event->getPlayer(), false, null, false);
+                }else{
+                    $event->setCancelled(true);
+                }
+            }
+        }elseif($this->getPlugin()->isAFK($event->getPlayer())){
+            $this->getPlugin()->setAFKMode($event->getPlayer(), false, true);
         }
     }
 

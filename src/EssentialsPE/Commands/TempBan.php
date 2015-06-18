@@ -22,43 +22,26 @@ class TempBan extends BaseCommand{
             return false;
         }
         $player = $this->getPlugin()->getPlayer($name = array_shift($args));
-
-        $date = new \DateTime();
-        foreach(explode(",", array_shift($args)) as $t){
-            if(strpos($t, "s")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(strpos($t, "m")){
-                $date->add(new \DateInterval("PT" . strtoupper($t)));
-            }elseif(strpos($t, "h")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(strpos($t, "d")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(strpos($t, "w")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(strpos($t, "mo")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(strpos($t, "y")){
-                $date->add(new \DateInterval("P" . strtoupper($t)));
-            }elseif(is_int((int) $t)){
-                $date->add(new \DateInterval("P" . $t . "S"));
-            }else{
-                $sender->sendMessage(TextFormat::RED . ($sender instanceof Player ? "" : "Usage: ") . $this->getUsage());
-                return false;
-            }
+        $info = $this->getPlugin()->stringToTimestamp(implode(" ", $args));
+        if(!$info){
+            $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid time");
+            return false;
         }
-        $reason = implode(" ", $args);
+        /** @var \DateTime $date */
+        $date = $info[0];
+        $reason = $info[1];
         if($player !== false){
             if($player->hasPermission("essentials.ban.exempt")){
-                $sender->sendMessage(TextFormat::RED . "[Error] ". $name . " can't be banned");
+                $sender->sendMessage(TextFormat::RED . "[Error] " . $name . " can't be banned");
                 return false;
             }else{
                 $name = $player->getName();
-                $player->kick(TextFormat::RED . "Banned until " . TextFormat::AQUA . $date->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $date->format("h:ia"));
+                $player->kick(TextFormat::RED . "Banned until " . TextFormat::AQUA . $date->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $date->format("h:ia") . (trim($reason) !== "" ? TextFormat::YELLOW . "\nReason: " . TextFormat::RESET . $reason : ""), false);
             }
         }
-        $sender->getServer()->getNameBans()->addBan($name, ($reason !== "" ? $reason : null), $date, "essentialspe");
+        $sender->getServer()->getNameBans()->addBan($name, (trim($reason) !== "" ? $reason : null), $date, "essentialspe");
 
-        $this->broadcastCommandMessage($sender, "Banned player " . $name . " until " . $date->format("l, F j, Y") . " at " . $date->format("h:ia"));
+        $this->broadcastCommandMessage($sender, "Banned player " . $name . " until " . $date->format("l, F j, Y") . " at " . $date->format("h:ia") . (trim($reason) !== "" ? TextFormat::YELLOW . " Reason: " . TextFormat::RESET . $reason : ""));
         return true;
     }
 }

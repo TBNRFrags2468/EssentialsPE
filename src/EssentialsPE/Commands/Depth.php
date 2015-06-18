@@ -29,7 +29,7 @@ class Depth extends BaseCommand{
         if($pos === 0){
             $sender->sendMessage(TextFormat::AQUA . "You're at sea level");
         }else{
-            $sender->sendMessage(TextFormat::AQUA . "You're " . (substr($pos, 0, 1) === "-" ? substr($pos, 1) : $pos) . " meters " . ($pos > 0 ? "above" : "below") . " the sea.");
+            $sender->sendMessage(TextFormat::AQUA . "You're " . (substr($pos, 0, 1) === "-" ? substr($pos, 1) : $pos) . " meters " . ($pos > 0 ? "above" : "below") . " the sea level.");
         }
         return true;
     }
