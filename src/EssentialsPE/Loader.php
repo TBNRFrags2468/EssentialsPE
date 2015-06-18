@@ -735,6 +735,9 @@ class Loader extends PluginBase{
      * @return bool
      */
     private function validateName($string, $allowColorCodes = false){
+        if(trim($string) === ""){
+            return false;
+        }
         $format = [];
         if($allowColorCodes){
             $format[] = "/(\&|\§)[0-9a-fk-or]/";
@@ -1352,7 +1355,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function homeExists(Player $player, $home){
-        return $player->isOnline() && trim($home) !== "" && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
+        return $player->isOnline() && $this->validateName($home, false) && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
     }
 
     /**
@@ -1380,7 +1383,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        if(trim($home) === ""){
+        if(!$this->validateName($home, false)){
             return false;
         }
         if($pos instanceof Location){
@@ -1459,7 +1462,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function kitExists($kit){
-        return isset($this->kits[$kit]);
+        return $this->validateName($kit, false) && isset($this->kits[$kit]);
     }
 
     /**
@@ -2348,7 +2351,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function warpExists($warp){
-        return trim($warp) !== "" && isset($this->warps[$warp]);
+        return $this->validateName($warp, false) && isset($this->warps[$warp]);
     }
 
     /**
@@ -2375,7 +2378,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setWarp($warp, Position $pos, $yaw = 0, $pitch = 0){
-        if(trim($warp) === ""){
+        if(!$this->validateName($warp, false)){
             return false;
         }
         if($pos instanceof Location){
