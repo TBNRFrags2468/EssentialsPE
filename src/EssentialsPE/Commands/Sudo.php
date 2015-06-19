@@ -9,11 +9,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Sudo extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "sudo", "Run a command as another player", "/sudo <player> <command line|c:<chat message>");
         $this->setPermission("essentials.sudo");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

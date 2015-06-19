@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class GetPos extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "getpos", "Get your/other's position", "/getpos [player]", null, ["coords", "position", "whereami", "getlocation", "getloc"]);
         $this->setPermission("essentials.getpos");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

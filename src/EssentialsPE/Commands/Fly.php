@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Fly extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "fly", "Fly in Survival or Adventure mode!", "/fly [player]", null);
         $this->setPermission("essentials.fly");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

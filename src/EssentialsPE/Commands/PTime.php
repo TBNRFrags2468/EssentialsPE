@@ -9,11 +9,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class PTime extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "ptime", "Changes the time of a player", "/ptime <time> [player]", null, ["playertime"]);
         $this->setPermission("essentials.ptime");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

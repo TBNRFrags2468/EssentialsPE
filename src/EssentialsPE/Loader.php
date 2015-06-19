@@ -1189,19 +1189,6 @@ class Loader extends PluginBase{
      */
 
     /**
-     * Spawn a carpet of bomb!
-     *
-     * @param Player $player
-     */
-    public function nuke(Player $player){
-        for($x = -10; $x <= 10; $x += 5){
-            for($z = -10; $z <= 10; $z += 5){
-                $this->createTNT($player->add($x, 0, $z), $player->getLevel());
-            }
-        }
-    }
-
-    /**
      * @param Player $player
      * @return bool
      */
@@ -1212,6 +1199,19 @@ class Loader extends PluginBase{
         }
         $this->createTNT($block->add(0, 1), $player->getLevel());
         return true;
+    }
+
+    /**
+     * Spawn a carpet of bomb!
+     *
+     * @param Player $player
+     */
+    public function nuke(Player $player){
+        for($x = -10; $x <= 10; $x += 5){
+            for($z = -10; $z <= 10; $z += 5){
+                $this->createTNT($player->add($x, 0, $z), $player->getLevel());
+            }
+        }
     }
 
     /**
@@ -1227,7 +1227,7 @@ class Loader extends PluginBase{
             }
         }
         $mot = (new Random())->nextSignedFloat() * M_PI * 2;
-        $entity = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("", [
+        $entity = Entity::createEntity("PrimedTNT", $level->getChunk($pos->x >> 4, $pos->z >> 4), new Compound("EssNuke", [
             "Pos" => new Enum("Pos", [
                 new Double("", $pos->getFloorX() + 0.5),
                 new Double("", $pos->getFloorY()),
@@ -1244,7 +1244,6 @@ class Loader extends PluginBase{
             ]),
             "Fuse" => new Byte("Fuse", 80),
         ]));
-        $entity->namedtag->setName("EssNuke");
         $entity->spawnToAll();
     }
 

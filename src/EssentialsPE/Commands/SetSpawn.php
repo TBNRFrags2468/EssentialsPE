@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetSpawn extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "setspawn", "Change your server main spawn point", "/setspawn", false);
         $this->setPermission("essentials.setspawn");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

@@ -10,11 +10,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Reply extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "/reply <message ...>", null, ["r"]);
         $this->setPermission("essentials.reply");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

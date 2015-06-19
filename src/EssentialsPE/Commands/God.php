@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class God extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "god", "Prevent you to take any damage", "/god [player]", null, ["godmode", "tgm"]);
         $this->setPermission("essentials.god");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

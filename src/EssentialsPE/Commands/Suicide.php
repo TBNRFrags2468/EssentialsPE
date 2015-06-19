@@ -8,11 +8,20 @@ use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
 
 class Suicide extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "suicide", "Kill yourself", "/suicide", false);
         $this->setPermission("essentials.suicide");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

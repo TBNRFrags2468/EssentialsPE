@@ -8,11 +8,20 @@ use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
 class Mute extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "mute", "Prevent a player from chatting", "/mute <player> [time...]", null, ["silence"]);
         $this->setPermission("essentials.mute");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;

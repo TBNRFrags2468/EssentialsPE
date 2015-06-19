@@ -8,11 +8,20 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Repair extends BaseCommand{
+    /**
+     * @param Loader $plugin
+     */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", false, ["fix"]);
         $this->setPermission("essentials.repair");
     }
 
+    /**
+     * @param CommandSender $sender
+     * @param string $alias
+     * @param array $args
+     * @return bool
+     */
     public function execute(CommandSender $sender, $alias,  array $args){
         if(!$this->testPermission($sender)){
             return false;
