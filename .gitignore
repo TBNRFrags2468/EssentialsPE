@@ -1,8 +1,6 @@
 .idea/*
-*.xml
 config.yml
 Economy.yml
-Homes.yml
 Kits.yml
-Nicks.yml
 Warps.yml
+Sessions/*

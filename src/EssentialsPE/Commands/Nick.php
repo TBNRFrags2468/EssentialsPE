@@ -33,7 +33,7 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 $nickname = $args[0];
-                $nickname === "off" ? $this->getPlugin()->removeNick($sender, true) : $this->getPlugin()->setNick($sender, $nickname, true);
+                $nickname === "off" ? $this->getPlugin()->removeNick($sender) : $this->getPlugin()->setNick($sender, $nickname);
                 $sender->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             case 2:
@@ -47,7 +47,7 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 $nickname = $args[0];
-                $nickname === "off" ? $this->getPlugin()->removeNick($player, true) : $this->getPlugin()->setNick($player, $nickname, true);
+                $nickname === "off" ? $this->getPlugin()->removeNick($player) : $this->getPlugin()->setNick($player, $nickname);
                 $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;

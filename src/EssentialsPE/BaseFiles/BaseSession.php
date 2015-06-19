@@ -21,6 +21,7 @@ class BaseSession {
         "lastMovement" => null,
         "lastPosition" => null,
         "isGod" => false,
+        "homes" => [],
         "quickReply" => false,
         "isMuted" => false,
         "mutedUntil" => null,
@@ -41,6 +42,7 @@ class BaseSession {
     public static $configDefaults = [
         "isAFK" => false,
         "isGod" => false,
+        "homes" => [],
         "isMuted" => false,
         "mutedUntil" => null,
         "nick" => null,
@@ -64,15 +66,16 @@ class BaseSession {
         foreach($values as $k => $v){
             $this->{$k} = $v;
         }
+        $this->loadHomes();
     }
 
-    public function saveSession(){
+    private function saveSession(){
         $values = [];
         foreach(self::$configDefaults as $k => $v){
             if($k !== "mutedUntil"){
                 $values[$k] = $this->{$k};
             }else{
-                // Use '$this->{$k}' so we can later implement more time handlers wihtout problems
+                // Use '$this->{$k}' so we can later implement more time handlers without problems...
                 $values[$k] = $this->{$k} instanceof \DateTime ? $this->{$k}->getTimestamp() : $v;
             }
         }
@@ -81,6 +84,7 @@ class BaseSession {
     }
 
     public function onClose(){
+        $this->encodeHomes();
         $this->saveSession();
 
         // Let's revert some things to their original state...
@@ -240,6 +244,101 @@ class BaseSession {
         }
         $this->isGod = $mode;
         return true;
+    }
+
+    /**  _    _
+     *  | |  | |
+     *  | |__| | ___  _ __ ___   ___ ___
+     *  |  __  |/ _ \| '_ ` _ \ / _ / __|
+     *  | |  | | (_) | | | | | |  __\__ \
+     *  |_|  |_|\___/|_| |_| |_|\___|___/
+     */
+
+    /** @var array */
+    private $homes = [];
+
+    private function loadHomes(){
+        $homes = [];
+        foreach($this->homes as $name => $values){
+            if(is_array($values)){
+                if($this->getPlugin()->getServer()->isLevelGenerated($values[3])){
+                    if(!$this->getPlugin()->getServer()->isLevelLoaded($values[3])){
+                        $this->getPlugin()->getServer()->loadLevel($values[3]);
+                    }
+                    $homes[$name] = new BaseLocation($name, $values[0], $values[1], $values[2], $this->getPlugin()->getServer()->getLevelByName($values[3]), $values[4], $values[5]);
+                }
+            }
+        }
+        $this->homes = $homes;
+    }
+
+    private function encodeHomes(){
+        $homes = [];
+        foreach($homes as $name => $object){
+            if($object instanceof BaseLocation){
+                $homes[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
+            }
+        }
+        $this->homes = $homes;
+    }
+
+    /**
+     * @param $home
+     * @return bool
+     */
+    public function homeExists($home){
+        return $this->getPlugin()->validateName($home) && isset($this->homes[$home]) && $this->homes[$home] instanceof BaseLocation;
+    }
+
+    /**
+     * @param $home
+     * @return bool|BaseLocation
+     */
+    public function getHome($home){
+        if(!$this->homeExists($home)){
+            return false;
+        }
+        return $this->homes[$home];
+    }
+
+    /**
+     * @param $home
+     * @param Location $pos
+     * @return bool
+     */
+    public function setHome($home, Location $pos){
+        if(!$this->getPlugin()->validateName($home, false)){
+            return false;
+        }
+        $this->homes[$home] = new BaseLocation($home, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $pos->getYaw(), $pos->getPitch());
+        return true;
+    }
+
+    /**
+     * @param $home
+     * @return bool
+     */
+    public function removeHome($home){
+        if(!$this->homeExists($home)){
+            return false;
+        }
+        unset($this->homes[$home]);
+        return true;
+    }
+
+    /**
+     * @param bool $inArray
+     * @return array|bool|string
+     */
+    public function homesList($inArray = false){
+        $list = array_keys($this->homes);
+        if(count($list) < 1){
+            return false;
+        }
+        if(!$inArray){
+            return implode(", ", $list);
+        }
+        return $list;
     }
 
     /**  __  __

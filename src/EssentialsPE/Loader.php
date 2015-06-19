@@ -115,24 +115,12 @@ class Loader extends PluginBase{
     /** @var Config */
     private $economy;
 
-    /** @var Config|null */
-    private $homesFile = null;
-    /** @var array */
-    private $homes = [];
-
     /** @var MessagesAPI */
     private $messages;
 
-    /** @var Config */
-    private $nicks;
-
-    /** @var Config|null */
-    private $kitsFile = null;
     /** @var array */
     private $kits = [];
 
-    /** @var Config|null */
-    private $warpsFile = null;
     /** @var array */
     private $warps = [];
 
@@ -161,15 +149,11 @@ class Loader extends PluginBase{
 
     public function onDisable(){
         foreach($this->getServer()->getOnlinePlayers() as $p){
-            //Vanish
-            if($this->isVanished($p)){
-                foreach($this->getServer()->getOnlinePlayers() as $players){
-                    $players->showPlayer($p);
-                }
-            }
             //Sessions
             $this->removeSession($p);
         }
+
+        $this->encodeWarps(true);
     }
 
     /**
@@ -421,37 +405,44 @@ class Loader extends PluginBase{
             }
         }*/
 
-        $this->loadhomes();
         $this->loadKits();
-        $this->nicks = new Config($this->getDataFolder() . "Nicks.yml", Config::YAML);
         $this->loadWarps();
+        $this->updateHomesAndNicks();
     }
 
-    private function loadHomes(){
-        // TODO: Homes updater implementation
-        if($this->homesFile === null) {
-            $this->homesFile = new Config($this->getDataFolder() . "Homes.yml", Config::YAML);
-        }
-        $this->homesFile->reload();
-        foreach($this->homesFile->getAll() as $p => $h){
-            foreach($h as $n => $v){
-                if($this->getServer()->isLevelGenerated($v[3])){
-                    if(!$this->getServer()->isLevelLoaded($v[3])){
-                        $this->getServer()->loadLevel($v[3]);
-                    }
-                    $this->homes[$p][$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+    private function updateHomesAndNicks(){
+        if(file_exists($f = $this->getDataFolder() . "Homes.yml")){
+            $cfg = new Config($f, Config::YAML);
+            foreach($cfg->getAll() as $player => $home){
+                if(!is_array($home)){
+                    continue;
                 }
+                $pCfg = $this->getSessionFile($player);
+                foreach($home as $name => $values){
+                    if(!$this->validateName($name, false) || !is_array($values)){
+                        continue;
+                    }
+                    $pCfg->setNested("homes." . $name, $values);
+                }
+                $pCfg->save();
             }
+            unlink($f);
+        }
+        if(file_exists($f = $this->getDataFolder() . "Nicks.yml")){
+            $cfg = new Config($f, Config::YAML);
+            foreach($cfg->getAll() as $player => $nick){
+                $pCfg = $this->getSessionFile($player);
+                $pCfg->set("nick", $nick);
+                $pCfg->save();
+            }
+            unlink($f);
         }
     }
 
     private function loadKits(){
-        if($this->kitsFile === null){
-            $this->kitsFile = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
-        }
-        $this->kitsFile->reload();
+        $cfg = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
         $children = [];
-        foreach($this->kitsFile->getAll() as $n => $i){
+        foreach($cfg->getAll() as $n => $i){
             $this->kits[$n] = new BaseKit($n, $i);
             $children[] = new Permission("essentials.kits." . $n);
         }
@@ -459,12 +450,10 @@ class Loader extends PluginBase{
     }
 
     private function loadWarps(){
-        if($this->warpsFile === null){
-            $this->warpsFile = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        }
-        $this->warpsFile->reload();
+        $cfg = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+        $cfg->reload();
         $children = [];
-        foreach($this->warpsFile->getAll() as $n => $v){
+        foreach($cfg->getAll() as $n => $v){
             if($this->getServer()->isLevelGenerated($v[3])){
                 if(!$this->getServer()->isLevelLoaded($v[3])){
                     $this->getServer()->loadLevel($v[3]);
@@ -476,13 +465,30 @@ class Loader extends PluginBase{
         $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.warps", null, null, $children));
     }
 
+    /**
+     * @param bool $save
+     */
+    private function encodeWarps($save = false){
+        $warps = [];
+        foreach($this->warps as $name => $object){
+            if($object instanceof BaseLocation){
+                $warps[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
+            }
+        }
+        if($save){
+            $cfg = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
+            $cfg->setAll($warps);
+            $cfg->save();
+        }
+        $this->warps = $warps;
+    }
+
     public function reloadFiles(){
         $this->getConfig()->reload();
         //$this->economy->reload();
-        $this->loadHomes();
         $this->loadKits();
-        $this->nicks->reload();
         $this->loadWarps();
+        $this->updateHomesAndNicks();
     }
 
     /*
@@ -616,7 +622,7 @@ class Loader extends PluginBase{
         $players = [];
         foreach($player->getLevel()->getNearbyEntities(new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius), $player) as $e){
             if($e instanceof Player){
-                $player[] = $e;
+                $players[] = $e;
             }
         }
         return $players;
@@ -728,13 +734,13 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Checks if a name is valid, it could be a Nick, Home or Warp name
+     * Checks if a name is valid, it could be for a Nick, Home, Warp, etc...
      *
      * @param string $string
      * @param bool $allowColorCodes
      * @return bool
      */
-    private function validateName($string, $allowColorCodes = false){
+    public function validateName($string, $allowColorCodes = false){
         if(trim($string) === ""){
             return false;
         }
@@ -780,14 +786,8 @@ class Loader extends PluginBase{
     public function createSession(Player $player){
         $spl = spl_object_hash($player);
         if(!isset($this->sessions[$spl])){
-            if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
-                mkdir($dir);
-            }
-            if(!is_dir($dir = $dir . strtolower(substr($player->getName(), 0, 1)) . DIRECTORY_SEPARATOR)){
-                mkdir($dir);
-            }
             $this->getLogger()->debug("Creating player session file...");
-            $cfg = new Config($dir . strtolower($player->getName()) . ".json", Config::JSON, BaseSession::$configDefaults);
+            $cfg = $this->getSessionFile($player->getName());
             $tValues = $cfg->getAll();
             $values = BaseSession::$defaults;
             foreach($tValues as $k => $v){
@@ -837,6 +837,20 @@ class Loader extends PluginBase{
             $this->setVanish($player, $v, $vNP);
         }
         return $this->sessions[$spl];
+    }
+
+    /**
+     * @param $player
+     * @return bool|Config
+     */
+    private function getSessionFile($player){
+        if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
+            mkdir($dir);
+        }
+        if(!is_dir($dir = $dir . strtolower(substr($player, 0, 1)) . DIRECTORY_SEPARATOR)){
+            mkdir($dir);
+        }
+        return new Config($dir . strtolower($player) . ".session", Config::JSON, BaseSession::$configDefaults);
     }
 
     /**
@@ -1354,7 +1368,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function homeExists(Player $player, $home){
-        return $player->isOnline() && $this->validateName($home, false) && isset($this->homes[$player->getName()]) && isset($this->homes[$player->getName()][$home]);
+        return $this->sessionExists($player) && $this->getSession($player)->homeExists($home);
     }
 
     /**
@@ -1365,10 +1379,7 @@ class Loader extends PluginBase{
      * @return bool|BaseLocation
      */
     public function getHome(Player $player, $home){
-        if(!$this->homeExists($player, $home)){
-            return false;
-        }
-        return $this->homes[$player->getName()][$home];
+        return $this->getSession($player)->getHome($home);
     }
 
     /**
@@ -1382,24 +1393,11 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        if(!$this->validateName($home, false)){
-            return false;
-        }
         if($pos instanceof Location){
             $yaw = $pos->getYaw();
             $pitch = $pos->getPitch();
         }
-        $this->homesFile->setNested($player->getName() . "." . strtolower($home), [
-            $pos->getX(),
-            $pos->getY(),
-            $pos->getZ(),
-            $pos->getLevel()->getName(),
-            $yaw,
-            $pitch
-        ]);
-        $this->homesFile->save();
-        $this->homes[$player->getName()][$home] = new BaseLocation($home, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $yaw, $pitch);
-        return true;
+        return $this->getSession($player)->setHome($home, new Location($pos->getX(), $pos->getY(), $pos->getZ(), $yaw, $pitch, $pos->getLevel()));
     }
 
     /**
@@ -1410,19 +1408,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function removeHome(Player $player, $home){
-        if(!$this->homeExists($player, $home)){
-            return false;
-        }
-        $list = $this->homesFile->get($player->getName());
-        unset($list[strtolower($home)]);
-        if(count($list) > 0){
-            $this->homesFile->set($player->getName(), $list);
-        }else{
-            $this->homesFile->remove($player->getName());
-        }
-        $this->homesFile->save();
-        unset($this->homes[$player->getName()][$home]);
-        return true;
+        return $this->getSession($player)->removeHome($home);
     }
 
     /**
@@ -1433,17 +1419,7 @@ class Loader extends PluginBase{
      * @return array|bool|string
      */
     public function homesList(Player $player, $inArray = false){
-        if(!isset($this->homes[$player->getName()]) || count($this->homes[$player->getName()]) < 1){
-            return false;
-        }
-        $list = array_keys($this->homes[$player->getName()]);
-        if(count($list) < 1){
-            return false;
-        }
-        if(!$inArray){
-            return implode(", ", $list);
-        }
-        return $list;
+        return $this->getSession($player)->homesList($inArray);
     }
 
     /**  _  ___ _
@@ -2384,15 +2360,6 @@ class Loader extends PluginBase{
             $yaw = $pos->getYaw();
             $pitch = $pos->getPitch();
         }
-        $this->warpsFile->set(strtolower($warp), [
-            $pos->getX(),
-            $pos->getY(),
-            $pos->getZ(),
-            $pos->getLevel()->getName(),
-            $yaw,
-            $pitch
-        ]);
-        $this->warpsFile->save();
         $this->warps[$warp] = new BaseLocation($warp, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $yaw, $pitch);
         return true;
     }
@@ -2408,8 +2375,6 @@ class Loader extends PluginBase{
         if(!$this->warpExists($warp)){
             return false;
         }
-        $this->warpsFile->remove(strtolower($warp));
-        $this->warpsFile->save();
         unset($this->warps[$warp]);
         return true;
     }
