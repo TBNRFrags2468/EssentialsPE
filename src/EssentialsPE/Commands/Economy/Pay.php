@@ -1,13 +1,13 @@
 <?php
 namespace EssentialsPE\Commands\Economy;
 
-use EssentialsPE\BaseFiles\BaseCommand;
+use EssentialsPE\BaseFiles\TestCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Pay extends BaseCommand{
+class Pay extends TestCommand{
     /**
      * @param Loader $plugin
      */

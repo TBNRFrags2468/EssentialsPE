@@ -274,6 +274,20 @@ class Loader extends PluginBase{
             new Gamemode($this),
             new Kill($this)
         ]);
+
+        // Command Auto-Loader (Thanks to @Falkirks for base :3)
+        /*$commands = [];
+        $regex = new \RegexIterator(new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($this->getFile() . "/src/" . __NAMESPACE__ . "/Commands/")), '/^.+\.php$/i', \RecursiveRegexIterator::GET_MATCH);
+        foreach ($regex as $file) {
+            var_dump($file);
+            $class = substr($file[0], strrpos($file[0], "\\") + 1, -4);
+            //$class = str_replace("/", "\\", substr($file[0], strpos($file[0], __NAMESPACE__ . "/Commands/"), -4));
+            $commands[] = new $class($this);
+        }
+
+        //Register the new commands
+        $cmdmap = $this->getServer()->getCommandMap();
+        $cmdmap->registerAll("essentialspe", $commands);*/
     }
 
     public function checkConfig(){

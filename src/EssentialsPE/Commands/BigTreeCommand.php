@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Commands;
 
-use EssentialsPE\BaseFiles\BaseCommand;
+use EssentialsPE\BaseFiles\TestCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
@@ -9,7 +9,7 @@ use pocketmine\level\generator\object\BigTree;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class BigTreeCommand extends BaseCommand{
+class BigTreeCommand extends TestCommand{
     /**
      * @param Loader $plugin
      */
