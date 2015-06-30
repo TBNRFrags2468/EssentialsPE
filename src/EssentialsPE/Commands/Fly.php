@@ -13,7 +13,7 @@ class Fly extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "fly", "Fly in Survival or Adventure mode!", "/fly [player]", null);
-        $this->setPermission("essentials.fly");
+        $this->setPermission("essentials.fly.use");
     }
 
     /**

@@ -13,7 +13,7 @@ class AFK extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "afk", "Toggle the \"Away From the Keyboard\" status", "/afk [player]", null, ["away"]);
-        $this->setPermission("essentials.afk");
+        $this->setPermission("essentials.afk.use");
     }
 
     /**

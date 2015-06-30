@@ -13,7 +13,7 @@ class Repair extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", false, ["fix"]);
-        $this->setPermission("essentials.repair");
+        $this->setPermission("essentials.repair.use");
     }
 
     /**

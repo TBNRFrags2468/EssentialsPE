@@ -14,7 +14,7 @@ class Heal extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "heal", "Heal yourself or other player", "/heal [player]");
-        $this->setPermission("essentials.heal");
+        $this->setPermission("essentials.heal.use");
     }
 
     /**

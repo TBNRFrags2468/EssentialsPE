@@ -13,7 +13,7 @@ class Kit extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "kit", "Get a pre-defined kit!", "/kit [name] [player]", "/kit [name <player>]", ["kits"]);
-        $this->setPermission("essentials.kit");
+        $this->setPermission("essentials.kit.use");
     }
 
     /**

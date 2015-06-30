@@ -13,7 +13,7 @@ class Eco extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "eco", "Sets the balance of a player", "/eco <give|take|set|reset> <player> [amount]", null, ["economy"]);
-        $this->setPermission("essentials.eco");
+        $this->setPermission("essentials.eco.use");
     }
 
     /**

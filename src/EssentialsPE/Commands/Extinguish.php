@@ -13,7 +13,7 @@ class Extinguish extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "extinguish", "Extinguish a player", "/extinguish [player]", null, ["ext"]);
-        $this->setPermission("essentials.extinguish");
+        $this->setPermission("essentials.extinguish.use");
     }
 
     /**

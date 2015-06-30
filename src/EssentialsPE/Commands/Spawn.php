@@ -13,7 +13,7 @@ class Spawn extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "/spawn [player]", null);
-        $this->setPermission("essentials.spawn");
+        $this->setPermission("essentials.spawn.use");
     }
 
     /**

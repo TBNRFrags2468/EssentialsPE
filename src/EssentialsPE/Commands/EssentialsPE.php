@@ -13,7 +13,7 @@ class EssentialsPE extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [update <check|install>]", null, ["essentials", "ess", "esspe"]);
-        $this->setPermission("essential.essentials");
+        $this->setPermission("essentials.essentials");
     }
 
     /**
@@ -35,7 +35,7 @@ class EssentialsPE extends BaseCommand{
                 switch(strtolower($args[0])){
                     case "update":
                     case "u":
-                        if(!$sender->hasPermission("essentials.update")){
+                        if(!$sender->hasPermission("essentials.update.use")){
                             $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                             return false;
                         }
