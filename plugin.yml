@@ -10,9 +10,13 @@ permissions:
         default: false
         description: "Allow to access to every EssentialsPE feature"
         children:
-            essentials.ban.exempt:
-                default: op
-                description: "Prevent the player from being banned"
+            essentials.ban:
+                default: false
+                description: "Ban utilities nodes"
+                children:
+                    essentials.ban.exempt:
+                        default: op
+                        descrption: "Prevent the player from being banned"
             essentials.colorchat:
                 default: op
                 description: "Allow to chat using colors!"
@@ -198,8 +202,15 @@ permissions:
                 default: op
                 description: "Kick all the online players except the sender"
             essentials.kill:
-                default: op
-                description: "Kill other players"
+                default: false
+                description: "Kill a player!"
+                children:
+                    essentials.kill.use:
+                        default: op
+                        description: "Commit to suicide"
+                    essentials.kill.other:
+                        default: op
+                        description: "Kill other players"
             essentials.kit:
                 default: false
                 description: "Access to the /kit command"
