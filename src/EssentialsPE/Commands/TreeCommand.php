@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Commands;
 
-use EssentialsPE\BaseFiles\TestCommand;
+use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
@@ -9,7 +9,7 @@ use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class TreeCommand extends TestCommand{
+class TreeCommand extends BaseCommand{
     /**
      * @param Loader $plugin
      */

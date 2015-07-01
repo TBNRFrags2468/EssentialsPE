@@ -1,14 +1,14 @@
 <?php
 namespace EssentialsPE\Commands\Economy;
 
-use EssentialsPE\BaseFiles\TestCommand;
+use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Sell extends TestCommand{
+class Sell extends BaseCommand{
     /**
      * @param Loader $plugin
      */
