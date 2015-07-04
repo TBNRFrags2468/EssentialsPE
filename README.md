@@ -1,7 +1,7 @@
 EssentialsPE [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ================
 
-The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/essentials/) for [PocketMine-MP Software](http://http://www.pocketmine.net/).
+The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/essentials/) for [PocketMine-MP Software](http://www.pocketmine.net/).
 
 **Remember that we will only support PocketMine-MP [Beta Builds](https://github.com/PocketMine/PocketMine-MP/releases) now.**
 
