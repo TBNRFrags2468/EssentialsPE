@@ -204,7 +204,7 @@ class PlayerEvents extends BaseEventHandler{
      */
     public function onPlayerDeath(PlayerDeathEvent $event){
         if($event->getEntity()->hasPermission("essentials.back.ondeath")){
-            $this->getPlugin()->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getPosition(), $event->getEntity()->getYaw(), $event->getEntity()->getPitch());
+            $this->getPlugin()->setPlayerLastPosition($event->getEntity(), $event->getEntity()->getLocation();
         }else{
             $this->getPlugin()->removePlayerLastPosition($event->getEntity());
         }
