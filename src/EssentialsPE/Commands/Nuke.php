@@ -13,7 +13,7 @@ class Nuke extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "nuke", "Thin carpet of bomb", "/nuke [player]", null);
-        $this->setPermission("essentials.nuke");
+        $this->setPermission("essentials.nuke.use");
     }
 
     /**

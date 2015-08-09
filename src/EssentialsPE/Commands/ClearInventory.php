@@ -13,7 +13,7 @@ class ClearInventory extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", null, ["ci", "clean", "clearinvent"]);
-        $this->setPermission("essentials.clearinventory");
+        $this->setPermission("essentials.clearinventory.use");
     }
 
     /**

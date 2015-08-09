@@ -13,7 +13,7 @@ class Back extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "back", "Teleport to your previous location", "/back", false, ["return"]);
-        $this->setPermission("essentials.back");
+        $this->setPermission("essentials.back.use");
     }
 
     /**

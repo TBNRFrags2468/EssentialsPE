@@ -13,7 +13,7 @@ class Home extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "home", "Teleport to your home", "/home <name>", false, ["homes"]);
-        $this->setPermission("essentials.home");
+        $this->setPermission("essentials.home.use");
     }
 
     /**

@@ -13,8 +13,8 @@ class Kill extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kill", "Kill other people", "/kill <player>");
-        $this->setPermission("essentials.kill");
+        parent::__construct($plugin, "kill", "Kill other people", "/kill [player]", "/kill <player>");
+        $this->setPermission("essentials.kill.use");
     }
 
     /**
@@ -27,14 +27,21 @@ class Kill extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) !== 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+        if(!$sender instanceof Player && count($args) !== 1){
+            $sender->sendMessage($this->getConsoleUsage());
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($args[0]);
-        if(!($player instanceof Player)){
-            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-            return false;
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.kill.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }
+            $player = $this->getPlugin()->getPlayer($args[0]);
+            if(!$player instanceof Player){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
         }
         if($this->getPlugin()->isGod($player)){
             $sender->sendMessage(TextFormat::RED . "You can't kill " . $args[0]);

@@ -14,7 +14,7 @@ class BreakCommand extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "break", "Breaks the block you're looking at", "/break", false);
-        $this->setPermission("essentials.break");
+        $this->setPermission("essentials.break.use");
     }
 
     /**

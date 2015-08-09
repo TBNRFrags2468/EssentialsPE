@@ -13,7 +13,7 @@ class Near extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "near", "List the players near to you", "/near [player]", null, ["nearby"]);
-        $this->setPermission("essentials.near");
+        $this->setPermission("essentials.near.use");
     }
 
     /**

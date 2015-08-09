@@ -13,7 +13,7 @@ class Warp extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "warp", "Teleport to a warp", "/warp <name> [player]", null, ["warps"]);
-        $this->setPermission("essentials.warp");
+        $this->setPermission("essentials.warp.use");
     }
 
     /**

@@ -13,7 +13,7 @@ class Unlimited extends BaseCommand{
      */
     public function __construct(Loader $plugin){
         parent::__construct($plugin, "unlimited", "Allow you to place unlimited blocks", "/unlimited [player]", null, ["ul", "unl"]);
-        $this->setPermission("essentials.unlimited");
+        $this->setPermission("essentials.unlimited.use");
     }
 
     /**
