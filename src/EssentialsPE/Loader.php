@@ -135,8 +135,6 @@ class Loader extends PluginBase{
         $this->registerCommands();
 
         foreach($this->getServer()->getOnlinePlayers() as $p){
-            //Nicks
-            $this->setNick($p, $this->getNick($p), false);
             //Sessions & Mute
             $this->createSession($p);
         }
@@ -915,12 +913,12 @@ class Loader extends PluginBase{
         $state = $ev->getAFKMode();
         $this->getSession($player)->setAFK($state);
         $time = $this->getConfig()->getNested("afk.auto-kick");
-        if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID($player)) !== false){
+        if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID()) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
-            $this->getSession($player)->removeAFKKickTaskID($player);
+            $this->getSession($player)->removeAFKKickTaskID();
         }elseif($state === true and (is_int($time) and $time  > 0) and !$player->hasPermission("essentials.afk.kickexempt")){
             $task = $this->getServer()->getScheduler()->scheduleDelayedTask(new AFKKickTask($this, $player), ($time * 20));
-            $this->getSession($player)->setAFKKickTaskID($player, $task->getTaskId());
+            $this->getSession($player)->setAFKKickTaskID($task->getTaskId());
         }
         $player->sendMessage(TextFormat::YELLOW . "You're " . ($this->isAFK($player) ? "now" : "no longer") . " AFK");
         if($ev->getBroadcast()){
@@ -1393,11 +1391,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setHome(Player $player, $home, Position $pos, $yaw = 0, $pitch = 0){
-        if($pos instanceof Location){
-            $yaw = $pos->getYaw();
-            $pitch = $pos->getPitch();
-        }
-        return $this->getSession($player)->setHome($home, new Location($pos->getX(), $pos->getY(), $pos->getZ(), $yaw, $pitch, $pos->getLevel()));
+        return $this->getSession($player)->setHome($home, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getLevel(), $yaw, $pitch)));
     }
 
     /**
@@ -2356,11 +2350,7 @@ class Loader extends PluginBase{
         if(!$this->validateName($warp, false)){
             return false;
         }
-        if($pos instanceof Location){
-            $yaw = $pos->getYaw();
-            $pitch = $pos->getPitch();
-        }
-        $this->warps[$warp] = new BaseLocation($warp, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $yaw, $pitch);
+        $this->warps[$warp] = $pos instanceof BaseLocation ? $pos : BaseLocation::fromPosition($warp, ($pos instanceof Location ? $pos : Location::fromObject($pos, $pos->getLevel(), $yaw, $pitch)));
         return true;
     }
 

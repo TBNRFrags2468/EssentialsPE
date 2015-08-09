@@ -28,4 +28,8 @@ class BaseLocation extends Location{
     public function getName(){
         return $this->name;
     }
+
+    public static function fromPosition($name, Location $pos){
+        return new BaseLocation($name, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $pos->getYaw(), $pos->getPitch());
+    }
 }

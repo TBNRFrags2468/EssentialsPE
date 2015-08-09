@@ -56,6 +56,7 @@ class BaseSession {
     /**
      * @param Loader $plugin
      * @param Player $player
+     * @param Config $config
      * @param array $values
      */
     public function __construct(Loader $plugin, Player $player, Config $config, array $values){
@@ -72,19 +73,24 @@ class BaseSession {
     private function saveSession(){
         $values = [];
         foreach(self::$configDefaults as $k => $v){
-            if($k !== "mutedUntil"){
-                $values[$k] = $this->{$k};
-            }else{
-                // Use '$this->{$k}' so we can later implement more time handlers without problems...
-                $values[$k] = $this->{$k} instanceof \DateTime ? $this->{$k}->getTimestamp() : $v;
+            switch($k){
+                case "mutedUntil":
+                    $v = $this->{$k} instanceof \DateTime ? $this->{$k}->getTimestamp() : null;
+                    break;
+                case "homes":
+                    $v = $this->encodeHomes();
+                    break;
+                default:
+                    $v = $this->{$k};
+                    break;
             }
+            $values[$k] = $v;
         }
         $this->config->setAll($values);
         $this->config->save();
     }
 
     public function onClose(){
-        $this->encodeHomes();
         $this->saveSession();
 
         // Let's revert some things to their original state...
@@ -274,12 +280,12 @@ class BaseSession {
 
     private function encodeHomes(){
         $homes = [];
-        foreach($homes as $name => $object){
+        foreach($this->homes as $name => $object){
             if($object instanceof BaseLocation){
                 $homes[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
             }
         }
-        $this->homes = $homes;
+        return $homes;
     }
 
     /**
@@ -310,7 +316,7 @@ class BaseSession {
         if(!$this->getPlugin()->validateName($home, false)){
             return false;
         }
-        $this->homes[$home] = new BaseLocation($home, $pos->getX(), $pos->getY(), $pos->getZ(), $pos->getLevel(), $pos->getYaw(), $pos->getPitch());
+        $this->homes[$home] = $pos instanceof BaseLocation ? $pos : BaseLocation::fromPosition($home, $pos);
         return true;
     }
 

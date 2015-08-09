@@ -34,8 +34,6 @@ class PlayerEvents extends BaseEventHandler{
         }
         // Session configure:
         $this->getPlugin()->createSession($event->getPlayer());
-        // Nick and NameTag set:
-        $this->getPlugin()->setNick($event->getPlayer(), $this->getPlugin()->getNick($event->getPlayer()), false);
     }
 
     /**
