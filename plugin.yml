@@ -233,10 +233,13 @@ permissions:
                 chldren:
                     essentials.mute.use:
                         default: op
-                        description: "mute a player from the chat"
+                        description: "Mute a player from the chat"
                     essentials.mute.exempt:
                         default: op
                         description: "Prevent a player from being muted"
+                    essentials.mute.notify:
+                        default: true
+                        description: "Tell a user until when is muted from the chat"
             essentials.near:
                 default: false
                 description: "Let you search for near players"
