@@ -115,8 +115,8 @@ class Loader extends PluginBase{
     /** @var Config */
     private $economy;
 
-    /** @var MessagesAPI */
-    private $messages;
+    /** @var MessagesAPI
+    private $messages;*/
 
     /** @var array */
     private $kits = [];
@@ -155,7 +155,7 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Function to register all the Event Hanlders that EssentialsPE provide
+     * Function to register all the Event Handlers that EssentialsPE provide
      */
     public function registerEvents(){
         $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this), $this);
