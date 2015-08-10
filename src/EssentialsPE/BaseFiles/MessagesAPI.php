@@ -44,12 +44,15 @@ class MessagesAPI{
      * @return bool|string
      */
     public function getMessage($identifier){
-        if(trim($identifier) === "" || (!$this->config->exists($identifier) && !$this->original->exists($identifier))){
+        if(trim($identifier) === ""){
             return false;
         }
-        if(($c = $this->config->get($identifier)) === null){
-            return $this->original->get($identifier);
+        if(($c = $this->config->getNested($identifier)) !== null){
+            return $c;
+        }elseif(($o = $this->original->getNested($identifier)) !== null){
+            return $o;
+        }else{
+            return false;
         }
-        return $c;
     }
 }
