@@ -1471,8 +1471,6 @@ class Loader extends PluginBase{
      *                             |___/
      */
 
-    // TODO: Multi-Language API
-
     /** @var MessagesAPI */
     private $messagesAPI = null;
 
