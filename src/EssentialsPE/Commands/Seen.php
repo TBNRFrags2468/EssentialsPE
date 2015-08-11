@@ -49,7 +49,7 @@ class Seen extends BaseCommand{
          * Y = Year in 4 digits (1999)
          */
         $ptime = $sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed() / 1000;
-        $sender->sendMessage(TextFormat::AQUA .  $player->getDisplayName() ." was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
+        $sender->sendMessage(TextFormat::AQUA .  $args[0] . " was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
         return true;
     }
 }
