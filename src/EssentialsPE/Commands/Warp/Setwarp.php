@@ -43,7 +43,10 @@ class Setwarp extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You can't modify this warp position");
             return false;
         }
-        $this->getPlugin()->setWarp($args[0], $sender->getPosition(), $sender->getYaw(), $sender->getPitch());
+        if(!$this->getPlugin()->setWarp($args[0], $sender->getPosition(), $sender->getYaw(), $sender->getPitch())){
+            $sender->sendMessage(TextFormat::RED . "Invalid warp name given! Please be sure to only use alphanumerical characters and underscores");
+            return false;
+        }
         $sender->sendMessage(TextFormat::GREEN . "Warp successfully " . ($existed ? "updated!" : "created!"));
         return true;
     }

@@ -42,7 +42,10 @@ class SetHome extends BaseCommand{
             return false;
         }
         $existed = $this->getPlugin()->homeExists($sender, $args[0]);
-        $this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch());
+        if(!$this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
+            $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
+            return false;
+        }
         $sender->sendMessage(TextFormat::GREEN . "Home successfuly " . ($existed ? "updated" : "created"));
         return true;
     }
