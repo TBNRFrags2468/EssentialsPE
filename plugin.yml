@@ -134,7 +134,7 @@ permissions:
                         default: op
                         description: "Make other players fly!"
             essentials.gamemode:
-                deault: op
+                default: op
                 description: "Change your gamemode!"
             essentials.getpos:
                 default: false
