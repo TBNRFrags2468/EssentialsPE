@@ -575,31 +575,20 @@ class Loader extends PluginBase{
 
     /**
      * Let you know if the item is a Tool or Armor
-     * (Items that can get "real damage"
+     * (Items that can get "real damage")
      *
      * @param Item $item
      * @return bool
      */
     public  function isReparable(Item $item){
-        $IDs = [
-                               /** Wood */            /** Stone */             /** Iron */            /** Gold */              /** Diamond */
-            /** Swords */   Item::WOODEN_SWORD,     Item::STONE_SWORD,      Item::IRON_SWORD,       Item::GOLD_SWORD,       Item::DIAMOND_SWORD,
-            /** Shovels */  Item::WOODEN_SHOVEL,    Item::STONE_SHOVEL,     Item::IRON_SHOVEL,      Item::GOLD_SHOVEL,      Item::DIAMOND_SHOVEL,
-            /** Pickaxes */ Item::WOODEN_PICKAXE,   Item::STONE_PICKAXE,    Item::IRON_PICKAXE,     Item::GOLD_PICKAXE,     Item::DIAMOND_PICKAXE,
-            /** Axes */     Item::WOODEN_AXE,       Item::STONE_AXE,        Item::IRON_AXE,         Item::GOLD_AXE,         Item::DIAMOND_AXE,
-            /** Hoes */     Item::WOODEN_HOE,       Item::STONE_HOE,        Item::IRON_HOE,         Item::GOLD_HOE,         Item::DIAMOND_HOE,
-
-
+        $armors = [
                                    /** Leather */          /** Chain */                /** Iron */                 /** Gold */                 /** Diamond */
             /** Boots */        Item::LEATHER_BOOTS,    Item::CHAIN_BOOTS,          Item::IRON_BOOTS,           Item::GOLD_BOOTS,           Item::DIAMOND_BOOTS,
             /** Leggings */     Item::LEATHER_PANTS,    Item::CHAIN_LEGGINGS,       Item::IRON_LEGGINGS,        Item::GOLD_LEGGINGS,        Item::DIAMOND_LEGGINGS,
             /** Chestplates */  Item::LEATHER_TUNIC,    Item::CHAIN_CHESTPLATE,     Item::IRON_CHESTPLATE,      Item::GOLD_CHESTPLATE,      Item::DIAMOND_CHESTPLATE,
             /** Helmets */      Item::LEATHER_CAP,      Item::CHAIN_HELMET,         Item::IRON_HELMET,          Item::GOLD_HELMET,          Item::DIAMOND_HELMET,
-
-
-            /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
         ];
-        return in_array($item->getId(), $IDs);
+        return $item->isTool() || in_array($item->getId(), $armors);
     }
 
     /**
