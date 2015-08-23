@@ -13,7 +13,7 @@ class TravisKillTask extends PluginTask{
      * @return void
      */
     public function onRun($currentTick){
-        exec("kill -9 " . ((int) getmygid()) . " > /dev/null 2>&1");
+        exec("kill -9 " . getmygid() . " > /dev/null 2>&1");
     }
 
 }

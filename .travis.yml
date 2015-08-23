@@ -3,3 +3,4 @@ install: cd .. && git clone https://github.com/PocketMine/PocketMine-MP.git --re
 script: cd .. && cp -R $TRAVIS_BUILD_DIR server/plugins/EssentialsPE && cd server && php src/pocketmine/PocketMine.php --no-wizard
 php:
   - 5.6
+sudo: false
