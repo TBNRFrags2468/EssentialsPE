@@ -83,6 +83,7 @@ use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFK\AFKKickTask;
 use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\TPRequestTask;
+use EssentialsPE\Tasks\TravisKillTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use EssentialsPE\Tasks\Updater\UpdateInstallTask;
@@ -143,6 +144,10 @@ class Loader extends PluginBase{
             $this->fetchEssentialsPEUpdate(false);
         }
         $this->scheduleAutoAFKSetter();
+        if(getenv("TRAVIS") !== false){
+            $this->getLogger()->info("Scheduling TravisKillTask...");
+            $this->getServer()->getScheduler()->scheduleDelayedTask(new TravisKillTask($this), 5);
+        }
     }
 
     public function onDisable(){
