@@ -117,9 +117,6 @@ class Loader extends PluginBase{
     /** @var Config */
     private $economy;
 
-    /** @var MessagesAPI
-    private $messages;*/
-
     /** @var array */
     private $kits = [];
 
@@ -1467,7 +1464,22 @@ class Loader extends PluginBase{
      *                             |___/
      */
 
-    // TODO: Multi-Language API
+    /** @var MessagesAPI */
+    private $messagesAPI = null;
+
+    public function loadMessagesAPI(){
+        $this->messagesAPI = new MessagesAPI($this, $this->getFile() . "resources/Messages.yml");
+    }
+
+    /**
+     * @return MessagesAPI
+     */
+    public function getMessagesAPI(){
+        if($this->messagesAPI === null){
+            $this->loadMessagesAPI();
+        }
+        return $this->messagesAPI;
+    }
 
     /**  __  __
      *  |  \/  |

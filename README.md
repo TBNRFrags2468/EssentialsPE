@@ -11,22 +11,18 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 
 =
 
-#### TODO (v1.1.0):
+#### TODO (v2.0.0):
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
 
-###### AFK:
-  - [x] Implement Auto-AFK setter
-  - [x] Test the Auto-AFK setter
+- [ ] Add 'Messages' API (Multi-language update)
+- [ ] Implement _Online-Player Checking_ to prevent crashes
+
 
 ###### Updater:
-  - [x] Fix the *Beta* channel:
-     - [x] Fix the _Fetcher_
-     - [x] Fix the _Downloader_
-
-###### PowerTool:
-  - [x] Handle air touch
+  - [ ] Add _Development_ channel 
+  - [ ] Implement better "version" checking
 
 #### TODO (Economy Update)
   - [ ] Implement Commands:
@@ -44,7 +40,3 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
      - [ ] Sell.
      - [ ] Balance.
   - [ ] Test Economy Signs.
-
-#### TODO (Multi-Language Update)
-- [ ] Add option for _Join_ and _Leave_ messages.
-- [ ] Add 'Messages' API

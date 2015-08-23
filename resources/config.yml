@@ -2,7 +2,7 @@
 # This configuration flie let you modify how EssentialsPE work with some features
 
 # DO NOT EDIT THIS PROPERTY! For internal use ONLY
-version: 0.0.1
+version: 2.0.0
 
 # Edit different parts of the AFK feature!
 afk:

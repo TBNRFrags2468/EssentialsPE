@@ -52,7 +52,12 @@ class UpdateFetchTask extends AsyncTask{
     public function onCompletion(Server $server){
         /** @var Loader $esspe */
         $esspe = $server->getPluginManager()->getPlugin("EssentialsPE");
-        if($esspe->getDescription()->getVersion() < ($v = $this->getResult()["version"])){
+
+        // Tricky move for better "version" comparison...
+        $currentVersion = $this->correctVersion($esspe->getDescription()->getVersion());
+        $v = $this->getResult()["version"];
+
+        if($currentVersion < $v){
             $continue = true;
             $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::GREEN . " A new " . TextFormat::YELLOW . $this->build . TextFormat::GREEN . " version of EssentialsPE found! Version: " . TextFormat::YELLOW . $v . TextFormat::GREEN . ($this->install !== true ? "" : ", " . TextFormat::LIGHT_PURPLE . "Installing...");
         }else{
@@ -64,5 +69,15 @@ class UpdateFetchTask extends AsyncTask{
             $server->getScheduler()->scheduleAsyncTask($task = new UpdateInstallTask($esspe, $this->getResult()["downloadURL"], $server->getPluginPath(), $v));
             $esspe->updaterDownloadTask = $task;
         }
+    }
+
+    /**
+     * @param string $version
+     * @return string
+     */
+    private function correctVersion($version){
+        $beta = stripos($version, "Beta") !== false;
+        $version = preg_replace("/[^0-9]+/", "", $version);
+        return ($beta ? substr($version, 0, strlen($version) -1) . "." . substr($version, -1, 1) : $version);
     }
 }
