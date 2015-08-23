@@ -1,0 +1,7 @@
+language: php
+install: cd .. && git clone https://github.com/PocketMine/PocketMine-MP.git --recursive server && cd server && mkdir plugins && cd plugins && wget https://github.com/PocketMine/DevTools/releases/download/v1.10.0/DevTools_v1.10.0.phar && cd TRAVIS_BUILD_DIR
+script: cd .. && cp -R TRAVIS_BUILD_DIR server/plugins/EssentialsPE && php server/src/pocketmine/PocketMine.php
+php:
+  - 5.4
+  - 5.5
+  - 5.6
