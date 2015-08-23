@@ -1,5 +1,5 @@
 language: php
-install: cd .. && git clone https://github.com/PocketMine/PocketMine-MP.git --recursive server && cd server && mkdir plugins && cd plugins && wget https://github.com/PocketMine/DevTools/releases/download/v1.10.0/DevTools_v1.10.0.phar && printf "\n" | pecl install pthreads --ignore-errors && printf "\n" | pecl install yaml --ignore-errors && printf "\n" | pecl install weakref --ignore-errors && cd $TRAVIS_BUILD_DIR
+install: cd .. && git clone https://github.com/PocketMine/PocketMine-MP.git --recursive server && cd server && mkdir plugins && cd plugins && wget https://github.com/PocketMine/DevTools/releases/download/v1.10.0/DevTools_v1.10.0.phar && printf "\n" | pecl install pthreads && printf "\n" | pecl install yaml && printf "\n" | pecl install weakref-0.2.6 && cd $TRAVIS_BUILD_DIR
 script: cd .. && cp -R $TRAVIS_BUILD_DIR server/plugins/EssentialsPE && cd server && php src/pocketmine/PocketMine.php
 php:
   - 5.6
