@@ -105,6 +105,7 @@ use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
+use pocketmine\OfflinePlayer;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -547,6 +548,20 @@ class Loader extends PluginBase{
             }
         }
         return $found;
+    }
+    /**
+     * Let you search for a player using his Display name(Nick) or Real name
+     * Instead of returning false, this method will create an OfflinePlayer object.
+     *
+     * @param string $name
+     * @return Player|OfflinePlayer
+     */
+    public function getOfflinePlayer($name){
+        $player = $this->getPlayer($name);
+        if($player === false){
+            $player = new OfflinePlayer($this->getServer(), strtolower($name));
+        }
+        return $player;
     }
 
     /**

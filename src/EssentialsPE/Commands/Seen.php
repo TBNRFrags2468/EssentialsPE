@@ -30,7 +30,7 @@ class Seen extends BaseCommand{
             $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
-        $player = $sender->getServer()->getOfflinePlayer($args[0]); //TODO reimplement ability to use nicks
+        $player = $this->getPlugin()->getOfflinePlayer($args[0]);
 
         if($player instanceof Player){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
