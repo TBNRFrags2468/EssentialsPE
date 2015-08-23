@@ -5,13 +5,13 @@ class PluginDescription{
     private $name;
     private $main;
     private $api;
-    private $depend = [];
-    private $softDepend = [];
-    private $loadBefore = [];
+    private $depend = array();
+    private $softDepend = array();
+    private $loadBefore = array();
     private $version;
-    private $commands = [];
+    private $commands = array();
     private $description = null;
-    private $authors = [];
+    private $authors = array();
     private $website = null;
     private $prefix = null;
     private $order = 1;
@@ -65,7 +65,7 @@ class PluginDescription{
             if($order == "STARTUP") $this->order = 0;
             else $this->order = 1;
         }
-        $this->authors = [];
+        $this->authors = array();
         if(isset($plugin["author"])){
             $this->authors[] = $plugin["author"];
         }
@@ -165,7 +165,7 @@ print "Packaging plugin...\n";
 $description = new PluginDescription(file_get_contents(DIRECTORY . "/plugin.yml"));
 $pharPath = DIRECTORY . "/" . $description->getName() ."_v" . $description->getVersion() . ".phar";
 $phar = new Phar($pharPath);
-$phar->setMetadata([
+$phar->setMetadata(array(
     "name" => $description->getName(),
     "version" => $description->getVersion(),
     "main" => $description->getMain(),
@@ -175,7 +175,7 @@ $phar->setMetadata([
     "authors" => $description->getAuthors(),
     "website" => $description->getWebsite(),
     "creationDate" => strtotime("now")
-]);
+));
 $phar->setStub('<?php echo "PocketMine-MP plugin ' . $description->getName() . ' v' . $description->getVersion() . '\n----------------\n";if(extension_loaded("phar")){$phar = new \Phar(__FILE__);foreach($phar->getMetadata() as $key => $value){echo ucfirst($key).": ".(is_array($value) ? implode(", ", $value):$value)."\n";}}__HALT_COMPILER();');
 $phar->setSignatureAlgorithm(\Phar::SHA1);
 $phar->startBuffering();
