@@ -29,6 +29,7 @@ use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\Home\DelHome;
 use EssentialsPE\Commands\Home\Home;
 use EssentialsPE\Commands\Home\SetHome;
+use EssentialsPE\Commands\Invsee;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
@@ -42,6 +43,7 @@ use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\Override\Msg;
+use EssentialsPE\Commands\Ping;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
 use EssentialsPE\Commands\PTime;
@@ -62,6 +64,7 @@ use EssentialsPE\Commands\Teleport\TPDeny;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
+use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -223,6 +226,7 @@ class Loader extends PluginBase{
             new Near($this),
             new Nick($this),
             new Nuke($this),
+            new Ping($this),
             new PTime($this),
             new PvP($this),
             new RealName($this),
@@ -234,7 +238,7 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            //new TreeCommand($this), //TODO
+            new TreeCommand($this), //TODO
             new Unlimited($this),
             new Vanish($this),
             new World($this),
@@ -852,6 +856,7 @@ class Loader extends PluginBase{
      * @return bool|Config
      */
     private function getSessionFile($player){
+        $this->getLogger()->info("Running");
         if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
             mkdir($dir);
         }
