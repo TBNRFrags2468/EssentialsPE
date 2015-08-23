@@ -14,6 +14,7 @@ class TravisKillTask extends PluginTask{
      */
     public function onRun($currentTick){
         $this->getOwner()->getServer()->forceShutdown();
+        exit(0);
     }
 
 }
