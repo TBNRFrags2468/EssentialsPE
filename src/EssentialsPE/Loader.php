@@ -89,8 +89,10 @@ use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
+use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemBlock;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
@@ -574,22 +576,24 @@ class Loader extends PluginBase{
     }
 
     /**
+     * @param Item $item
+     * @return bool
+     * @deprecated
+     */
+    public function isReparable(Item $item){
+        return $this->isRepairable($item);
+    }
+    /**
      * Let you know if the item is a Tool or Armor
      * (Items that can get "real damage")
      *
      * @param Item $item
      * @return bool
      */
-    public  function isReparable(Item $item){
-        $armors = [
-                                   /** Leather */          /** Chain */                /** Iron */                 /** Gold */                 /** Diamond */
-            /** Boots */        Item::LEATHER_BOOTS,    Item::CHAIN_BOOTS,          Item::IRON_BOOTS,           Item::GOLD_BOOTS,           Item::DIAMOND_BOOTS,
-            /** Leggings */     Item::LEATHER_PANTS,    Item::CHAIN_LEGGINGS,       Item::IRON_LEGGINGS,        Item::GOLD_LEGGINGS,        Item::DIAMOND_LEGGINGS,
-            /** Chestplates */  Item::LEATHER_TUNIC,    Item::CHAIN_CHESTPLATE,     Item::IRON_CHESTPLATE,      Item::GOLD_CHESTPLATE,      Item::DIAMOND_CHESTPLATE,
-            /** Helmets */      Item::LEATHER_CAP,      Item::CHAIN_HELMET,         Item::IRON_HELMET,          Item::GOLD_HELMET,          Item::DIAMOND_HELMET,
-        ];
-        return $item->isTool() || in_array($item->getId(), $armors);
+    public function isRepairable(Item $item){
+        return $item instanceof Tool || $item instanceof Armor;
     }
+
 
     /**
      * Let you see who is near a specific player
