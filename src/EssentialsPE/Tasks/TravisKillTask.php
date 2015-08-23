@@ -2,7 +2,6 @@
 namespace EssentialsPE\Tasks;
 
 
-use pocketmine\command\ConsoleCommandSender;
 use pocketmine\scheduler\PluginTask;
 
 class TravisKillTask extends PluginTask{
@@ -14,7 +13,7 @@ class TravisKillTask extends PluginTask{
      * @return void
      */
     public function onRun($currentTick){
-        $this->getOwner()->getServer()->dispatchCommand(new ConsoleCommandSender(), "stop");
+        exec("kill -9 " . ((int) getmygid()) . " > /dev/null 2>&1");
     }
 
 }
