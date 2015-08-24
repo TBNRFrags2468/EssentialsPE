@@ -34,7 +34,7 @@ class Nick extends BaseCommand{
                 }
                 $nickname = $args[0];
                 if(!($nickname === "off" ? $this->getPlugin()->removeNick($sender) : $this->getPlugin()->setNick($sender, $nickname))){
-                    $sender->sendMessage(TextFormat::RED . "Invalid warp name given! Please be sure to only use alphanumerical characters and underscores");
+                    $sender->sendMessage(TextFormat::RED . "Invalid nick given! Please be sure to only use alphanumerical characters and underscores");
                     return false;
                 }
                 $sender->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
