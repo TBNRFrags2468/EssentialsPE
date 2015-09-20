@@ -1,4 +1,5 @@
 language: bash
+sudo: false
 
 before_install: cd .. && mkdir server && cd server && wget -O - -q get.pocketmine.net | bash -s - -v development
 
