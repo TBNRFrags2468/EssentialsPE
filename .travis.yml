@@ -10,4 +10,4 @@ install:
 
 before_script: cp -R $TRAVIS_BUILD_DIR $TRAVIS_BUILD_DIR/../server/plugins/EssentialsPE
 
-script: $TRAVIS_BUILD_DIR/../server/start.sh --disable-ansi
+script: $TRAVIS_BUILD_DIR/../server/start.sh --disable-ansi --no-wizard
