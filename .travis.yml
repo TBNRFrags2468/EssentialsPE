@@ -2,6 +2,8 @@ language: php
 php:
   - 5.6
 
+before_install: pecl channel-update pecl.php.net
+
 install: cd .. && git clone https://github.com/PocketMine/PocketMine-MP.git --recursive server && cd server && mkdir plugins && cd plugins && wget https://github.com/PocketMine/DevTools/releases/download/v1.10.0/DevTools_v1.10.0.phar && printf "\n" | pecl install pthreads && printf "\n" | pecl install yaml && printf "\n" | pecl install weakref-0.2.6 && cd $TRAVIS_BUILD_DIR
 
 script: cd .. && cp -R $TRAVIS_BUILD_DIR server/plugins/EssentialsPE && cd server && mkdir plugins && wget -O plugins/Terminator.php https://gist.githubusercontent.com/PEMapModder/46a4c61fcd855d14db9a/raw/932587edf6789e975ae1a32956cdc5bafac96ade/ServerStop.php && php src/pocketmine/PocketMine.php --no-wizard --disable-ansi
