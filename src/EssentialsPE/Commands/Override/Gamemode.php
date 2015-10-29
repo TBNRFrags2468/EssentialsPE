@@ -56,6 +56,7 @@ class Gamemode extends BaseCommand{
         }
         if(count($args) < 1){
             $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            return false;
         }
         $player = $sender;
         if(!$player instanceof Player && !isset($args[1])){
@@ -74,7 +75,7 @@ class Gamemode extends BaseCommand{
          * The following switch is applied when the user execute:
          * /gamemode <MODE>
          */
-        if(is_int($args[0])){
+        if(is_numeric($args[0])){
             switch($args[0]){
                 case 0:
                 case 1:
