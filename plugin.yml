@@ -1,7 +1,7 @@
 name: EssentialsPE
 main: EssentialsPE\Loader
 version: 2.0.0
-api: 1.13.0
+api: 1.12.0
 author: LegendsOfMCPE Team
 website: https://github.com/LegendOfMCPE/EssentialsPE
 
@@ -134,7 +134,7 @@ permissions:
                         default: op
                         description: "Make other players fly!"
             essentials.gamemode:
-                deault: op
+                default: op
                 description: "Change your gamemode!"
             essentials.getpos:
                 default: false
@@ -289,6 +289,9 @@ permissions:
             essentials.powertooltoggle:
                 default: op
                 description: "Allow to disable PowerTool from all the items (of a player)"
+            essentials.ping:
+              default: op
+              description: "Pong!"
             essentials.ptime:
                default: false
                description: "Change your current time!"

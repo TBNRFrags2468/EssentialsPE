@@ -23,7 +23,9 @@ class TPRequestTask extends BaseTask{
      * @param int $currentTick
      */
     public function onRun($currentTick){
-        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's TPRequestTask");
-        $this->getPlugin()->removeTPRequest($this->requester);
+        if($this->requester instanceof Player && $this->requester->isOnline()) {
+            $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's TPRequestTask");
+            $this->getPlugin()->removeTPRequest($this->requester);
+        }
     }
 } 

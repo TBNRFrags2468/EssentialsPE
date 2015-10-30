@@ -75,7 +75,7 @@ class UpdateFetchTask extends AsyncTask{
      * @param string $version
      * @return string
      */
-    private function correctVersion($version){
+    protected function correctVersion($version){
         $beta = stripos($version, "Beta") !== false;
         $version = preg_replace("/[^0-9]+/", "", $version);
         return ($beta ? substr($version, 0, strlen($version) -1) . "." . (($b = substr($version, -1, 1)) < 10 ? 0 : "") . $b : $version);

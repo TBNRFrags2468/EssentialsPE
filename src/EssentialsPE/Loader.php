@@ -29,6 +29,7 @@ use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\Home\DelHome;
 use EssentialsPE\Commands\Home\Home;
 use EssentialsPE\Commands\Home\SetHome;
+use EssentialsPE\Commands\Invsee;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
@@ -42,6 +43,7 @@ use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\Override\Msg;
+use EssentialsPE\Commands\Ping;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
 use EssentialsPE\Commands\PTime;
@@ -62,6 +64,7 @@ use EssentialsPE\Commands\Teleport\TPDeny;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
+use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -83,14 +86,17 @@ use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFK\AFKKickTask;
 use EssentialsPE\Tasks\AFK\AFKSetterTask;
 use EssentialsPE\Tasks\TPRequestTask;
+use EssentialsPE\Tasks\TravisKillTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
+use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemBlock;
+use pocketmine\item\Tool;
 use pocketmine\level\Level;
 use pocketmine\level\Location;
 use pocketmine\level\Position;
@@ -103,6 +109,7 @@ use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
+use pocketmine\OfflinePlayer;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -140,6 +147,10 @@ class Loader extends PluginBase{
             $this->fetchEssentialsPEUpdate(false);
         }
         $this->scheduleAutoAFKSetter();
+        if(getenv("TRAVIS") !== false){
+            $this->getLogger()->info("Scheduling TravisKillTask...");
+            $this->getServer()->getScheduler()->scheduleDelayedTask(new TravisKillTask($this), 5);
+        }
     }
 
     public function onDisable(){
@@ -215,6 +226,7 @@ class Loader extends PluginBase{
             new Near($this),
             new Nick($this),
             new Nuke($this),
+            new Ping($this),
             new PTime($this),
             new PvP($this),
             new RealName($this),
@@ -226,7 +238,7 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            //new TreeCommand($this), //TODO
+            new TreeCommand($this), //TODO
             new Unlimited($this),
             new Vanish($this),
             new World($this),
@@ -546,6 +558,20 @@ class Loader extends PluginBase{
         }
         return $found;
     }
+    /**
+     * Let you search for a player using his Display name(Nick) or Real name
+     * Instead of returning false, this method will create an OfflinePlayer object.
+     *
+     * @param string $name
+     * @return Player|OfflinePlayer
+     */
+    public function getOfflinePlayer($name){
+        $player = $this->getPlayer($name);
+        if($player === false){
+            $player = new OfflinePlayer($this->getServer(), strtolower($name));
+        }
+        return $player;
+    }
 
     /**
      * Return a colored message replacing every
@@ -571,33 +597,24 @@ class Loader extends PluginBase{
     }
 
     /**
+     * @param Item $item
+     * @return bool
+     * @deprecated
+     */
+    public function isReparable(Item $item){
+        return $this->isRepairable($item);
+    }
+    /**
      * Let you know if the item is a Tool or Armor
-     * (Items that can get "real damage"
+     * (Items that can get "real damage")
      *
      * @param Item $item
      * @return bool
      */
-    public  function isReparable(Item $item){
-        $IDs = [
-                               /** Wood */            /** Stone */             /** Iron */            /** Gold */              /** Diamond */
-            /** Swords */   Item::WOODEN_SWORD,     Item::STONE_SWORD,      Item::IRON_SWORD,       Item::GOLD_SWORD,       Item::DIAMOND_SWORD,
-            /** Shovels */  Item::WOODEN_SHOVEL,    Item::STONE_SHOVEL,     Item::IRON_SHOVEL,      Item::GOLD_SHOVEL,      Item::DIAMOND_SHOVEL,
-            /** Pickaxes */ Item::WOODEN_PICKAXE,   Item::STONE_PICKAXE,    Item::IRON_PICKAXE,     Item::GOLD_PICKAXE,     Item::DIAMOND_PICKAXE,
-            /** Axes */     Item::WOODEN_AXE,       Item::STONE_AXE,        Item::IRON_AXE,         Item::GOLD_AXE,         Item::DIAMOND_AXE,
-            /** Hoes */     Item::WOODEN_HOE,       Item::STONE_HOE,        Item::IRON_HOE,         Item::GOLD_HOE,         Item::DIAMOND_HOE,
-
-
-                                   /** Leather */          /** Chain */                /** Iron */                 /** Gold */                 /** Diamond */
-            /** Boots */        Item::LEATHER_BOOTS,    Item::CHAIN_BOOTS,          Item::IRON_BOOTS,           Item::GOLD_BOOTS,           Item::DIAMOND_BOOTS,
-            /** Leggings */     Item::LEATHER_PANTS,    Item::CHAIN_LEGGINGS,       Item::IRON_LEGGINGS,        Item::GOLD_LEGGINGS,        Item::DIAMOND_LEGGINGS,
-            /** Chestplates */  Item::LEATHER_TUNIC,    Item::CHAIN_CHESTPLATE,     Item::IRON_CHESTPLATE,      Item::GOLD_CHESTPLATE,      Item::DIAMOND_CHESTPLATE,
-            /** Helmets */      Item::LEATHER_CAP,      Item::CHAIN_HELMET,         Item::IRON_HELMET,          Item::GOLD_HELMET,          Item::DIAMOND_HELMET,
-
-
-            /** Other */    Item::BOW, Item::FLINT_AND_STEEL, Item::SHEARS
-        ];
-        return in_array($item->getId(), $IDs);
+    public function isRepairable(Item $item){
+        return $item instanceof Tool || $item instanceof Armor;
     }
+
 
     /**
      * Let you see who is near a specific player
@@ -839,6 +856,7 @@ class Loader extends PluginBase{
      * @return bool|Config
      */
     private function getSessionFile($player){
+        $this->getLogger()->info("Running");
         if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
             mkdir($dir);
         }

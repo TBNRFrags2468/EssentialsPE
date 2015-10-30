@@ -1,3 +1,6 @@
+> ### Notice
+> The talented lead developer of EssentialsPE, [@iksaku2](https://github.com/iksaku2), has [annouced](https://twitter.com/iksaku2/status/635218810694320128) that he will not continue development of EssentialsPE. [@Falkirks](https://github.com/Falkirks) will server as maintainer for the time being, please direct all your issues to him. 
+
 EssentialsPE [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ================
 
@@ -11,22 +14,18 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 
 =
 
-#### TODO (v1.1.0):
+#### TODO (v2.0.0):
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
 
-###### AFK:
-  - [x] Implement Auto-AFK setter
-  - [x] Test the Auto-AFK setter
+- [ ] Add 'Messages' API (Multi-language update)
+- [ ] Implement _Online-Player Checking_ to prevent crashes
+
 
 ###### Updater:
-  - [x] Fix the *Beta* channel:
-     - [x] Fix the _Fetcher_
-     - [x] Fix the _Downloader_
-
-###### PowerTool:
-  - [x] Handle air touch
+  - [ ] Add _Development_ channel 
+  - [ ] Implement better "version" checking
 
 #### TODO (Economy Update)
   - [ ] Implement Commands:
@@ -44,7 +43,3 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
      - [ ] Sell.
      - [ ] Balance.
   - [ ] Test Economy Signs.
-
-#### TODO (Multi-Language Update)
-- [ ] Add option for _Join_ and _Leave_ messages.
-- [ ] Add 'Messages' API

@@ -30,12 +30,13 @@ class Seen extends BaseCommand{
             $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($args[0]);
-        if($player !== false){
+        $player = $this->getPlugin()->getOfflinePlayer($args[0]);
+
+        if($player instanceof Player){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
             return true;
         }
-        if(!is_numeric($sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed())){
+        if(!is_numeric($player->getLastPlayed())){
             $sender->sendMessage(TextFormat::RED .  $args[0] . " has never played on this server.");
             return false;
         }
@@ -48,8 +49,8 @@ class Seen extends BaseCommand{
          * F = Month name
          * Y = Year in 4 digits (1999)
          */
-        $ptime = $sender->getServer()->getOfflinePlayer($args[0])->getLastPlayed() / 1000;
-        $sender->sendMessage(TextFormat::AQUA .  $player->getDisplayName() ." was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
+        $ptime = $player->getLastPlayed() / 1000;
+        $sender->sendMessage(TextFormat::AQUA .  $player->getName() ." was last seen on " . TextFormat::RED . date("l, F j, Y", $ptime) . TextFormat::AQUA . " at " . TextFormat::RED . date("h:ia", $ptime));
         return true;
     }
 }
