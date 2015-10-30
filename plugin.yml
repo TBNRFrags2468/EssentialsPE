@@ -289,9 +289,6 @@ permissions:
             essentials.powertooltoggle:
                 default: op
                 description: "Allow to disable PowerTool from all the items (of a player)"
-            essentials.ping:
-              default: op
-              description: "Pong!"
             essentials.ptime:
                default: false
                description: "Change your current time!"
