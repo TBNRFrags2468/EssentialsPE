@@ -1,6 +1,3 @@
-> ### Notice
-> The talented lead developer of EssentialsPE, [@iksaku2](https://github.com/iksaku2), has [annouced](https://twitter.com/iksaku2/status/635218810694320128) that he will not continue development of EssentialsPE. [@Falkirks](https://github.com/Falkirks) will serve as maintainer for the time being, please direct all your issues to him. 
-
 EssentialsPE [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ================
 
