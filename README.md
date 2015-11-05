@@ -1,6 +1,3 @@
-> ### Notice
-> The talented lead developer of EssentialsPE, [@iksaku2](https://github.com/iksaku2), has [annouced](https://twitter.com/iksaku2/status/635218810694320128) that he will not continue development of EssentialsPE. [@Falkirks](https://github.com/Falkirks) will serve as maintainer for the time being, please direct all your issues to him. 
-
 EssentialsPE [![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/LegendOfMCPE/EssentialsPE?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 ================
 
@@ -10,7 +7,8 @@ The port version of [Bukkit Essentials](http://dev.bukkit.org/bukkit-plugins/ess
 
 If you are planning to use PocketMine-MP _Dev_ builds keep in mind that EssentialsPE can crash it because may not support _Dev_ API versions.
 
-#### [Download the latest _Development_ Builds here!](http://pemapmodder.zapto.org/data/builds/#top-LegendOfMCPE/EssentialsPE)
+#### [Download the latest _Development_ Builds here!](#)
+> TODO: Add new 'dev builds' site
 
 =
 
