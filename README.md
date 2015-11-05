@@ -16,14 +16,13 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
-
-- [ ] Add 'Messages' API (Multi-language update)
+- [ ] Implement _Messages API_ (Multi-language update)
 - [ ] Implement _Online-Player Checking_ to prevent crashes
 
 
-###### Updater:
+### Updater:
   - [ ] Add _Development_ channel 
-  - [ ] Implement better "version" checking
+  - [x] Implement "better version" checking
 
 #### TODO (Economy Update)
   - [ ] Implement Commands:
