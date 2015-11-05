@@ -14,6 +14,7 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 
 #### TODO (v2.0.0):
 * Start working over [THIS](https://gist.github.com/shoghicp/88acec9d15564ccc8e75).
+- [ ] Update to `PHP7`
 - [ ] Add _Developers API_ documentation.
 - [ ] Add _Special Signs_ documentation.
 - [ ] Implement _Messages API_ (Multi-language update)
