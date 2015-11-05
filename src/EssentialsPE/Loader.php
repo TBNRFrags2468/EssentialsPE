@@ -29,7 +29,6 @@ use EssentialsPE\Commands\Heal;
 use EssentialsPE\Commands\Home\DelHome;
 use EssentialsPE\Commands\Home\Home;
 use EssentialsPE\Commands\Home\SetHome;
-use EssentialsPE\Commands\Invsee;
 use EssentialsPE\Commands\ItemCommand;
 use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
@@ -2088,7 +2087,7 @@ class Loader extends PluginBase{
     public $updaterDownloadTask = null; // Used to prevent Async Task conflicts with Server's limit :P
 
     /**
-     * Tell if the updater is enabled or not
+     * Tell if the auto-updater is enabled or not
      *
      * @return bool
      */

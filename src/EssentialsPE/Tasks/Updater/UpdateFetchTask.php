@@ -27,12 +27,13 @@ class UpdateFetchTask extends AsyncTask{
             case "stable":
             default:
                 $url = "http://forums.pocketmine.net/api.php?action=getResource&value=886"; // PocketMine repository for 'Stable' releases
+                $this->build = "stable"; // Override property in case of an 'unknown' source
                 break;
             case "beta":
                 $url = "https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases"; // Github repository for 'Beta' releases
                 break;
-            /*case "development":
-                // TODO
+            /*case "development": TODO: Release 'dev' builds
+                $url = "https://api.github.com/repos/LegendOfMCPE/EssentialsPE/contents/plugin.yml";
                 break;*/
         }
         $i = json_decode(Utils::getURL($url), true);
@@ -40,7 +41,6 @@ class UpdateFetchTask extends AsyncTask{
         $r = [];
         switch(strtolower($this->build)){
             case "stable":
-            default:
                 $r["version"] = $i["version_string"];
                 $r["downloadURL"] = "http://forums.pocketmine.net/plugins/essentialspe.886/download?version=" . $i["current_version_id"];
                 break;
@@ -48,6 +48,11 @@ class UpdateFetchTask extends AsyncTask{
                 $i = $i[0]; // Grab the latest version from Github releases... Doesn't matter if it's Beta or Stable :3
                 $r["version"] = substr($i["name"], 13);
                 $r["downloadURL"] = $i["assets"][0]["browser_download_url"];
+                break;
+            case "development":
+                $content = yaml_parse(base64_decode($i["content"]));
+                $r["version"] = $content["version"];
+                $r["downloadURL"] = "https://raw.githubusercontent.com/LegendOfMCPE/EssentialsPE/master/build/EssentialsPE.phar"; // TODO: Update when releasing 'dev' builds, this is written just for reference now...
                 break;
         }
         $this->setResult($r);
