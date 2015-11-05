@@ -23,10 +23,17 @@ class UpdateFetchTask extends AsyncTask{
     }
 
     public function onRun(){
-        if($this->build === "beta"){
-            $url = "https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases"; // Github repository for 'Beta' releases
-        }else{
-            $url = "http://forums.pocketmine.net/api.php?action=getResource&value=886"; // PocketMine repository for 'Stable' releases
+        switch($this->build){
+            case "stable":
+            default:
+                $url = "http://forums.pocketmine.net/api.php?action=getResource&value=886"; // PocketMine repository for 'Stable' releases
+                break;
+            case "beta":
+                $url = "https://api.github.com/repos/LegendOfMCPE/EssentialsPE/releases"; // Github repository for 'Beta' releases
+                break;
+            /*case "development":
+                // TODO
+                break;*/
         }
         $i = json_decode(Utils::getURL($url), true);
 

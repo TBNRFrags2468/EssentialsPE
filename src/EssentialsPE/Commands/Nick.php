@@ -33,9 +33,12 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 $nickname = $args[0];
-                if(!($nickname === "off" ? $this->getPlugin()->removeNick($sender) : $this->getPlugin()->setNick($sender, $nickname))){
-                    $sender->sendMessage(TextFormat::RED . "Invalid nick given! Please be sure to only use alphanumerical characters and underscores");
-                    return false;
+                if($nickname === "off"){
+                    $this->getPlugin()->removeNick($sender);
+                }else{
+                    if(!$this->getPlugin()->setNick($sender, $nickname)){
+                        $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to use 'colored' nicknames");
+                    }
                 }
                 $sender->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
@@ -50,9 +53,12 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 $nickname = $args[0];
-                if(!($nickname === "off" ? $this->getPlugin()->removeNick($player) : $this->getPlugin()->setNick($player, $nickname))){
-                    $sender->sendMessage(TextFormat::RED . "Invalid nick name given! Please be sure to only use alphanumerical characters and underscores");
-                    return false;
+                if($nickname === "off"){
+                    $this->getPlugin()->removeNick($player);
+                }else{
+                    if(!$this->getPlugin()->setNick($player, $nickname)){
+                        $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to give 'colored' nicknames");
+                    }
                 }
                 $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));

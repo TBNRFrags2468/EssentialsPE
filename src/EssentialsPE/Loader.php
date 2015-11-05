@@ -419,7 +419,7 @@ class Loader extends PluginBase{
         if(file_exists($f = $this->getDataFolder() . "Homes.yml")){
             $cfg = new Config($f, Config::YAML);
             foreach($cfg->getAll() as $player => $home){
-                if(!is_array($home)){
+                if(is_array($home)){
                     continue;
                 }
                 $pCfg = $this->getSessionFile($player);
@@ -1626,7 +1626,7 @@ class Loader extends PluginBase{
      * @return bool
      */
     public function setNick(Player $player, $nick){
-        if(!$this->validateName($nick, true) || !$this->colorMessage($nick, $player)){
+        if(!$this->colorMessage($nick, $player)){
             return false;
         }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerNickChangeEvent($this, $player, $this->colorMessage($nick)));

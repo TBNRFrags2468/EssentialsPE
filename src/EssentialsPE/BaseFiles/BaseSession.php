@@ -266,7 +266,7 @@ class BaseSession {
     private function loadHomes(){
         $homes = [];
         foreach($this->homes as $name => $values){
-            if(is_array($values)){
+            if(is_array($values) && count($values) > 1){
                 if($this->getPlugin()->getServer()->isLevelGenerated($values[3])){
                     if(!$this->getPlugin()->getServer()->isLevelLoaded($values[3])){
                         $this->getPlugin()->getServer()->loadLevel($values[3]);
