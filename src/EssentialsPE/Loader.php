@@ -776,11 +776,16 @@ class Loader extends PluginBase{
      * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
      *
      * @param BaseInventory $inv
-     *
+     * @param Item[]|null $target
      * @return BaseInventory
      */
-    public function condenseItems(BaseInventory $inv){
-        $items = $inv->getContents();
+    public function condenseItems(BaseInventory $inv, $target = null){
+        if($target === null){
+            $items =& $inv->getContents();
+        }else{
+            $items = $target;
+        }
+        // First step: Merge target items...
         foreach($items as $slot => $item){
             $sub = $inv->all($item);
             foreach($sub as $index => $i){
@@ -788,14 +793,59 @@ class Loader extends PluginBase{
                 $item->setCount($item->getCount() + $i->getCount());
                 unset($items[$index]);
             }
-            switch($item->getId()){
-                /* TODO
-                 * $item = new Item(...) <- Replace with Item->Block crafting calculation
-                 */
-            }
         }
         $inv->setContents($items);
+        // Second step: Condense items...
+        foreach($items as $slot => $item){
+            $condense = $this->condenseRecipes($item);
+            $cSlot = $slot;
+            if(count($condense) > 1){
+                $cSlot = $inv->firstEmpty();
+                $items[$slot] = $condense[1];
+            }
+            $items[$cSlot] = $items[0];
+        }
         return $inv;
+    }
+
+    /** @var array */
+    private $condenseShapes = [
+        [], // 2x2 Shapes
+        [Item::COAL => Item::COAL_BLOCK, Item::IRON_INGOT => Item::IRON_BLOCK, Item::GOLD_INGOT => Item::GOLD_BLOCK, Item::DIAMOND => Item::DIAMOND_BLOCK, Item::EMERALD => Item::EMERALD_BLOCK] // 3x3 Shapes
+    ];
+
+    /**
+     * @param Item $item
+     * @return array|Item
+     */
+    private function condenseRecipes(Item $item){
+        if(isset($this->condenseShapes[0][$item->getId()])){ // 2x2 Shapes
+            $shape = 4;
+        }elseif(isset($this->condenseShapes[1][$item->getId()])){ // 3x3 Shapes
+            $shape = 9;
+        }else{
+            return $item;
+        }
+        $index = (int) sqrt($shape) - 2;
+        $newId = $this->condenseShapes[$index][$item->getId()];
+        $damage = 0;
+        if(is_array($newId)){
+            if(!isset($newId[1][$item->getDamage()])){
+                return $item;
+            }
+            $damage = $newId[1][$item->getDamage()];
+            $newId = $newId[0];
+        }
+        if(($count = floor($shape / $item->getCount())) < 1){
+            return $item;
+        }
+        $item->setCount($item->getCount() - ($count * $shape));
+        $condense = new Item($newId, $count, $damage);
+        $ret = [$condense];
+        if($item->getCount() > 0){
+            $ret[] = $item;
+        }
+        return $ret;
     }
 
     /**   _____              _
