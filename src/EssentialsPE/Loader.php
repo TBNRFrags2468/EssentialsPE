@@ -92,6 +92,7 @@ use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
+use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemBlock;
@@ -769,6 +770,32 @@ class Loader extends PluginBase{
             return false;
         }
         return true;
+    }
+
+    /**
+     * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
+     *
+     * @param BaseInventory $inv
+     *
+     * @return BaseInventory
+     */
+    public function condenseItems(BaseInventory $inv){
+        $items = $inv->getContents();
+        foreach($items as $slot => $item){
+            $sub = $inv->all($item);
+            foreach($sub as $index => $i){
+                /** @var Item $i */
+                $item->setCount($item->getCount() + $i->getCount());
+                unset($items[$index]);
+            }
+            switch($item->getId()){
+                /* TODO
+                 * $item = new Item(...) <- Replace with Item->Block crafting calculation
+                 */
+            }
+        }
+        $inv->setContents($items);
+        return $inv;
     }
 
     /**   _____              _
