@@ -12,7 +12,7 @@ class Top extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "top", "Teleport to the highest block above you", "/top", false);
+        parent::__construct($plugin, "top", "Teleport to the highest block above you", null, false);
         $this->setPermission("essentials.top");
     }
 
@@ -27,11 +27,11 @@ class Top extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");

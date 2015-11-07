@@ -12,7 +12,7 @@ class Vanish extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "vanish", "Hide from other players!", "/vanish [player]", "/vanish <player>", ["v"]);
+        parent::__construct($plugin, "vanish", "Hide from other players!", "[player]", null, ["v"]);
         $this->setPermission("essentials.vanish.use");
     }
 
@@ -29,7 +29,7 @@ class Vanish extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $this->getPlugin()->switchVanish($sender);
@@ -50,7 +50,7 @@ class Vanish extends BaseCommand{
                 $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!"));
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

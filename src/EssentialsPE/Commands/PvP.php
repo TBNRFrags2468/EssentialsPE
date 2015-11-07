@@ -12,7 +12,7 @@ class PvP extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "pvp", "Toggle PvP on/off", "/pvp <on|off>", false);
+        parent::__construct($plugin, "pvp", "Toggle PvP on/off", "<on|off>", false);
         $this->setPermission("essentials.pvp");
     }
 
@@ -27,10 +27,10 @@ class PvP extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }elseif(count($args) != 1){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
 
@@ -41,7 +41,7 @@ class PvP extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "PvP " . (strtolower($args[0]) === "on" ? "enabled!" : "disabled!"));
                 break;
             default:
-                $sender->sendMessage($this->getUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

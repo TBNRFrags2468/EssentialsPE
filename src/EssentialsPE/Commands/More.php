@@ -12,7 +12,7 @@ class More extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "more", "Get a stack of the item you're holding", "/more", false);
+        parent::__construct($plugin, "more", "Get a stack of the item you're holding", null, false);
         $this->setPermission("essentials.more");
     }
 
@@ -27,7 +27,7 @@ class More extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $gm = $sender->getGamemode();
@@ -36,7 +36,7 @@ class More extends BaseCommand{
             return false;
         }
         if(count($args) != 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $item = clone($sender->getInventory()->getItemInHand());

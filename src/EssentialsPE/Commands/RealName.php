@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class RealName extends BaseCommand{
@@ -12,7 +11,7 @@ class RealName extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "realname", "Check the realname of a player", "/realname <player>");
+        parent::__construct($plugin, "realname", "Check the realname of a player", "<player>");
         $this->setPermission("essentials.realname");
     }
 
@@ -27,7 +26,7 @@ class RealName extends BaseCommand{
             return false;
         }
         if(count($args) != 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

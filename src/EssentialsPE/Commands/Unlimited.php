@@ -12,7 +12,7 @@ class Unlimited extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "unlimited", "Allow you to place unlimited blocks", "/unlimited [player]", null, ["ul", "unl"]);
+        parent::__construct($plugin, "unlimited", "Allow you to place unlimited blocks", "[player]", null, ["ul", "unl"]);
         $this->setPermission("essentials.unlimited.use");
     }
 
@@ -29,7 +29,7 @@ class Unlimited extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $gm = $sender->getServer()->getGamemodeString($sender->getGamemode());
@@ -60,7 +60,7 @@ class Unlimited extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getPlugin()->isUnlimitedEnabled($player) ? "enabled!" : "disabled!"));
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

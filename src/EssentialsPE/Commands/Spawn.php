@@ -12,7 +12,7 @@ class Spawn extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "/spawn [player]", null);
+        parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "[player]");
         $this->setPermission("essentials.spawn.use");
     }
 
@@ -29,7 +29,7 @@ class Spawn extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $sender->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
@@ -49,7 +49,7 @@ class Spawn extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "Teleporting...");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

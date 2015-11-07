@@ -12,7 +12,7 @@ class Suicide extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "suicide", "Kill yourself", "/suicide", false);
+        parent::__construct($plugin, "suicide", "Kill yourself", null, false);
         $this->setPermission("essentials.suicide");
     }
 
@@ -27,11 +27,11 @@ class Suicide extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($sender, EntityDamageEvent::CAUSE_SUICIDE, ($sender->getHealth())));

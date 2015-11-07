@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
 use pocketmine\level\generator\object\Tree;
 use pocketmine\Player;
 use pocketmine\utils\Random;
@@ -16,7 +15,7 @@ class TreeCommand extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <tree|birch|redwood|jungle>", false);
+        parent::__construct($plugin, "tree", "Spawns a tree", "<tree|birch|redwood|jungle>", false);
         $this->setPermission("essentials.tree");
     }
 
@@ -31,11 +30,11 @@ class TreeCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
@@ -45,6 +44,7 @@ class TreeCommand extends BaseCommand{
         }
         switch(strtolower($args[0])){
             case "oak":
+            default:
                 $type = Sapling::OAK;
                 break;
             case "birch":
@@ -65,10 +65,6 @@ class TreeCommand extends BaseCommand{
             case "swamp":
                 $type = Sapling::SWAMP;
                 break;*/
-            default:
-                $type = Sapling::OAK;
-                return false;
-                break;
         }
         Tree::growTree($sender->getLevel(), $block->x, $block->y+1, $block->z, new Random(mt_rand()), $type & 0x07);
         return true;

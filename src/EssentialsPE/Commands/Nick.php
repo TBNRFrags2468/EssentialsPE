@@ -12,7 +12,7 @@ class Nick extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nick", "Change your in-game name", "/nick <new nick|off> [player]", null, ["nickname"]);
+        parent::__construct($plugin, "nick", "Change your in-game name", "<new nick|off> [player]", null, ["nickname"]);
         $this->setPermission("essentials.nick.use");
     }
 
@@ -29,7 +29,7 @@ class Nick extends BaseCommand{
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $nickname = $args[0];
@@ -64,7 +64,7 @@ class Nick extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }
