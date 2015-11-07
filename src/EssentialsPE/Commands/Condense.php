@@ -34,6 +34,10 @@ class Condense extends BaseCommand{
                 break;
             default: // Item name|id
                 $target = $this->getPlugin()->getItem($args[0]);
+                if($target->getId() === 0){
+                    $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $args[0] . "\"");
+                    return false;
+                }
                 break;
         }
         $this->getPlugin()->condenseItems($sender->getInventory(), $target);
