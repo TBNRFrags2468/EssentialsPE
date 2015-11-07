@@ -14,7 +14,7 @@ class Msg extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "Msg", "Send private messages to other players", "/msg <player> <message ...>", null, ["tell", "m", "t", "whisper"]);
+        parent::__construct($plugin, "Msg", "Send private messages to other players", "<player> <message ...>", null, ["tell", "m", "t", "whisper"]);
         $this->setPermission("essentials.msg");
     }
 

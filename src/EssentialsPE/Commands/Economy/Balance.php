@@ -12,7 +12,7 @@ class Balance extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "balance", "See how many money do you have", "/balance [player]", null, ["bal", "money"]);
+        parent::__construct($plugin, "balance", "See how many money do you have", "[player]", null, ["bal", "money"]);
         $this->setPermission("essentials.balance.use");
     }
 

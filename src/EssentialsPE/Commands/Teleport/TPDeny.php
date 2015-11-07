@@ -12,7 +12,7 @@ class TPDeny extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpdeny", "Decline a Teleport Request", "/tpdeny [player]", false, ["tpno"]);
+        parent::__construct($plugin, "tpdeny", "Decline a Teleport Request", "[player]", false, ["tpno"]);
         $this->setPermission("essentials.tpdeny");
     }
 

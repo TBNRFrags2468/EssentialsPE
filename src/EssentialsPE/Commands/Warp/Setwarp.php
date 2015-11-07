@@ -12,7 +12,7 @@ class Setwarp extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "/setwarp <name>", false, ["openwarp", "createwarp"]);
+        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "<name>", false, ["openwarp", "createwarp"]);
         $this->setPermission("essentials.setwarp");
     }
 

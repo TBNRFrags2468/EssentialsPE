@@ -12,7 +12,7 @@ class Back extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "back", "Teleport to your previous location", "/back", false, ["return"]);
+        parent::__construct($plugin, "back", "Teleport to your previous location", null, false, ["return"]);
         $this->setPermission("essentials.back.use");
     }
 
@@ -27,11 +27,11 @@ class Back extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!($pos = $this->getPlugin()->getLastPlayerPosition($sender))){

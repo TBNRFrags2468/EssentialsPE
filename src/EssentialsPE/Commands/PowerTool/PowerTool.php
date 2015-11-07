@@ -13,7 +13,7 @@ class PowerTool extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "/powertool <command|c:chat macro> <arguments...>", false, ["pt"]);
+        parent::__construct($plugin, "powertool", "Toogle PowerTool on the item you're holding", "<command|c:chat macro> <arguments...>", false, ["pt"]);
         $this->setPermission("essentials.powertool.use");
     }
 

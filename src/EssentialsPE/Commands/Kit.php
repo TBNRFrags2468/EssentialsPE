@@ -12,7 +12,7 @@ class Kit extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kit", "Get a pre-defined kit!", "/kit [name] [player]", "/kit [name <player>]", ["kits"]);
+        parent::__construct($plugin, "kit", "Get a pre-defined kit!", "[name] [player]", "[<name> <player>]", ["kits"]);
         $this->setPermission("essentials.kit.use");
     }
 
@@ -42,7 +42,7 @@ class Kit extends BaseCommand{
         switch(count($args)){
             case 1:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 if(!$sender->hasPermission("essentials.kits.*") && !$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
@@ -71,7 +71,7 @@ class Kit extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Giving " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " kit " . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . "...");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

@@ -12,7 +12,7 @@ class Compass extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "compass", "Display your current bearing direction", "/compass", false, ["direction"]);
+        parent::__construct($plugin, "compass", "Display your current bearing direction", null, false, ["direction"]);
         $this->setPermission("essentials.compass");
     }
 
@@ -27,11 +27,11 @@ class Compass extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
 

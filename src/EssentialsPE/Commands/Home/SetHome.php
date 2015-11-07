@@ -12,7 +12,7 @@ class SetHome extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sethome", "Create or update a home position", "/sethome <name>", false, ["createhome"]);
+        parent::__construct($plugin, "sethome", "Create or update a home position", "<name>", false, ["createhome"]);
         $this->setPermission("essentials.sethome");
     }
 

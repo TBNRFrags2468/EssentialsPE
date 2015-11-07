@@ -12,7 +12,7 @@ class Jump extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", "/jump", false, ["j", "jumpto"]);
+        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", null, false, ["j", "jumpto"]);
         $this->setPermission("essentials.jump");
     }
 
@@ -27,15 +27,15 @@ class Jump extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
         }
         $transparent = [6, 8, 9, 10, 11, 31, 32, 36, 37, 38, 39, 40, 50,
             51, 55, 59, 63, 68, 69, 75, 76, 77, 83, 90, 104, 105, 115,
-            119, 120, 122, 127, 131, 132, 141, 142, 143, 175, 176, 177];
+            119, 120, 122, 127, 131, 132, 141, 142, 143, 175, 176, 177]; // TODO: Replace hardcoded Id's with "Item" class constants
         $block = $sender->getTargetBlock(100, $transparent);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");

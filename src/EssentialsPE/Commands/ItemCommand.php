@@ -12,7 +12,7 @@ class ItemCommand extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "item", "Gives yourself an item", "/item <item[:damage]> [amount]", false, ["i"]);
+        parent::__construct($plugin, "item", "Gives yourself an item", "<item[:damage]> [amount]", false, ["i"]);
         $this->setPermission("essentials.item");
     }
 
@@ -27,7 +27,7 @@ class ItemCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(($gm = $sender->getServer()->getGamemodeString($sender->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
@@ -35,7 +35,7 @@ class ItemCommand extends BaseCommand{
             return false;
         }
         if(count($args) < 1 || count($args) > 2){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
 

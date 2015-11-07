@@ -12,7 +12,7 @@ class TPAll extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "/tpall [player]");
+        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "[player]");
         $this->setPermission("essentials.tpall");
     }
 

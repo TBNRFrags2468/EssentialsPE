@@ -12,7 +12,7 @@ class Pay extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "pay", "Pays a player from your balance", "/pay <player> <amount>", false);
+        parent::__construct($plugin, "pay", "Pays a player from your balance", "<player> <amount>", false);
         $this->setPermission("essentials.pay");
     }
 

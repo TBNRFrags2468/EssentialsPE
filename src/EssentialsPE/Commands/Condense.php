@@ -9,7 +9,7 @@ use pocketmine\utils\TextFormat;
 
 class Condense extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "condense", "Compact your inventory!", "/condense [item name|id|hand|inventory|all]", null, ["compact", "toblocks"]);
+        parent::__construct($plugin, "condense", "Compact your inventory!", "[item name|id|hand|inventory|all]", false, ["compact", "toblocks"]);
         $this->setPermission("essentials.condense");
     }
 
@@ -18,7 +18,7 @@ class Condense extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!isset($args[0])){

@@ -12,7 +12,7 @@ class DelHome extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "delhome", "Remove a home", "/delhome <name>", false, ["remhome", "removehome"]);
+        parent::__construct($plugin, "delhome", "Remove a home", "<name>", false, ["remhome", "removehome"]);
         $this->setPermission("essentials.delhome");
     }
 

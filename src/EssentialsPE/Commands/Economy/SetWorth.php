@@ -12,7 +12,7 @@ class SetWorth extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setworth", "Sets the worth of the item you're holding", "/setworth <worth>", false);
+        parent::__construct($plugin, "setworth", "Sets the worth of the item you're holding", "<worth>", false);
         $this->setPermission("essentials.setworth");
     }
 

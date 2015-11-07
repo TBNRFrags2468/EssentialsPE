@@ -12,7 +12,7 @@ class TPAHere extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpahere", "Request a player to teleport to your position", "/tpahere <player>", false);
+        parent::__construct($plugin, "tpahere", "Request a player to teleport to your position", "<player>", false);
         $this->setPermission("essentials.tpahere");
     }
 

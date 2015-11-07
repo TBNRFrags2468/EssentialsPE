@@ -12,7 +12,7 @@ class Antioch extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "antioch", "Holy hand grenade", "/antioch", false, ["grenade", "tnt"]);
+        parent::__construct($plugin, "antioch", "Holy hand grenade", null, false, ["grenade", "tnt"]);
         $this->setPermission("essentials.antioch");
     }
 
@@ -27,11 +27,11 @@ class Antioch extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
         }
         if(!$this->getPlugin()->antioch($sender)){
             $sender->sendMessage(TextFormat::RED . "[Error] Cannot throw the grenade, there isn't a near valid block");

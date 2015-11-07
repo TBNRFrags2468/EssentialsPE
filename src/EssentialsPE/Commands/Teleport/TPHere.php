@@ -12,7 +12,7 @@ class TPHere extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tphere", "Teleport a player to you", "/tphere <player>", false, ["s"]);
+        parent::__construct($plugin, "tphere", "Teleport a player to you", "<player>", false, ["s"]);
         $this->setPermission("essentials.tphere");
     }
 

@@ -13,7 +13,7 @@ class Kill extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kill", "Kill other people", "/kill [player]");
+        parent::__construct($plugin, "kill", "Kill other people", "[player]");
         $this->setPermission("essentials.kill.use");
     }
 

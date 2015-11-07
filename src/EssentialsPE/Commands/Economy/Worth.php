@@ -12,7 +12,7 @@ class Worth extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "worth", "Get the price of an item", "/worth <hand|item>", "/worth <item>");
+        parent::__construct($plugin, "worth", "Get the price of an item", "<hand|item>", "<item>");
         $this->setPermission("essentials.worth");
     }
 

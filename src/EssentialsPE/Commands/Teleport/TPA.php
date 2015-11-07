@@ -12,7 +12,7 @@ class TPA extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpa", "Asks the player if you can telepor to them", "/tpa <player>", false, ["call", "tpask"]);
+        parent::__construct($plugin, "tpa", "Asks the player if you can telepor to them", "<player>", false, ["call", "tpask"]);
         $this->setPermission("essentials.tpa");
     }
 
