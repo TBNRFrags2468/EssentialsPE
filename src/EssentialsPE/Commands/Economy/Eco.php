@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands\Economy;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
@@ -66,7 +65,7 @@ class Eco extends BaseCommand{
                 }
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 break;
         }
         return true;

@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands\Warp;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class DelWarp extends BaseCommand{
@@ -27,7 +26,7 @@ class DelWarp extends BaseCommand{
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!$this->getPlugin()->warpExists($args[0])){

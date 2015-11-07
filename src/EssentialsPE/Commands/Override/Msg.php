@@ -29,7 +29,7 @@ class Msg extends BaseCommand{
             return false;
         }
         if(count($args) < 2){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $t = array_shift($args);

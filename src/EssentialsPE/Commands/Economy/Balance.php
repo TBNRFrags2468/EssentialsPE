@@ -30,6 +30,7 @@ class Balance extends BaseCommand{
             case 0:
                 if(!$sender instanceof Player){
                     $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $sender->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($sender));

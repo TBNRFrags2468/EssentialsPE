@@ -27,7 +27,7 @@ class TPDeny extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $request = $this->getPlugin()->hasARequest($sender);
@@ -61,7 +61,7 @@ class TPDeny extends BaseCommand{
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

@@ -28,7 +28,7 @@ class PowerTool extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
@@ -39,7 +39,7 @@ class PowerTool extends BaseCommand{
 
         if(count($args) === 0){
             if(!$this->getPlugin()->getPowerToolItemCommand($sender, $item) && !$this->getPlugin()->getPowerToolItemCommands($sender, $item) && !$this->getPlugin()->getPowerToolItemChatMacro($sender, $item)){
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
             }
             if($this->getPlugin()->getPowerToolItemCommand($sender, $item) !== false){
@@ -112,7 +112,7 @@ class PowerTool extends BaseCommand{
                         break;
                     case "d":
                         if(!$this->getPlugin()->getPowerToolItemCommand($sender, $item)){
-                            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                            $this->sendUsage($sender, $alias);
                             return false;
                         }
                         $this->getPlugin()->disablePowerToolItem($sender, $item);

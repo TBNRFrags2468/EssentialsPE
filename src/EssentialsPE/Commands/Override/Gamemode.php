@@ -55,12 +55,12 @@ class Gamemode extends BaseCommand{
             }
         }
         if(count($args) < 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $player = $sender;
         if(!$player instanceof Player && !isset($args[1])){
-            $player->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(isset($args[1])){
