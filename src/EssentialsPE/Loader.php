@@ -13,6 +13,7 @@ use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Condense;
 use EssentialsPE\Commands\Depth;
 #use EssentialsPE\Commands\Economy\Balance;
 #use EssentialsPE\Commands\Economy\Eco;
@@ -209,6 +210,7 @@ class Loader extends PluginBase{
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
+            //new Condense($this), // TODO
             new Depth($this),
             new EssentialsPE($this),
             new Extinguish($this),
@@ -238,7 +240,7 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            new TreeCommand($this), //TODO
+            //new TreeCommand($this), //TODO
             new Unlimited($this),
             new Vanish($this),
             new World($this),
@@ -776,34 +778,34 @@ class Loader extends PluginBase{
      * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
      *
      * @param BaseInventory $inv
-     * @param Item[]|null $target
+     * @param Item|null $target
      * @return BaseInventory
      */
     public function condenseItems(BaseInventory $inv, $target = null){
         if($target === null){
             $items =& $inv->getContents();
         }else{
-            $items = $target;
+            $items =& $inv->all($target);
         }
+        $replace = Item::get(0);
         // First step: Merge target items...
         foreach($items as $slot => $item){
-            $sub = $inv->all($item);
+            $sub = $target === null ? $inv->all($item) : $items;
             foreach($sub as $index => $i){
                 /** @var Item $i */
                 $item->setCount($item->getCount() + $i->getCount());
-                unset($items[$index]);
+                $inv->setItem($index, $replace);
             }
         }
-        $inv->setContents($items);
         // Second step: Condense items...
         foreach($items as $slot => $item){
             $condense = $this->condenseRecipes($item);
             $cSlot = $slot;
             if(count($condense) > 1){
                 $cSlot = $inv->firstEmpty();
-                $items[$slot] = $condense[1];
+                $inv->setItem($slot, $condense[1]);
             }
-            $items[$cSlot] = $items[0];
+            $inv->setItem($cSlot, $condense[0]);
         }
         return $inv;
     }

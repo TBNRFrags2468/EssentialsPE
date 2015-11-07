@@ -91,6 +91,9 @@ permissions:
             essentials.compass:
                 default: true
                 description: "Display your current bearing direction"
+            essentials.condense:
+                default: true
+                description: "Compact items into blocks in your inventory!"
             essentials.delhome:
                 default: true
                 description: "Remove one of your homes"
