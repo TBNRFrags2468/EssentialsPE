@@ -93,6 +93,7 @@ use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
+use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
@@ -108,6 +109,7 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
+use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\OfflinePlayer;
@@ -1354,6 +1356,44 @@ class Loader extends PluginBase{
             "Fuse" => new Byte("Fuse", 80),
         ]));
         $entity->spawnToAll();
+    }
+
+    /**
+     * @param Position|Player $pos
+     * @param int $damage
+     */
+    public function strikeLightning($pos, $damage = 0){
+        $pk = $this->lightning($pos);
+        foreach($pos->getLevel()->getPlayers() as $p){
+            $p->dataPacket($pk);
+        }
+        if($pos instanceof Player){
+            $pos->attack(0, new EntityDamageEvent($pos, EntityDamageEvent::CAUSE_MAGIC, $damage));
+        }
+    }
+
+    /** @var null|AddEntityPacket */
+    private $lightningPacket = null;
+
+    /**
+     * @param Vector3 $pos
+     * @return AddEntityPacket
+     */
+    public function lightning(Vector3 $pos){
+        if($this->lightningPacket === null){
+            $pk = new AddEntityPacket();
+            $pk->type = 93;
+            $pk->eid = 0;
+            $pk->metadata = [];
+            $pk->speedX = 0;
+            $pk->speedY = 0;
+            $pk->speedZ = 0;
+            $pk->x = $pos->getX();
+            $pk->y = $pos->getY();
+            $pk->z = $pos->getZ();
+            $this->lightningPacket = $pk;
+        }
+        return $this->lightningPacket;
     }
 
     /**  ______ _
