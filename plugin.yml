@@ -451,7 +451,7 @@ permissions:
                         default: op
                         description: "Run a command as another player"
                     essentials.sudo.exempt:
-                        default: op
+                        default: false
                         description: "Prevent from being Sudo'ed"
             essentials.suicide:
                 default: op

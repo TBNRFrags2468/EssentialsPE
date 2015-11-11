@@ -35,6 +35,7 @@ use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\Kit;
+use EssentialsPE\Commands\Lightning;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
@@ -212,7 +213,7 @@ class Loader extends PluginBase{
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
-            //new Condense($this), // TODO
+            //new Condense($this),
             new Depth($this),
             new EssentialsPE($this),
             new Extinguish($this),
@@ -225,6 +226,7 @@ class Loader extends PluginBase{
             new Jump($this),
             new KickAll($this),
             new Kit($this),
+            new Lightning($this),
             new More($this),
             new Mute($this),
             new Near($this),
@@ -295,11 +297,7 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
-        $rCfg = $this->getResource("config.yml");
-        $version = yaml_parse(fgetc($rCfg))["version"];
-        fclose($rCfg);
-
-        if(!$cfg->exists("version") || $cfg->get("version") !== $version){
+        if(!$cfg->exists("version") || $cfg->get("version") !== "0.0.2"){
             $this->getLogger()->debug(TextFormat::RED . "An invalid config file was found, generating a new one...");
             unlink($this->getDataFolder() . "config.yml");
             $this->saveDefaultConfig();
@@ -783,31 +781,33 @@ class Loader extends PluginBase{
      * @param Item|null $target
      * @return BaseInventory
      */
-    public function condenseItems(BaseInventory $inv, $target = null){
-        if($target === null){
-            $items =& $inv->getContents();
-        }else{
-            $items =& $inv->all($target);
-        }
+    public function condenseItems(BaseInventory $inv, $target = null){ // TODO: Fix inventory clear...
+        $items = $target === null ? $inv->getContents() : $inv->all($target);
         $replace = Item::get(0);
         // First step: Merge target items...
         foreach($items as $slot => $item){
-            $sub = $target === null ? $inv->all($item) : $items;
+            $sub = $inv->all($item);
             foreach($sub as $index => $i){
                 /** @var Item $i */
-                $item->setCount($item->getCount() + $i->getCount());
-                $inv->setItem($index, $replace);
+                if($slot !== $index && $i->getDamage() === $item->getDamage()){
+                    $item->setCount($item->getCount() + $i->getCount());
+                    $items[$index] = $replace;
+                }
             }
         }
+        $inv->setContents($items);
         // Second step: Condense items...
         foreach($items as $slot => $item){
             $condense = $this->condenseRecipes($item);
-            $cSlot = $slot;
-            if(count($condense) > 1){
-                $cSlot = $inv->firstEmpty();
-                $inv->setItem($slot, $condense[1]);
+            if($condense === null){
+                continue;
             }
-            $inv->setItem($cSlot, $condense[0]);
+            $cSlot = $slot;
+            if($item->getCount() > 0){
+                $cSlot = $inv->firstEmpty();
+                $inv->setItem($slot, $item);
+            }
+            $inv->setItem($cSlot, $condense);
         }
         return $inv;
     }
@@ -820,7 +820,7 @@ class Loader extends PluginBase{
 
     /**
      * @param Item $item
-     * @return array|Item
+     * @return Item|null
      */
     private function condenseRecipes(Item $item){
         if(isset($this->condenseShapes[0][$item->getId()])){ // 2x2 Shapes
@@ -828,28 +828,27 @@ class Loader extends PluginBase{
         }elseif(isset($this->condenseShapes[1][$item->getId()])){ // 3x3 Shapes
             $shape = 9;
         }else{
-            return $item;
+            return null;
         }
         $index = (int) sqrt($shape) - 2;
         $newId = $this->condenseShapes[$index][$item->getId()];
         $damage = 0;
         if(is_array($newId)){
             if(!isset($newId[1][$item->getDamage()])){
-                return $item;
+                return null;
             }
             $damage = $newId[1][$item->getDamage()];
             $newId = $newId[0];
         }
         if(($count = floor($shape / $item->getCount())) < 1){
-            return $item;
+            return null;
+        }
+        $nItem = new Item($newId, $count, $damage);
+        if($nItem->getId() === 0){
+            return null;
         }
         $item->setCount($item->getCount() - ($count * $shape));
-        $condense = new Item($newId, $count, $damage);
-        $ret = [$condense];
-        if($item->getCount() > 0){
-            $ret[] = $item;
-        }
-        return $ret;
+        return $nItem; // TODO: Fix returning a "wrong ID"
     }
 
     /**   _____              _
@@ -1383,7 +1382,7 @@ class Loader extends PluginBase{
         if($this->lightningPacket === null){
             $pk = new AddEntityPacket();
             $pk->type = 93;
-            $pk->eid = 0;
+            $pk->eid = Entity::$entityCount++;
             $pk->metadata = [];
             $pk->speedX = 0;
             $pk->speedY = 0;

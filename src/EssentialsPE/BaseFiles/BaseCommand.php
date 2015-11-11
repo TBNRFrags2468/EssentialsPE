@@ -38,22 +38,8 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
     /**
      * @return string
      */
-    public function getConsoleUsage(){
-        if($this->consoleUsageMessage === null){
-            $message = "Usage: " . str_replace("[player]", "<player>", $this->getUsage());
-        }elseif(!$this->consoleUsageMessage){
-            $message = "[Error] Please run this command in-game";
-        }else{
-            $message = $this->consoleUsageMessage;
-        }
-        return TextFormat::RED . $message;
-    }
-
-    /**
-     * @return string
-     */
     public function getUsage(){
-        return TextFormat::RED . parent::getUsage();
+        return "/" . parent::getName() . " " . parent::getUsage();
     }
 
     /**
@@ -64,14 +50,14 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
         $message = TextFormat::RED . "Usage: " . TextFormat::GRAY . "/$alias ";
         if(!$sender instanceof Player){
             if($this->consoleUsageMessage === null){
-                $message .= str_replace("[player]", "<player>", $this->getUsage());
+                $message .= str_replace("[player]", "<player>", parent::getUsage());
             }elseif(!$this->consoleUsageMessage){
-                $message = "[Error] Please run this command in-game";
+                $message = TextFormat::RED . "[Error] Please run this command in-game";
             }else{
                 $message .= $this->consoleUsageMessage;
             }
         }else{
-            $message .= $this->getUsage();
+            $message .= parent::getUsage();
         }
         $sender->sendMessage($message);
     }
