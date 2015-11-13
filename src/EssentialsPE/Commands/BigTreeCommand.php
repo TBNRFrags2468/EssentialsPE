@@ -14,7 +14,7 @@ class BigTreeCommand extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "bigtree", "Spawns a big tree", "/bigtree <tree|redwood|jungle>", false);
+        parent::__construct($plugin, "bigtree", "Spawns a big tree", "<tree|redwood|jungle>", false);
         $this->setPermission("essentials.bigtree");
     }
 
@@ -29,11 +29,11 @@ class BigTreeCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $transparent = [];

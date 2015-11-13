@@ -12,7 +12,7 @@ class Depth extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "depth", "Display your depth related to sea-level", "/depth", false, ["height"]);
+        parent::__construct($plugin, "depth", "Display your depth related to sea-level", null, false, ["height"]);
         $this->setPermission("essentials.depth");
     }
 
@@ -27,11 +27,11 @@ class Depth extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $pos = $sender->getFloorY() - 63;

@@ -12,7 +12,7 @@ class TPA extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpa", "Asks the player if you can telepor to them", "/tpa <player>", false, ["call", "tpask"]);
+        parent::__construct($plugin, "tpa", "Asks the player if you can telepor to them", "<player>", false, ["call", "tpask"]);
         $this->setPermission("essentials.tpa");
     }
 
@@ -27,11 +27,11 @@ class TPA extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

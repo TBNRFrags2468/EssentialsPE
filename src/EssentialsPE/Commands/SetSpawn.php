@@ -12,7 +12,7 @@ class SetSpawn extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setspawn", "Change your server main spawn point", "/setspawn", false);
+        parent::__construct($plugin, "setspawn", "Change your server main spawn point", null, false);
         $this->setPermission("essentials.setspawn");
     }
 
@@ -27,11 +27,11 @@ class SetSpawn extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) != 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $sender->getLevel()->setSpawnLocation($sender);

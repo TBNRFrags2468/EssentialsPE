@@ -12,7 +12,7 @@ class Balance extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "balance", "See how many money do you have", "/balance [player]", null, ["bal", "money"]);
+        parent::__construct($plugin, "balance", "See how many money do you have", "[player]", null, ["bal", "money"]);
         $this->setPermission("essentials.balance.use");
     }
 
@@ -30,6 +30,7 @@ class Balance extends BaseCommand{
             case 0:
                 if(!$sender instanceof Player){
                     $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $sender->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($sender));

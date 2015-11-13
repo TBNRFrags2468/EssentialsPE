@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands\Economy;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
@@ -12,7 +11,7 @@ class Eco extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "eco", "Sets the balance of a player", "/eco <give|take|set|reset> <player> [amount]", null, ["economy"]);
+        parent::__construct($plugin, "eco", "Sets the balance of a player", "<give|take|set|reset> <player> [amount]", null, ["economy"]);
         $this->setPermission("essentials.eco.use");
     }
 
@@ -66,7 +65,7 @@ class Eco extends BaseCommand{
                 }
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 break;
         }
         return true;

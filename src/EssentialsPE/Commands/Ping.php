@@ -1,20 +1,19 @@
 <?php
 namespace EssentialsPE\Commands;
 
+
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
 
-class Broadcast extends BaseCommand{
+class Ping extends BaseCommand{
     /**
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "broadcast", "Broadcast a message.", "<message>", null, ["bcast"]);
-        $this->setPermission("essentials.broadcast");
+        parent::__construct($plugin, "ping", "Pong!");
+        $this->setPermission("essentials.ping");
     }
-
     /**
      * @param CommandSender $sender
      * @param string $alias
@@ -25,11 +24,7 @@ class Broadcast extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) < 1){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        $sender->getServer()->broadcastMessage(TextFormat::LIGHT_PURPLE . "[Broadcast] " . TextFormat::RESET . implode(" ", $args));
+        $sender->sendMessage("Pong!");
         return true;
     }
 }

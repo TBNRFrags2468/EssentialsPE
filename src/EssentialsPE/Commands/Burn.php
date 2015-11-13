@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Burn extends BaseCommand{
@@ -12,7 +11,7 @@ class Burn extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "burn", "Set a player on fire", "/burn <player> <seconds>");
+        parent::__construct($plugin, "burn", "Set a player on fire", "<player> <seconds>");
         $this->setPermission("essentials.burn");
     }
 
@@ -27,7 +26,7 @@ class Burn extends BaseCommand{
             return false;
         }
         if(count($args) != 2){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $player = $this->getPlugin()->getPlayer($args[0]);

@@ -12,7 +12,7 @@ class AFK extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "afk", "Toggle the \"Away From the Keyboard\" status", "/afk [player]", null, ["away"]);
+        parent::__construct($plugin, "afk", "Toggle the \"Away From the Keyboard\" status", "[player]", null, ["away"]);
         $this->setPermission("essentials.afk.use");
     }
 
@@ -29,7 +29,7 @@ class AFK extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $this->getPlugin()->switchAFKMode($sender, true);
@@ -47,7 +47,7 @@ class AFK extends BaseCommand{
                 $this->getPlugin()->switchAFKMode($player, true);
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

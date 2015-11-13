@@ -14,7 +14,7 @@ class Heal extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "heal", "Heal yourself or other player", "/heal [player]");
+        parent::__construct($plugin, "heal", "Heal yourself or other player", "[player]");
         $this->setPermission("essentials.heal.use");
     }
 
@@ -31,7 +31,7 @@ class Heal extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $sender->heal($sender->getMaxHealth(), new EntityRegainHealthEvent($sender, $sender->getMaxHealth() - $sender->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
@@ -54,7 +54,7 @@ class Heal extends BaseCommand{
                 $player->sendMessage(TextFormat::GREEN . "You have been healed!");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

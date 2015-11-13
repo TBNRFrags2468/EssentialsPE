@@ -3,7 +3,9 @@ namespace EssentialsPE\BaseFiles;
 
 use EssentialsPE\Loader;
 use pocketmine\command\Command;
+use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
@@ -36,21 +38,27 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
     /**
      * @return string
      */
-    public function getConsoleUsage(){
-        if($this->consoleUsageMessage === null){
-            $message = "Usage: " . str_replace("[player]", "<player>", $this->getUsage());
-        }elseif(!$this->consoleUsageMessage){
-            $message = "[Error] Please run this command in-game";
-        }else{
-            $message = $this->consoleUsageMessage;
-        }
-        return TextFormat::RED . $message;
+    public function getUsage(){
+        return "/" . parent::getName() . " " . parent::getUsage();
     }
 
     /**
-     * @return string
+     * @param CommandSender $sender
+     * @param string $alias
      */
-    public function getUsage(){
-        return TextFormat::RED . parent::getUsage();
+    public function sendUsage(CommandSender $sender, $alias){
+        $message = TextFormat::RED . "Usage: " . TextFormat::GRAY . "/$alias ";
+        if(!$sender instanceof Player){
+            if($this->consoleUsageMessage === null){
+                $message .= str_replace("[player]", "<player>", parent::getUsage());
+            }elseif(!$this->consoleUsageMessage){
+                $message = TextFormat::RED . "[Error] Please run this command in-game";
+            }else{
+                $message .= $this->consoleUsageMessage;
+            }
+        }else{
+            $message .= parent::getUsage();
+        }
+        $sender->sendMessage($message);
     }
 }

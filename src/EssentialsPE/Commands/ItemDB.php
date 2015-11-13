@@ -12,7 +12,7 @@ class ItemDB extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "itemdb", "Display the information attached to the item you hold", "/itemdb [name|id|meta]", false, ["itemno", "durability", "dura"]);
+        parent::__construct($plugin, "itemdb", "Display the information attached to the item you hold", "[name|id|meta]", false, ["itemno", "durability", "dura"]);
         $this->setPermission("essentials.itemdb");
     }
 
@@ -27,7 +27,7 @@ class ItemDB extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $item = $sender->getInventory()->getItemInHand();
@@ -52,7 +52,7 @@ class ItemDB extends BaseCommand{
                 }
                 break;
             default:
-                $sender->sendMessage($this->getUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

@@ -12,7 +12,7 @@ class SetHome extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sethome", "Create or update a home position", "/sethome <name>", false, ["createhome"]);
+        parent::__construct($plugin, "sethome", "Create or update a home position", "<name>", false, ["createhome"]);
         $this->setPermission("essentials.sethome");
     }
 
@@ -27,11 +27,11 @@ class SetHome extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(strtolower($args[0]) === "bed"){

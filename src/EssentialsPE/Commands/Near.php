@@ -12,7 +12,7 @@ class Near extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "near", "List the players near to you", "/near [player]", null, ["nearby"]);
+        parent::__construct($plugin, "near", "List the players near to you", "[player]", null, ["nearby"]);
         $this->setPermission("essentials.near.use");
     }
 
@@ -29,7 +29,7 @@ class Near extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $sender->sendMessage($this->broadcastPlayers($sender, "you"));
@@ -47,7 +47,7 @@ class Near extends BaseCommand{
                 $sender->sendMessage($this->broadcastPlayers($player, $player->getDisplayName()));
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

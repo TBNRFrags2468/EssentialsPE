@@ -11,7 +11,7 @@ class KickAll extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kickall", "Kick all the players", "/kickall <reason>");
+        parent::__construct($plugin, "kickall", "Kick all the players", "<reason>");
         $this->setPermission("essentials.kickall");
     }
 

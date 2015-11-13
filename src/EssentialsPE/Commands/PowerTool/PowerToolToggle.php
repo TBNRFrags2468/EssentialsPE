@@ -12,7 +12,7 @@ class PowerToolToggle extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "powertooltoggle", "Disable PowerTool from all the items", "/powertooltoggle", false, ["ptt", "pttoggle"]);
+        parent::__construct($plugin, "powertooltoggle", "Disable PowerTool from all the items", null, false, ["ptt", "pttoggle"]);
         $this->setPermission("essentials.powertooltoggle");
     }
 
@@ -27,11 +27,11 @@ class PowerToolToggle extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $this->getPlugin()->disablePowerTool($sender);

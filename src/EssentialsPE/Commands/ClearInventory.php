@@ -12,7 +12,7 @@ class ClearInventory extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "/clearinventory [player]", null, ["ci", "clean", "clearinvent"]);
+        parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "[player]", null, ["ci", "clean", "clearinvent"]);
         $this->setPermission("essentials.clearinventory.use");
     }
 
@@ -29,7 +29,7 @@ class ClearInventory extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $gm = $sender->getGamemode();
@@ -60,7 +60,7 @@ class ClearInventory extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

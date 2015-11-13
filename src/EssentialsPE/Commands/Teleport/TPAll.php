@@ -12,7 +12,7 @@ class TPAll extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "/tpall [player]", "/tpall <player>");
+        parent::__construct($plugin, "tpall", "Teleport all player to you or another player", "[player]");
         $this->setPermission("essentials.tpall");
     }
 
@@ -29,7 +29,7 @@ class TPAll extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
@@ -55,7 +55,7 @@ class TPAll extends BaseCommand{
                 $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

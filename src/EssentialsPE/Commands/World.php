@@ -12,7 +12,7 @@ class World extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "world", "Teleport between worlds", "/world <world name>", false);
+        parent::__construct($plugin, "world", "Teleport between worlds", "<world name>", false);
         $this->setPermission("essentials.world");
     }
 
@@ -27,11 +27,11 @@ class World extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!$sender->hasPermission("essentials.worlds.*") && !$sender->hasPermission("essentials.worlds." . strtolower($args[0]))){

@@ -7,21 +7,12 @@ use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Extinguish extends BaseCommand{
-    /**
-     * @param Loader $plugin
-     */
+class Lightning extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "extinguish", "Extinguish a player", "[player]", null, ["ext"]);
-        $this->setPermission("essentials.extinguish.use");
+        parent::__construct($plugin, "lightning", "Strike a lightning!", "[player [damage]]", "<player> [damage]", ["strike", "smite", "thor", "shock"]);
+        $this->setPermission("essentials.lightning.use");
     }
 
-    /**
-     * @param CommandSender $sender
-     * @param string $alias
-     * @param array $args
-     * @return bool
-     */
     public function execute(CommandSender $sender, $alias, array $args){
         if(!$this->testPermission($sender)){
             return false;
@@ -32,27 +23,33 @@ class Extinguish extends BaseCommand{
                     $this->sendUsage($sender, $alias);
                     return false;
                 }
-                $sender->extinguish();
-                $sender->sendMessage(TextFormat::AQUA . "You were extinguished!");
+                $pos = $sender->getTargetBlock(100);
+                $damage = 0;
                 break;
             case 1:
-                if(!$sender->hasPermission("essentials.extinguish.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                $player = $this->getPlugin()->getPlayer($args[0]);
-                if(!$player){
+            case 2:
+                $pos = $this->getPlugin()->getPlayer($args[0]);
+                if(!$pos){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
-                $player->extinguish();
-                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has been extinguished!");
+                if(!isset($args[1])){
+                    $args[1] = 0;
+                }else{
+                    if(!is_int((int) $args[1])){
+                        $sender->sendMessage(TextFormat::RED . "[Error] Damage should be numeric");
+                        return false;
+                    }
+                }
+                $damage = $args[1];
                 break;
             default:
                 $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }
+        $this->getPlugin()->strikeLightning($pos, $damage);
+        $sender->sendMessage(TextFormat::YELLOW . "Lightning summoned!");
         return true;
     }
 }

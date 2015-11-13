@@ -13,7 +13,7 @@ class Sell extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sell", "Sell the specified item", "/sell <item|hand> [amount]", false);
+        parent::__construct($plugin, "sell", "Sell the specified item", "<item|hand> [amount]", false);
         $this->setPermission("essentials.sell");
     }
 
@@ -28,7 +28,7 @@ class Sell extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if($sender->getGamemode() === 1 || $sender->getGamemode() === 3){

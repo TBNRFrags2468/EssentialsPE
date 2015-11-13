@@ -12,7 +12,7 @@ class Setwarp extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "/setwarp <name>", false, ["openwarp", "createwarp"]);
+        parent::__construct($plugin, "setwarp", "Create a warp (or update it)", "<name>", false, ["openwarp", "createwarp"]);
         $this->setPermission("essentials.setwarp");
     }
 
@@ -27,11 +27,11 @@ class Setwarp extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if($args[0] === null || $args[0] === "" || $args[0] === " "){

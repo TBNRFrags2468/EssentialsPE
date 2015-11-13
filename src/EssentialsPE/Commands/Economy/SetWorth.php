@@ -12,7 +12,7 @@ class SetWorth extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setworth", "Sets the worth of the item you're holding", "/setworth <worth>", false);
+        parent::__construct($plugin, "setworth", "Sets the worth of the item you're holding", "<worth>", false);
         $this->setPermission("essentials.setworth");
     }
 
@@ -27,11 +27,11 @@ class SetWorth extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!is_int((int) $args[0]) || (int) $args[0] < 0){

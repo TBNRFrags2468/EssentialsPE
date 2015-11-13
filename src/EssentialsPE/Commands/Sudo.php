@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\event\player\PlayerChatEvent;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Sudo extends BaseCommand{
@@ -13,7 +12,7 @@ class Sudo extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sudo", "Run a command as another player", "/sudo <player> <command line|c:<chat message>");
+        parent::__construct($plugin, "sudo", "Run a command as another player", "<player> <command line|c:<chat message>");
         $this->setPermission("essentials.sudo.use");
     }
 
@@ -28,7 +27,7 @@ class Sudo extends BaseCommand{
             return false;
         }
         if(count($args) < 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $player = $this->getPlugin()->getPlayer(array_shift($args));

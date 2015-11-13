@@ -13,6 +13,7 @@ use EssentialsPE\Commands\Broadcast;
 use EssentialsPE\Commands\Burn;
 use EssentialsPE\Commands\ClearInventory;
 use EssentialsPE\Commands\Compass;
+use EssentialsPE\Commands\Condense;
 use EssentialsPE\Commands\Depth;
 #use EssentialsPE\Commands\Economy\Balance;
 #use EssentialsPE\Commands\Economy\Eco;
@@ -34,6 +35,7 @@ use EssentialsPE\Commands\ItemDB;
 use EssentialsPE\Commands\Jump;
 use EssentialsPE\Commands\KickAll;
 use EssentialsPE\Commands\Kit;
+use EssentialsPE\Commands\Lightning;
 use EssentialsPE\Commands\More;
 use EssentialsPE\Commands\Mute;
 use EssentialsPE\Commands\Near;
@@ -42,6 +44,7 @@ use EssentialsPE\Commands\Nuke;
 use EssentialsPE\Commands\Override\Gamemode;
 use EssentialsPE\Commands\Override\Kill;
 use EssentialsPE\Commands\Override\Msg;
+use EssentialsPE\Commands\Ping;
 use EssentialsPE\Commands\PowerTool\PowerTool;
 use EssentialsPE\Commands\PowerTool\PowerToolToggle;
 use EssentialsPE\Commands\PTime;
@@ -90,6 +93,8 @@ use EssentialsPE\Tasks\Updater\UpdateInstallTask;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
+use pocketmine\event\entity\EntityDamageEvent;
+use pocketmine\inventory\BaseInventory;
 use pocketmine\item\Armor;
 use pocketmine\item\Item;
 use pocketmine\item\ItemBlock;
@@ -104,8 +109,10 @@ use pocketmine\nbt\tag\Compound;
 use pocketmine\nbt\tag\Double;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\nbt\tag\Float;
+use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
+use pocketmine\OfflinePlayer;
 use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
@@ -117,9 +124,6 @@ use pocketmine\utils\TextFormat;
 class Loader extends PluginBase{
     /** @var Config */
     private $economy;
-
-    /** @var MessagesAPI
-    private $messages;*/
 
     /** @var array */
     private $kits = [];
@@ -208,6 +212,7 @@ class Loader extends PluginBase{
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
+            new Condense($this),
             new Depth($this),
             new EssentialsPE($this),
             new Extinguish($this),
@@ -220,11 +225,13 @@ class Loader extends PluginBase{
             new Jump($this),
             new KickAll($this),
             new Kit($this),
+            new Lightning($this),
             new More($this),
             new Mute($this),
             new Near($this),
             new Nick($this),
             new Nuke($this),
+            new Ping($this),
             new PTime($this),
             new PvP($this),
             new RealName($this),
@@ -289,7 +296,7 @@ class Loader extends PluginBase{
         $this->saveResource("Kits.yml");
         $cfg = $this->getConfig();
 
-        if(!$cfg->exists("version") || $cfg->get("version") !== "0.0.1"){
+        if(!$cfg->exists("version") || $cfg->get("version") !== "0.0.2"){
             $this->getLogger()->debug(TextFormat::RED . "An invalid config file was found, generating a new one...");
             unlink($this->getDataFolder() . "config.yml");
             $this->saveDefaultConfig();
@@ -556,6 +563,20 @@ class Loader extends PluginBase{
         }
         return $found;
     }
+    /**
+     * Let you search for a player using his Display name(Nick) or Real name
+     * Instead of returning false, this method will create an OfflinePlayer object.
+     *
+     * @param string $name
+     * @return Player|OfflinePlayer
+     */
+    public function getOfflinePlayer($name){
+        $player = $this->getPlayer($name);
+        if($player === false){
+            $player = new OfflinePlayer($this->getServer(), strtolower($name));
+        }
+        return $player;
+    }
 
     /**
      * Return a colored message replacing every
@@ -752,6 +773,99 @@ class Loader extends PluginBase{
         return true;
     }
 
+    /**
+     * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
+     *
+     * @param BaseInventory $inv
+     * @param Item|null $target
+     * @return bool
+     */
+    public function condenseItems(BaseInventory $inv, $target = null){ // TODO: Fix inventory clear...
+        $items = $target === null ? $inv->getContents() : $inv->all($target);
+        if($target !== null && !$this->canBeCondensed($target)){
+            return false;
+        }
+        $replace = Item::get(0);
+        // First step: Merge target items...
+        foreach($items as $slot => $item){
+            if(!isset($this->condenseShapes[0][$item->getId()]) && !isset($this->condenseShapes[1][$item->getId()])){
+                continue;
+            }
+            $sub = $inv->all($item);
+            foreach($sub as $index => $i){
+                /** @var Item $i */
+                if($slot !== $index){
+                    $item->setCount($item->getCount() + $i->getCount());
+                    $items[$index] = $replace;
+                    var_dump($index . " - " . $slot);
+                }
+            }
+        }
+        $inv->setContents($items);
+        // Second step: Condense items...
+        foreach($items as $slot => $item){
+            $condense = $this->condenseRecipes($item);
+            if($condense === null){
+                continue;
+            }
+            $cSlot = $slot;
+            if($item->getCount() > 0){
+                $cSlot = $inv->firstEmpty();
+                $inv->setItem($slot, $item);
+            }
+            $inv->setItem($cSlot, $condense);
+        }
+        return true;
+    }
+
+    /** @var array */
+    private $condenseShapes = [
+        [], // 2x2 Shapes
+        [Item::COAL => Item::COAL_BLOCK, Item::IRON_INGOT => Item::IRON_BLOCK, Item::GOLD_INGOT => Item::GOLD_BLOCK, Item::DIAMOND => Item::DIAMOND_BLOCK, Item::EMERALD => Item::EMERALD_BLOCK] // 3x3 Shapes
+    ];
+
+    /**
+     * @param Item $item
+     * @return Item|null
+     */
+    private function condenseRecipes(Item $item){
+        if(isset($this->condenseShapes[0][$item->getId()])){ // 2x2 Shapes
+            $shape = 4;
+        }elseif(isset($this->condenseShapes[1][$item->getId()])){ // 3x3 Shapes
+            $shape = 9;
+        }else{
+            return null;
+        }
+        $index = (int) sqrt($shape) - 2;
+        $newId = $this->condenseShapes[$index][$item->getId()];
+        $damage = 0;
+        if(is_array($newId)){
+            if(!isset($newId[1][$item->getDamage()])){
+                return null;
+            }
+            $damage = $newId[1][$item->getDamage()];
+            $newId = $newId[0];
+        }
+        $count = floor($item->getCount() / $shape);
+        if($count < 1){
+            return null;
+        }
+        $condensed = new Item($newId, $damage, $count);
+        if($condensed->getId() === Item::AIR){
+            return null;
+        }
+        $item->setCount($item->getCount() - ($count * $shape));
+        return $condensed;
+    }
+
+    /**
+     * @param Item $item
+     * @return bool
+     */
+    private function canBeCondensed(Item $item){
+        return isset($this->condenseShapes[0][$item->getId()]) || isset($this->condenseShapes[1][$item->getId()]);
+    }
+
     /**   _____              _
      *   / ____|            (_)
      *  | (___   ___ ___ ___ _  ___  _ __  ___
@@ -840,6 +954,7 @@ class Loader extends PluginBase{
      * @return bool|Config
      */
     private function getSessionFile($player){
+        $this->getLogger()->info("Running");
         if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
             mkdir($dir);
         }
@@ -1257,6 +1372,44 @@ class Loader extends PluginBase{
         $entity->spawnToAll();
     }
 
+    /**
+     * @param Position|Player $pos
+     * @param int $damage
+     */
+    public function strikeLightning($pos, $damage = 0){
+        $pk = $this->lightning($pos);
+        foreach($pos->getLevel()->getPlayers() as $p){
+            $p->dataPacket($pk);
+        }
+        if($pos instanceof Player){
+            $pos->attack(0, new EntityDamageEvent($pos, EntityDamageEvent::CAUSE_MAGIC, $damage));
+        }
+    }
+
+    /** @var null|AddEntityPacket */
+    private $lightningPacket = null;
+
+    /**
+     * @param Vector3 $pos
+     * @return AddEntityPacket
+     */
+    public function lightning(Vector3 $pos){
+        if($this->lightningPacket === null){
+            $pk = new AddEntityPacket();
+            $pk->type = 93;
+            $pk->eid = Entity::$entityCount++;
+            $pk->metadata = [];
+            $pk->speedX = 0;
+            $pk->speedY = 0;
+            $pk->speedZ = 0;
+            $pk->x = $pos->getX();
+            $pk->y = $pos->getY();
+            $pk->z = $pos->getZ();
+            $this->lightningPacket = $pk;
+        }
+        return $this->lightningPacket;
+    }
+
     /**  ______ _
      *  |  ____| |
      *  | |__  | |_   _
@@ -1472,7 +1625,22 @@ class Loader extends PluginBase{
      *                             |___/
      */
 
-    // TODO: Multi-Language API
+    /** @var MessagesAPI */
+    private $messagesAPI = null;
+
+    public function loadMessagesAPI(){
+        $this->messagesAPI = new MessagesAPI($this, $this->getFile() . "resources/Messages.yml");
+    }
+
+    /**
+     * @return MessagesAPI
+     */
+    public function getMessagesAPI(){
+        if($this->messagesAPI === null){
+            $this->loadMessagesAPI();
+        }
+        return $this->messagesAPI;
+    }
 
     /**  __  __
      *  |  \/  |
@@ -2056,7 +2224,7 @@ class Loader extends PluginBase{
     public $updaterDownloadTask = null; // Used to prevent Async Task conflicts with Server's limit :P
 
     /**
-     * Tell if the updater is enabled or not
+     * Tell if the auto-updater is enabled or not
      *
      * @return bool
      */

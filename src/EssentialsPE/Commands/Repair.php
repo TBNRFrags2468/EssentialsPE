@@ -12,7 +12,7 @@ class Repair extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "repair", "Repair the item you're holding", "/repair [all|hand]", false, ["fix"]);
+        parent::__construct($plugin, "repair", "Repair the item you're holding", "[all|hand]", false, ["fix"]);
         $this->setPermission("essentials.repair.use");
     }
 
@@ -27,7 +27,7 @@ class Repair extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         switch(count($args)){
@@ -73,7 +73,7 @@ class Repair extends BaseCommand{
                         $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         break;
                     default:
-                        $sender->sendMessage($this->getUsage());
+                        $this->sendUsage($sender, $alias);
                         return false;
                         break;
                 }

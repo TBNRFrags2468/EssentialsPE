@@ -12,7 +12,7 @@ class Seen extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "seen", "See player's last played time", "/seen <player>");
+        parent::__construct($plugin, "seen", "See player's last played time", "<player>");
         $this->setPermission("essentials.seen");
     }
 
@@ -27,10 +27,10 @@ class Seen extends BaseCommand{
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $sender->getServer()->getOfflinePlayer($args[0]); //TODO reimplement ability to use nicks
+        $player = $this->getPlugin()->getOfflinePlayer($args[0]);
 
         if($player instanceof Player){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");

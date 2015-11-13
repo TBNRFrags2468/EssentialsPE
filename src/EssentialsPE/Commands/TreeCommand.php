@@ -5,8 +5,9 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
-use pocketmine\item\Item;
+use pocketmine\level\generator\object\Tree;
 use pocketmine\Player;
+use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class TreeCommand extends BaseCommand{
@@ -14,7 +15,7 @@ class TreeCommand extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tree", "Spawns a tree", "/tree <tree|birch|redwood|jungle>", false);
+        parent::__construct($plugin, "tree", "Spawns a tree", "<tree|birch|redwood|jungle>", false);
         $this->setPermission("essentials.tree");
     }
 
@@ -29,11 +30,11 @@ class TreeCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
@@ -42,7 +43,8 @@ class TreeCommand extends BaseCommand{
             return false;
         }
         switch(strtolower($args[0])){
-            case "tree":
+            case "oak":
+            default:
                 $type = Sapling::OAK;
                 break;
             case "birch":
@@ -63,15 +65,8 @@ class TreeCommand extends BaseCommand{
             case "swamp":
                 $type = Sapling::SWAMP;
                 break;*/
-            default:
-                $sender->sendMessage(TextFormat::RED . "Invalid tree type, try with:\n<tree|birch|redwood|jungle>");
-                return false;
-                break;
         }
-        if($sender->getLevel()->setBlock($block->add(0, 1), new Sapling($type), true, true)){
-            $sender->getLevel()->getBlock($block->add(0, 1))->onActivate(new Item(Item::DYE, 15));
-            $sender->sendMessage(TextFormat::GREEN . "Tree spawned!");
-        }
+        Tree::growTree($sender->getLevel(), $block->x, $block->y+1, $block->z, new Random(mt_rand()), $type & 0x07);
         return true;
     }
 } 

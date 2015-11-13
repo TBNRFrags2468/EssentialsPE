@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Level;
-use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class PTime extends BaseCommand{
@@ -13,7 +12,7 @@ class PTime extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "ptime", "Changes the time of a player", "/ptime <time> [player]", null, ["playertime"]);
+        parent::__construct($plugin, "ptime", "Changes the time of a player", "<time> [player]", null, ["playertime"]);
         $this->setPermission("essentials.ptime.use");
     }
 
@@ -72,7 +71,7 @@ class PTime extends BaseCommand{
                 $sender->sendMessage(TextFormat::GREEN . "Setting player time...");
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

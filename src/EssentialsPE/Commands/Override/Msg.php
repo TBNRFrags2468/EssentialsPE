@@ -14,7 +14,7 @@ class Msg extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "Msg", "Send private messages to other players", "/msg <player> <message ...>", null, ["tell", "m", "t", "whisper"]);
+        parent::__construct($plugin, "Msg", "Send private messages to other players", "<player> <message ...>", null, ["tell", "m", "t", "whisper"]);
         $this->setPermission("essentials.msg");
     }
 
@@ -29,7 +29,7 @@ class Msg extends BaseCommand{
             return false;
         }
         if(count($args) < 2){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $t = array_shift($args);

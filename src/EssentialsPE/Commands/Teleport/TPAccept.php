@@ -12,7 +12,7 @@ class TPAccept extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpaccept", "Accept a teleport request", "/tpaccept [player]", false, ["tpyes"]);
+        parent::__construct($plugin, "tpaccept", "Accept a teleport request", "[player]", false, ["tpyes"]);
         $this->setPermission("essentials.tpaccept");
     }
 
@@ -27,7 +27,7 @@ class TPAccept extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $request = $this->getPlugin()->hasARequest($sender);
@@ -71,7 +71,7 @@ class TPAccept extends BaseCommand{
                 $this->getPlugin()->removeTPRequest($player, $sender);
                 break;
             default:
-                $sender->sendMessage(TextFormat::RED . $this->getUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

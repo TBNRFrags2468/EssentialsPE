@@ -3,6 +3,7 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
+use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -12,7 +13,7 @@ class Jump extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", "/jump", false, ["j", "jumpto"]);
+        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", null, false, ["j", "jumpto"]);
         $this->setPermission("essentials.jump");
     }
 
@@ -27,15 +28,15 @@ class Jump extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
         }
-        $transparent = [6, 8, 9, 10, 11, 31, 32, 36, 37, 38, 39, 40, 50,
-            51, 55, 59, 63, 68, 69, 75, 76, 77, 83, 90, 104, 105, 115,
-            119, 120, 122, 127, 131, 132, 141, 142, 143, 175, 176, 177];
+        $transparent = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::BUSH, Block::DANDELION,
+            Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
+            Block::PUMPKIN_STEM, Block::MELON_STEM, Block::VINE, Block::CARROT_BLOCK, Block::POTATO_BLOCK, Block::DOUBLE_PLANT];
         $block = $sender->getTargetBlock(100, $transparent);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");

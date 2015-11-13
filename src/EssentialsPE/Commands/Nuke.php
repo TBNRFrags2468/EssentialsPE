@@ -12,7 +12,7 @@ class Nuke extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nuke", "Thin carpet of bomb", "/nuke [player]", null);
+        parent::__construct($plugin, "nuke", "Thin carpet of bomb", "[player]");
         $this->setPermission("essentials.nuke.use");
     }
 
@@ -29,7 +29,7 @@ class Nuke extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $this->getPlugin()->nuke($sender);
@@ -47,7 +47,7 @@ class Nuke extends BaseCommand{
                 $this->getPlugin()->nuke($player);
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

@@ -12,7 +12,7 @@ class Home extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "home", "Teleport to your home", "/home <name>", false, ["homes"]);
+        parent::__construct($plugin, "home", "Teleport to your home", "<name>", false, ["homes"]);
         $this->setPermission("essentials.home.use");
     }
 
@@ -27,11 +27,11 @@ class Home extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) > 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if($alias === "homes" || count($args) === 0){

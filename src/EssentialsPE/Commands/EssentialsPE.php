@@ -12,7 +12,7 @@ class EssentialsPE extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "/essentialspe [update <check|install>]", null, ["essentials", "ess", "esspe"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "[update <check|install>]", null, ["essentials", "ess", "esspe"]);
         $this->setPermission("essentials.essentials");
     }
 
@@ -56,13 +56,13 @@ class EssentialsPE extends BaseCommand{
                     $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::YELLOW . "v" . TextFormat::GREEN . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
                         break;
                     default:
-                        $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                        $this->sendUsage($sender, $alias);
                         return false;
                         break;
                 }
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }

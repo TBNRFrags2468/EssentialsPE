@@ -12,7 +12,7 @@ class DelHome extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "delhome", "Remove a home", "/delhome <name>", false, ["remhome", "removehome"]);
+        parent::__construct($plugin, "delhome", "Remove a home", "<name>", false, ["remhome", "removehome"]);
         $this->setPermission("essentials.delhome");
     }
 
@@ -27,11 +27,11 @@ class DelHome extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 1){
-            $sender->sendMessage(TextFormat::RED . $this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(!$this->getPlugin()->homeExists($sender, $args[0])){

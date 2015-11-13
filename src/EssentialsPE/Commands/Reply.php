@@ -14,7 +14,7 @@ class Reply extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "/reply <message ...>", null, ["r"]);
+        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "<message ...>", null, ["r"]);
         $this->setPermission("essentials.reply");
     }
 
@@ -29,7 +29,7 @@ class Reply extends BaseCommand{
             return false;
         }
         if(count($args) < 1){
-            $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $t = $this->getPlugin()->getQuickReply($sender);

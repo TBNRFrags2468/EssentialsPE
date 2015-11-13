@@ -13,7 +13,7 @@ class BreakCommand extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "break", "Breaks the block you're looking at", "/break", false);
+        parent::__construct($plugin, "break", "Breaks the block you're looking at", null, false);
         $this->setPermission("essentials.break.use");
     }
 
@@ -28,11 +28,11 @@ class BreakCommand extends BaseCommand{
             return false;
         }
         if(!$sender instanceof Player){
-            $sender->sendMessage($this->getConsoleUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         if(count($args) !== 0){
-            $sender->sendMessage($this->getUsage());
+            $this->sendUsage($sender, $alias);
             return false;
         }
         $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);

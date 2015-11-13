@@ -12,7 +12,7 @@ class God extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "god", "Prevent you to take any damage", "/god [player]", null, ["godmode", "tgm"]);
+        parent::__construct($plugin, "god", "Prevent you to take any damage", "[player]", null, ["godmode", "tgm"]);
         $this->setPermission("essentials.god.use");
     }
 
@@ -29,7 +29,7 @@ class God extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
+                    $this->sendUsage($sender, $alias);
                     return false;
                 }
                 $this->getPlugin()->switchGodMode($sender);
@@ -50,7 +50,7 @@ class God extends BaseCommand{
                 $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getPlugin()->isGod($player) ? "enabled!" : "disabled"));
                 break;
             default:
-                $sender->sendMessage($sender instanceof Player ? $this->getUsage() : $this->getConsoleUsage());
+                $this->sendUsage($sender, $alias);
                 return false;
                 break;
         }
