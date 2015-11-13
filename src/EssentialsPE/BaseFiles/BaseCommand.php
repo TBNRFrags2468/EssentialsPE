@@ -61,4 +61,6 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
         }
         $sender->sendMessage($message);
     }
+
+    public function execute(CommandSender $sender, $alias, array $args){}
 }

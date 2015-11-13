@@ -162,6 +162,9 @@ permissions:
                     essentials.god.pvp:
                         default: op
                         description: "Let you attack other players while you're in god mode"
+            essentials.hat:
+                default: op
+                description: "Get some new cool headgear!"
             essentials.heal:
                 default: false
                 description: "Heal yourself or other players"
@@ -224,6 +227,9 @@ permissions:
                     essentials.kit.other:
                         default: op
                         description: "Give a kit to other players"
+            essentials.lightning:
+                default: op
+                description: "Strike a lightning!"
             essentials.more:
                 default: op
                 description: "Get a stack of the item you're holding"
