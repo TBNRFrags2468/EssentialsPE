@@ -214,6 +214,7 @@ class Loader extends PluginBase{
             new Fly($this),
             new GetPos($this),
             new God($this),
+            //new Hat($this),
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),

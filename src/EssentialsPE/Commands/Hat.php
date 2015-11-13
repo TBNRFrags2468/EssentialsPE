@@ -42,11 +42,12 @@ class Hat extends BaseCommand{
             $sender->getInventory()->setHelmet(Item::get(Item::AIR));
         }else{
             $hat = $sender->getInventory()->getItemInHand();
-            if($hat->getId() === 0){
+            if($hat->getId() === Item::AIR){
                 $sender->sendMessage(TextFormat::RED . "[Error] Please specify an item to wear");
                 return false;
             }
-            $sender->getInventory()->setItemInHand(Item::get(Item::AIR));
+            // Swap hats, if there's no hat, then it will be right because the current slot will be replaced with an "Air" Helmet item :3
+            $sender->getInventory()->setItemInHand($sender->getInventory()->getHelmet());
             $sender->getInventory()->setHelmet($hat);
             $sender->sendMessage(TextFormat::AQUA . "You got a new hat!");
         }
