@@ -40,7 +40,9 @@ class Condense extends BaseCommand{
                 }
                 break;
         }
-        $this->getPlugin()->condenseItems($sender->getInventory(), $target);
+        if(!$this->getPlugin()->condenseItems($sender->getInventory(), $target)){
+            $sender->sendMessage(TextFormat::RED . "[Error] This item can't be condensed");
+        }
         $sender->sendMessage(TextFormat::YELLOW . "Condensing items...");
         return true;
     }

@@ -65,7 +65,6 @@ use EssentialsPE\Commands\Teleport\TPDeny;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
-use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -213,7 +212,7 @@ class Loader extends PluginBase{
             new Burn($this),
             new ClearInventory($this),
             new Compass($this),
-            //new Condense($this),
+            new Condense($this),
             new Depth($this),
             new EssentialsPE($this),
             new Extinguish($this),
@@ -779,19 +778,26 @@ class Loader extends PluginBase{
      *
      * @param BaseInventory $inv
      * @param Item|null $target
-     * @return BaseInventory
+     * @return bool
      */
     public function condenseItems(BaseInventory $inv, $target = null){ // TODO: Fix inventory clear...
         $items = $target === null ? $inv->getContents() : $inv->all($target);
+        if($target !== null && !$this->canBeCondensed($target)){
+            return false;
+        }
         $replace = Item::get(0);
         // First step: Merge target items...
         foreach($items as $slot => $item){
+            if(!isset($this->condenseShapes[0][$item->getId()]) && !isset($this->condenseShapes[1][$item->getId()])){
+                continue;
+            }
             $sub = $inv->all($item);
             foreach($sub as $index => $i){
                 /** @var Item $i */
-                if($slot !== $index && $i->getDamage() === $item->getDamage()){
+                if($slot !== $index){
                     $item->setCount($item->getCount() + $i->getCount());
                     $items[$index] = $replace;
+                    var_dump($index . " - " . $slot);
                 }
             }
         }
@@ -809,7 +815,7 @@ class Loader extends PluginBase{
             }
             $inv->setItem($cSlot, $condense);
         }
-        return $inv;
+        return true;
     }
 
     /** @var array */
@@ -840,15 +846,24 @@ class Loader extends PluginBase{
             $damage = $newId[1][$item->getDamage()];
             $newId = $newId[0];
         }
-        if(($count = floor($shape / $item->getCount())) < 1){
+        $count = floor($item->getCount() / $shape);
+        if($count < 1){
             return null;
         }
-        $nItem = new Item($newId, $count, $damage);
-        if($nItem->getId() === 0){
+        $condensed = new Item($newId, $damage, $count);
+        if($condensed->getId() === Item::AIR){
             return null;
         }
         $item->setCount($item->getCount() - ($count * $shape));
-        return $nItem; // TODO: Fix returning a "wrong ID"
+        return $condensed;
+    }
+
+    /**
+     * @param Item $item
+     * @return bool
+     */
+    private function canBeCondensed(Item $item){
+        return isset($this->condenseShapes[0][$item->getId()]) || isset($this->condenseShapes[1][$item->getId()]);
     }
 
     /**   _____              _
