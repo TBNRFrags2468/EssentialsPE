@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
+use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class KickAll extends BaseCommand{
@@ -25,16 +26,16 @@ class KickAll extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($this->getServer()->getOnlinePlayers()) < 1){
-            $sender->sendMessage(TextFormat::RED . "There are no players on the server!");
-            return true;
+        if(($count = count($this->getPlugin()->getServer()->getOnlinePlayers())) < 1 || ($sender instanceof Player && $count < 2)){
+            $sender->sendMessage(TextFormat::RED . "[Error] There are no more players in the server");
+            return false;
         }
         if(count($args) < 1){
             $reason = "Unknown";
         }else{
             $reason = implode(" ", $args);
         }
-        foreach($sender->getServer()->getOnlinePlayers() as $p){
+        foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
             if($p != $sender){
                 $p->kick($reason, false);
             }
