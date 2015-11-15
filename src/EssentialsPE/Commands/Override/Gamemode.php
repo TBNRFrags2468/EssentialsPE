@@ -75,7 +75,7 @@ class Gamemode extends BaseCommand{
          * The following switch is applied when the user execute:
          * /gamemode <MODE>
          */
-        if(is_int($args[0])){
+        if(is_int((int) $args[0])){
             switch($args[0]){
                 case 0:
                 case 1:
