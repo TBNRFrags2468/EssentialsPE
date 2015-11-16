@@ -34,23 +34,22 @@ class Hat extends BaseCommand{
                 return false;
             }
         }
-        if($remove){
-            $hat = $sender->getInventory()->getHelmet();
-            if($sender->getInventory()->canAddItem($hat)){
-                $sender->getInventory()->setItem($sender->getInventory()->firstEmpty(), $hat);
-            }
-            $sender->getInventory()->setHelmet(Item::get(Item::AIR));
-        }else{
-            $hat = $sender->getInventory()->getItemInHand();
-            if($hat->getId() === Item::AIR){
+        $new = Item::get(Item::AIR);
+        $old = $sender->getInventory()->getHelmet();
+        $slot = $sender->getInventory()->canAddItem($old) ? $sender->getInventory()->firstEmpty() : null;
+        if(!$remove){
+            $new = $sender->getInventory()->getItemInHand();
+            if($new->getId() === Item::AIR){
                 $sender->sendMessage(TextFormat::RED . "[Error] Please specify an item to wear");
                 return false;
             }
-            // Swap hats, if there's no hat, then it will be right because the current slot will be replaced with an "Air" Helmet item :3
-            $sender->getInventory()->setItemInHand($sender->getInventory()->getHelmet());
-            $sender->getInventory()->setHelmet($hat);
-            $sender->sendMessage(TextFormat::AQUA . "You got a new hat!");
+            $slot = $sender->getInventory()->getHeldItemSlot();
         }
+        $sender->getInventory()->setHelmet($new);
+        if($slot !== null){
+            $sender->getInventory()->setItem($slot, $old);
+        }
+        $sender->sendMessage(TextFormat::AQUA . ($new->getId() === Item::AIR ? "Hat removed!" : "You got a new hat!"));
         return true;
     }
 }

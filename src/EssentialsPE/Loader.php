@@ -214,7 +214,7 @@ class Loader extends PluginBase{
             new Fly($this),
             new GetPos($this),
             new God($this),
-            //new Hat($this),
+            //new Hat($this), TODO: Implement when MCPE implements "Hat rendering"
             new Heal($this),
             new ItemCommand($this),
             new ItemDB($this),
