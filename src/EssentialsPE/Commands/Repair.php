@@ -34,7 +34,7 @@ class Repair extends BaseCommand{
             case 0:
                 $inv = $sender->getInventory();
                 $item = $inv->getItemInHand();
-                if(!$this->getPlugin()->isReparable($item)){
+                if(!$this->getPlugin()->isRepairable($item)){
                     $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
                     return false;
                 }
@@ -51,7 +51,7 @@ class Repair extends BaseCommand{
                         }
                         $inv = $sender->getInventory();
                         foreach($inv->getContents() as $item){
-                            if($this->getPlugin()->isReparable($item)){
+                            if($this->getPlugin()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
@@ -65,7 +65,7 @@ class Repair extends BaseCommand{
                         $sender->sendMessage($r);
                         break;
                     case "hand":
-                        if(!$this->getPlugin()->isReparable($item = $sender->getInventory()->getItemInHand())){
+                        if(!$this->getPlugin()->isRepairable($item = $sender->getInventory()->getItemInHand())){
                             $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
                             return false;
                         }

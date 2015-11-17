@@ -598,14 +598,6 @@ class Loader extends PluginBase{
     }
 
     /**
-     * @param Item $item
-     * @return bool
-     * @deprecated
-     */
-    public function isReparable(Item $item){
-        return $this->isRepairable($item);
-    }
-    /**
      * Let you know if the item is a Tool or Armor
      * (Items that can get "real damage")
      *
