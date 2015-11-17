@@ -27,11 +27,9 @@ class Speed extends BaseCommand{
             return false;
         }
         $player = $sender;
-        if(isset($args[1])){
-            if(!($player = $this->getPlugin()->getPlayer($args[1]))){
-                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                return false;
-            }
+        if(isset($args[1]) && !($player = $this->getPlugin()->getPlayer($args[1]))){
+            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+            return false;
         }
         if($args[0] === 0){
             $player->removeEffect(Effect::SPEED);
