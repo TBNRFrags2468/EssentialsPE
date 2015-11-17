@@ -2326,7 +2326,7 @@ class Loader extends PluginBase{
         }
         if($this->invisibilityEffect === null){
             $effect = new Effect(Effect::INVISIBILITY, "Vanish", 127, 131, 146);
-            $effect->setDuration(1728000); // 24 hours... Well... No one will play more than this, so I think its OK xD
+            $effect->setDuration(PHP_INT_MAX);
             $this->invisibilityEffect = $effect;
         }
         $this->getServer()->getPluginManager()->callEvent($ev = new PlayerVanishEvent($this, $player, $state, $noPacket));
