@@ -26,15 +26,11 @@ class SetWorth extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) !== 1){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(!is_int((int) $args[0]) || (int) $args[0] < 0){
+        if(!is_numeric($args[0]) || (int) $args[0] < 0){
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide a valid worth");
             return false;
         }

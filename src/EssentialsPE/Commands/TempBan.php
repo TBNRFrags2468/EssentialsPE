@@ -29,16 +29,14 @@ class TempBan extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($name = array_shift($args));
-        $info = $this->getPlugin()->stringToTimestamp(implode(" ", $args));
-        if(!$info){
+        if(!($info = $this->getPlugin()->stringToTimestamp(implode(" ", $args)))){
             $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid time");
             return false;
         }
         /** @var \DateTime $date */
         $date = $info[0];
         $reason = $info[1];
-        if($player !== false){
+        if(($player = $this->getPlugin()->getPlayer($name = array_shift($args))) !== false){
             if($player->hasPermission("essentials.ban.exempt")){
                 $sender->sendMessage(TextFormat::RED . "[Error] " . $name . " can't be banned");
                 return false;
@@ -48,7 +46,6 @@ class TempBan extends BaseCommand{
             }
         }
         $sender->getServer()->getNameBans()->addBan($name, (trim($reason) !== "" ? $reason : null), $date, "essentialspe");
-
         $this->broadcastCommandMessage($sender, "Banned player " . $name . " until " . $date->format("l, F j, Y") . " at " . $date->format("h:ia") . (trim($reason) !== "" ? TextFormat::YELLOW . " Reason: " . TextFormat::RESET . $reason : ""));
         return true;
     }

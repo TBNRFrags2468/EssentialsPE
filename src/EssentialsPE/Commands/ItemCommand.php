@@ -30,8 +30,8 @@ class ItemCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(($gm = $sender->getServer()->getGamemodeString($sender->getGamemode())) === "CREATIVE" || $gm === "SPECTATOR"){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . strtolower($gm) . " mode");
+        if(($gm = $sender->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
         if(count($args) < 1 || count($args) > 2){
@@ -63,7 +63,7 @@ class ItemCommand extends BaseCommand{
             $item->setCount($amount);
         }
 
-        //Getting other values...
+        //Getting other values... TODO
         /*foreach($args as $a){
             //Example
             if(stripos(strtolower($a), "color") !== false){

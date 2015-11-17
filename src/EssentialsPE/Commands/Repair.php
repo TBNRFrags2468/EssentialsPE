@@ -32,14 +32,12 @@ class Repair extends BaseCommand{
         }
         switch(count($args)){
             case 0:
-                $inv = $sender->getInventory();
-                $item = $inv->getItemInHand();
-                if(!$this->getPlugin()->isRepairable($item)){
+                if(!$this->getPlugin()->isRepairable($item = $sender->getInventory()->getItemInHand())){
                     $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
                     return false;
                 }
                 $item->setDamage(0);
-                $inv->setItemInHand($item);
+                $sender->getInventory()->setItemInHand($item);
                 $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                 break;
             case 1:
@@ -49,15 +47,14 @@ class Repair extends BaseCommand{
                             $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                             return false;
                         }
-                        $inv = $sender->getInventory();
-                        foreach($inv->getContents() as $item){
+                        foreach($sender->getInventory()->getContents() as $item){
                             if($this->getPlugin()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
                         $r = TextFormat::GREEN . "All the tools on your inventory were repaired!";
                         if($sender->hasPermission("essentials.repair.armor")){
-                            foreach($inv->getArmorContents() as $item){
+                            foreach($sender->getInventory()->getArmorContents() as $item){
                                 $item->setDamage(0);
                             }
                             $r .= TextFormat::AQUA . "\n(including the equipped Armor)";

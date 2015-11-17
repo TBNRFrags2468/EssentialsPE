@@ -34,20 +34,20 @@ class Gamemode extends BaseCommand{
             switch(strtolower($alias)){
                 case "survival":
                 case "gms":
-                    $args[0] = "survival";
+                    $args[0] = Player::SURVIVAL;
                     break;
                 case "creative":
                 case "gmc":
-                    $args[0] = "creative";
+                    $args[0] = Player::CREATIVE;
                     break;
                 case "adventure":
                 case "gma":
-                    $args[0] = "adventure";
+                    $args[0] = Player::ADVENTURE;
                     break;
                 case "spectator":
                 case "viewer":
                 case "gmt":
-                    $args[0] = "spectator";
+                    $args[0] = Player::SPECTATOR;
                     break;
                 default:
                     return false;
@@ -58,8 +58,7 @@ class Gamemode extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $sender;
-        if(!$player instanceof Player && !isset($args[1])){
+        if(!($player = $sender) instanceof Player && !isset($args[1])){
             $this->sendUsage($sender, $alias);
             return false;
         }
@@ -75,12 +74,12 @@ class Gamemode extends BaseCommand{
          * The following switch is applied when the user execute:
          * /gamemode <MODE>
          */
-        if(is_int((int) $args[0])){
+        if(is_numeric($args[0])){
             switch($args[0]){
-                case 0:
-                case 1:
-                case 2:
-                case 3:
+                case Player::SURVIVAL:
+                case Player::CREATIVE:
+                case Player::ADVENTURE:
+                case Player::SPECTATOR:
                     $gm = $args[0];
                     break;
                 default:
@@ -92,22 +91,22 @@ class Gamemode extends BaseCommand{
             switch(strtolower($args[0])){
                 case "survival":
                 case "s":
-                    $gm = 0;
+                    $gm = Player::SURVIVAL;
                     break;
                 case "creative":
                 case "c":
-                    $gm = 1;
+                    $gm = Player::CREATIVE;
                     break;
                 case "adventure":
                 case "a":
-                    $gm = 2;
+                    $gm = Player::ADVENTURE;
                     break;
                 case "spectator":
                 case "viewer":
                 case "view":
                 case "v":
                 case "t":
-                    $gm = 3;
+                    $gm = Player::SPECTATOR;
                     break;
                 default:
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid gamemode");

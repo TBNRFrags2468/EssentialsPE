@@ -27,12 +27,9 @@ class Jump extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
-        }
-        if(count($args) !== 0){
-            $this->sendUsage($sender, $alias);
         }
         $transparent = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::BUSH, Block::DANDELION,
             Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
@@ -47,15 +44,16 @@ class Jump extends BaseCommand{
             return true;
         }
 
-        $side = $sender->getDirection();
-        if($side === 0){
-            $side = 3;
-        }elseif($side === 1){
-            $side = 4;
-        }elseif($side === 2){
-            $side = 2;
-        }elseif($side === 3){
-            $side = 5;
+        switch($side = $sender->getDirection()){
+            case 0:
+            case 1:
+                $side += 3;
+                break;
+            case 3:
+                $side += 2;
+                break;
+            default:
+                break;
         }
         if(!$block->getSide($side)->isSolid()){
             $sender->teleport($block);

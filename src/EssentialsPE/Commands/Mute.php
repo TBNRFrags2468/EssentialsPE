@@ -30,16 +30,13 @@ class Mute extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getPlayer(array_shift($args));
-        if(!$player){
+        if(!($player = $this->getPlugin()->getPlayer(array_shift($args)))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
             return false;
         }
-        if($player->hasPermission("essentials.mute.exempt")){
-            if(!$this->getPlugin()->isMuted($player)){
-                $sender->sendMessage(TextFormat::RED . $player->getDisplayName() . " can't be muted");
-                return false;
-            }
+        if($player->hasPermission("essentials.mute.exempt") && !$this->getPlugin()->isMuted($player)){
+            $sender->sendMessage(TextFormat::RED . $player->getDisplayName() . " can't be muted");
+            return false;
         }
         /** @var \DateTime $date */
         $date = null;
@@ -50,4 +47,4 @@ class Mute extends BaseCommand{
         $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " has been " . ($this->getPlugin()->isMuted($player) ? "muted " . ($date !== null ? "until: " . TextFormat::AQUA . $date->format("l, F j, Y") . TextFormat::RED . " at " . TextFormat::AQUA . $date->format("h:ia") : TextFormat::AQUA . "Forever" . TextFormat::YELLOW . "!") : "unmuted!"));
         return true;
     }
-} 
+}

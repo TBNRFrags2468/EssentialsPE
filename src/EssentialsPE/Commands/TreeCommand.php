@@ -29,11 +29,7 @@ class TreeCommand extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(count($args) !== 1){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
             return false;
         }

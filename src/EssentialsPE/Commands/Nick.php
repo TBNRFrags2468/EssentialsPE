@@ -32,8 +32,7 @@ class Nick extends BaseCommand{
                     $this->sendUsage($sender, $alias);
                     return false;
                 }
-                $nickname = $args[0];
-                if($nickname === "off"){
+                if(($nickname = $args[0]) === "off"){
                     $this->getPlugin()->removeNick($sender);
                 }else{
                     if(!$this->getPlugin()->setNick($sender, $nickname)){
@@ -47,13 +46,11 @@ class Nick extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getPlugin()->getPlayer($args[1]);
-                if(!$player){
+                if(!($player = $this->getPlugin()->getPlayer($args[1]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $nickname = $args[0];
-                if($nickname === "off"){
+                if(($nickname = $args[0]) === "off"){
                     $this->getPlugin()->removeNick($player);
                 }else{
                     if(!$this->getPlugin()->setNick($player, $nickname)){

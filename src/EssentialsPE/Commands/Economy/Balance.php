@@ -29,7 +29,6 @@ class Balance extends BaseCommand{
         switch(count($args)){
             case 0:
                 if(!$sender instanceof Player){
-                    $sender->sendMessage($this->getConsoleUsage());
                     $this->sendUsage($sender, $alias);
                     return false;
                 }
@@ -40,8 +39,7 @@ class Balance extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getPlugin()->getPlayer($args[0]);
-                if(!$player){
+                if(!$player = $this->getPlugin()->getPlayer($args[0])){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

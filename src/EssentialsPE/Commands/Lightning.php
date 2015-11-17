@@ -37,18 +37,15 @@ class Lightning extends BaseCommand{
                 break;
             case 1:
             case 2:
-                $pos = $this->getPlugin()->getPlayer($args[0]);
-                if(!$pos){
+                if(!($pos = $this->getPlugin()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
                 if(!isset($args[1])){
                     $args[1] = 0;
-                }else{
-                    if(!is_int((int) $args[1])){
-                        $sender->sendMessage(TextFormat::RED . "[Error] Damage should be numeric");
-                        return false;
-                    }
+                }elseif(!is_numeric($args[1])){
+                    $sender->sendMessage(TextFormat::RED . "[Error] Damage should be numeric");
+                    return false;
                 }
                 $damage = $args[1];
                 break;

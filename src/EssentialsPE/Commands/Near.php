@@ -39,8 +39,7 @@ class Near extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getPlugin()->getPlayer($args[0]);
-                if(!$player){
+                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
@@ -60,8 +59,7 @@ class Near extends BaseCommand{
      * @return string
      */
     private function broadcastPlayers(Player $player, $who){
-        $near = $this->getPlugin()->getNearPlayers($player);
-        if(count($near) < 1){
+        if(count($near = $this->getPlugin()->getNearPlayers($player)) < 1){
             $msg = TextFormat::GRAY . "** There are no players near to " . $who . "! **";
         }else{
             $msg = TextFormat::YELLOW . "** There " . (count($near) > 1 ? "are " : "is ") . TextFormat::AQUA . count($near) . TextFormat::YELLOW . "player" . (count($near) > 1 ? "s " : " ") . "near to " . $who . ":";

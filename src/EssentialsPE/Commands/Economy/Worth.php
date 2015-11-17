@@ -37,8 +37,7 @@ class Worth extends BaseCommand{
                     return false;
                 }
                 $id = $sender->getInventory()->getItemInHand()->getId();
-                $worth = $this->getPlugin()->getItemWorth($id);
-                if(!$worth){
+                if(!($worth = $this->getPlugin()->getItemWorth($id))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
                     return false;
                 }
@@ -46,8 +45,7 @@ class Worth extends BaseCommand{
                 break;
             default:
                 $item = $this->getPlugin()->getItem($args[0]);
-                $worth = $this->getPlugin()->getItemWorth($item->getId());
-                if(!$worth){
+                if(!($worth = $this->getPlugin()->getItemWorth($item->getId()))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
                     return false;
                 }

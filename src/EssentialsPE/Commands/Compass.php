@@ -26,28 +26,28 @@ class Compass extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) !== 0){
-            $this->sendUsage($sender, $alias);
-            return false;
+        switch($sender->getDirection()){
+            case 0:
+                $direction = "south";
+                break;
+            case 1:
+                $direction = "west";
+                break;
+            case 2:
+                $direction = "north";
+                break;
+            case 3:
+                $direction = "east";
+                break;
+            default:
+                $sender->sendMessage(TextFormat::RED . "Oops, there was an error while getting your face direction");
+                return false;
+                break;
         }
-
-        $direction = "";
-        if($sender->getDirection() === 0){
-            $direction = "south";
-        }elseif($sender->getDirection() === 1){
-            $direction = "west";
-        }elseif($sender->getDirection() === 2){
-            $direction = "north";
-        }elseif($sender->getDirection() === 3){
-            $direction = "east";
-        }else{
-            $sender->sendMessage(TextFormat::RED . "Oops, there was an error while getting your face direction");
-        }
-
         $sender->sendMessage(TextFormat::AQUA . "You're facing " . TextFormat::YELLOW . $direction);
         return true;
     }

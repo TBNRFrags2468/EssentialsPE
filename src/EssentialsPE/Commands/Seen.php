@@ -30,9 +30,7 @@ class Seen extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getOfflinePlayer($args[0]);
-
-        if($player instanceof Player){
+        if(($player = $this->getPlugin()->getOfflinePlayer($args[0])) instanceof Player){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
             return true;
         }

@@ -30,9 +30,8 @@ class More extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $gm = $sender->getGamemode();
-        if($gm === 1 || $gm === 3){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
+        if(($gm = $sender->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
         if(count($args) != 0){

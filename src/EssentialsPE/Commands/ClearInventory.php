@@ -32,9 +32,8 @@ class ClearInventory extends BaseCommand{
                     $this->sendUsage($sender, $alias);
                     return false;
                 }
-                $gm = $sender->getGamemode();
-                if($gm === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . ($gm === 1 ? "creative" : "adventure") . " mode");
+                if(($gm = $sender->getGamemode()) === 1 || $gm === 3){
+                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
                     return false;
                 }
                 $sender->getInventory()->clearAll();
@@ -45,13 +44,11 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                $player = $this->getPlugin()->getPlayer($args[0]);
-                if(!$player){
+                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
-                $gm = $player->getGamemode();
-                if($gm === 1 || $gm === 3){
+                if(($gm = $player->getGamemode()) === 1 || $gm === 3){
                     $sender->sendMessage(TextFormat::RED . "[Error] " . $player->getDisplayName() . " is on " . ($gm === 1 ? "creative" : "adventure") . " mode");
                     return false;
                 }

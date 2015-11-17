@@ -31,7 +31,7 @@ class Sell extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if($sender->getGamemode() === 1 || $sender->getGamemode() === 3){
+        if($sender->getGamemode() === Player::CREATIVE || $sender->getGamemode() === Player::SPECTATOR){
             $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($sender->getGamemode()) . " mode");
             return false;
         }
@@ -56,7 +56,7 @@ class Sell extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You don't have that item in your inventory");
             return false;
         }
-        if(isset($args[1]) && !is_int((int) $args[1])){
+        if(isset($args[1]) && !is_numeric($args[1])){
             $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid amount to sell");
             return false;
         }

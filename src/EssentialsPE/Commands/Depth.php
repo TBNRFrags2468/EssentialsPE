@@ -26,16 +26,11 @@ class Depth extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) !== 0){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        $pos = $sender->getFloorY() - 63;
-        if($pos === 0){
+        if(($pos = $sender->getFloorY() - 63) === 0){
             $sender->sendMessage(TextFormat::AQUA . "You're at sea level");
         }else{
             $sender->sendMessage(TextFormat::AQUA . "You're " . (substr($pos, 0, 1) === "-" ? substr($pos, 1) : $pos) . " meters " . ($pos > 0 ? "above" : "below") . " the sea level.");

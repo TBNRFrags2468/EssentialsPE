@@ -27,16 +27,11 @@ class BreakCommand extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) !== 0){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
-        if($block === null){
+        if(($block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11])) === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
         }

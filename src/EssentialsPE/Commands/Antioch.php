@@ -26,12 +26,9 @@ class Antioch extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
-        }
-        if(count($args) !== 0){
-            $this->sendUsage($sender, $alias);
         }
         if(!$this->getPlugin()->antioch($sender)){
             $sender->sendMessage(TextFormat::RED . "[Error] Cannot throw the grenade, there isn't a near valid block");

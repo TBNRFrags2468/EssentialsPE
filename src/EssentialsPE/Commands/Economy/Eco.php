@@ -28,17 +28,12 @@ class Eco extends BaseCommand{
         switch(count($args)){
             case 2:
             case 3:
-                $player = $this->getPlugin()->getPlayer($args[1]);
-                if(!$player){
+                if(!($player = $this->getPlugin()->getPlayer($args[1]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                if(!isset($args[2]) && strtolower($args[0]) !== "reset"){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify an amount");
-                    return false;
-                }
-                if(isset($args[2]) && !is_int((int) $args[2])){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid amount");
+                if((!isset($args[2]) && strtolower($args[0]) !== "reset") || (isset($args[2]) && !is_numeric($args[2]))){
+                    $sender->sendMessage(TextFormat::RED . "[Error] Please specify a" . (isset($args[2]) ? " valid" : "n") . " amount");
                     return false;
                 }
                 switch(strtolower($args[0])){

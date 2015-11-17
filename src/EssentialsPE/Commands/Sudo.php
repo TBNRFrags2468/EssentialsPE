@@ -30,8 +30,7 @@ class Sudo extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getPlayer(array_shift($args));
-        if(!$player){
+        if(!($player = $this->getPlugin()->getPlayer(array_shift($args)))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }elseif($player->hasPermission("essentials.sudo.exempt")){

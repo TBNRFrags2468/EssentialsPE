@@ -26,16 +26,11 @@ class Pay extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 2){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) !== 2){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        $player = $this->getPlugin()->getPlayer($args[0]);
-        if(!$player){
+        if(!($player = $this->getPlugin()->getPlayer($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
