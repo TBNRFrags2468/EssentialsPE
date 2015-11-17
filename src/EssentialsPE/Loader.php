@@ -235,6 +235,7 @@ class Loader extends PluginBase{
             new Seen($this),
             new SetSpawn($this),
             new Spawn($this),
+            //new Speed($this), TODO
             new Sudo($this),
             new Suicide($this),
             new TempBan($this),
