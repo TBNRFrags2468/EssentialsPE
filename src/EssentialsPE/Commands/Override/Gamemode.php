@@ -126,4 +126,15 @@ class Gamemode extends BaseCommand{
         $player->setGamemode($gm);
         return true;
     }
+
+    public function sendUsage(CommandSender $sender, $alias){
+        $usage = $this->usageMessage;
+        if($alias !== "gamemode" && $alias !== "gm"){
+            $usage = str_replace("<mode> ", "", $usage);
+        }
+        if(!$sender instanceof Player){
+            $usage = str_replace("[player]", "<player>", $usage);
+        }
+        $sender->sendMessage(TextFormat::RED . "Usage: " . TextFormat::GRAY . "/$alias $usage");
+    }
 } 

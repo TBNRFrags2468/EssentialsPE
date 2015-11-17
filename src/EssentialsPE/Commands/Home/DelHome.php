@@ -26,11 +26,7 @@ class DelHome extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(count($args) !== 1){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
@@ -39,7 +35,7 @@ class DelHome extends BaseCommand{
             return false;
         }
         $this->getPlugin()->removeHome($sender, $args[0]);
-        $sender->sendMessage(TextFormat::GREEN . "Home successfuly removed!");
+        $sender->sendMessage(TextFormat::GREEN . "Home successfully removed!");
         return true;
     }
 } 

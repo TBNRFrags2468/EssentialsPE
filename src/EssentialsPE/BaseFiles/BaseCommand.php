@@ -42,7 +42,14 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
         return "/" . parent::getName() . " " . parent::getUsage();
     }
 
+    public function getConsoleUsage(){
+        return $this->consoleUsageMessage;
+    }
+
     /**
+     * Function to give different type of usages, switching from "Console" and "Player" executors of a command.
+     * This function can be overridden to fit any command needs...
+     *
      * @param CommandSender $sender
      * @param string $alias
      */

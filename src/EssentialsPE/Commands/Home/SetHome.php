@@ -26,11 +26,7 @@ class SetHome extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(count($args) !== 1){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
@@ -46,7 +42,7 @@ class SetHome extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
             return false;
         }
-        $sender->sendMessage(TextFormat::GREEN . "Home successfuly " . ($existed ? "updated" : "created"));
+        $sender->sendMessage(TextFormat::GREEN . "Home successfully " . ($existed ? "updated" : "created"));
         return true;
     }
 } 

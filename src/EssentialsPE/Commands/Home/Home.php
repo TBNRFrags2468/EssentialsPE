@@ -26,15 +26,11 @@ class Home extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) > 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(count($args) > 1){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if($alias === "homes" || count($args) === 0){
+        if(count($args) === 0){
             if(($list = $this->getPlugin()->homesList($sender, false)) === false){
                 $sender->sendMessage(TextFormat::AQUA . "You don't have any home yet");
                 return false;

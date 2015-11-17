@@ -44,7 +44,7 @@ class Kill extends BaseCommand{
             }
         }
         if($this->getPlugin()->isGod($player)){
-            $sender->sendMessage(TextFormat::RED . "You can't kill " . $args[0]);
+            $sender->sendMessage(TextFormat::RED . $args[0] . " can't be killed!");
             return false;
         }
         $sender->getServer()->getPluginManager()->callEvent($ev = new EntityDamageEvent($player, EntityDamageEvent::CAUSE_SUICIDE, ($player->getHealth())));
