@@ -26,7 +26,7 @@ class Warp extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if($alias === "warps" || count($args) === 0){
+        if(count($args) === 0){
             if(($list = $this->getPlugin()->warpList(false)) === false){
                 $sender->sendMessage(TextFormat::AQUA . "There are no Warps currently available");
                 return false;
@@ -34,8 +34,7 @@ class Warp extends BaseCommand{
             $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $list);
             return true;
         }
-        $warp = $this->getPlugin()->getWarp($args[0]);
-        if(!$warp){
+        if(!($warp = $this->getPlugin()->getWarp($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exist");
             return false;
         }

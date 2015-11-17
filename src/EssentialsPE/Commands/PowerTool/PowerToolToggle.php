@@ -26,11 +26,7 @@ class PowerToolToggle extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(count($args) !== 0){
+        if(!$sender instanceof Player || count($args) !== 0){
             $this->sendUsage($sender, $alias);
             return false;
         }

@@ -26,16 +26,8 @@ class Setwarp extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if(count($args) !== 1){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        if($args[0] === null || $args[0] === "" || $args[0] === " "){
-            $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Warp name");
             return false;
         }
         $existed = $this->getPlugin()->warpExists($args[0]);
