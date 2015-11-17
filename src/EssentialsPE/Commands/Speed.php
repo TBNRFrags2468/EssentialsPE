@@ -31,7 +31,7 @@ class Speed extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        if($args[0] === 0){
+        if((int) $args[0] === 0){
             $player->removeEffect(Effect::SPEED);
         }else{
             $effect = Effect::getEffect(Effect::SPEED);
