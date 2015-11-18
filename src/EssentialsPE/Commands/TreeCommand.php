@@ -33,7 +33,7 @@ class TreeCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $block = $sender->getTargetBlock(100, [0, 8, 9, 10, 11]);
+        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;

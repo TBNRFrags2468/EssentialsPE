@@ -30,7 +30,7 @@ class Jump extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $block = $sender->getTargetBlock(100, Loader::TRANSPARENT_BLOCKS_JUMP);
+        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
@@ -39,7 +39,6 @@ class Jump extends BaseCommand{
             $sender->teleport($block->add(0, 1));
             return true;
         }
-
         switch($side = $sender->getDirection()){
             case 0:
             case 1:

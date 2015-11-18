@@ -36,15 +36,15 @@ class BigTreeCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $transparent = [];
-        $block = $sender->getTargetBlock(100, $transparent);
-        while(!$block->isSolid){
+        #$transparent = [];
+        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
+        /*while(!$block->isSolid){
             if($block === null){
                 break;
             }
             $transparent[] = $block->getID();
             $block = $sender->getTargetBlock(100, $transparent);
-        }
+        }*/
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
