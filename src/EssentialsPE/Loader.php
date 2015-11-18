@@ -140,12 +140,7 @@ class Loader extends PluginBase{
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->registerEvents();
         $this->registerCommands();
-
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            //Sessions & Mute
-            $this->createSession($p);
-        }
-
+        $this->createSession($this->getServer()->getOnlinePlayers());
         if($this->isUpdaterEnabled()){
             $this->fetchEssentialsPEUpdate(false);
         }
@@ -153,11 +148,7 @@ class Loader extends PluginBase{
     }
 
     public function onDisable(){
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            //Sessions
-            $this->removeSession($p);
-        }
-
+        $this->removeSession($this->getServer()->getOnlinePlayers());
         $this->encodeWarps(true);
     }
 
@@ -1892,64 +1883,71 @@ class Loader extends PluginBase{
     /**
      * Creates a new Sessions for the specified player
      *
-     * @param Player $player
+     * @param Player|Player[] $player
      * @return BaseSession
      */
-    public function createSession(Player $player){
-        $spl = spl_object_hash($player);
-        if(!isset($this->sessions[$spl])){
-            $this->getLogger()->debug("Creating player session file...");
-            $cfg = $this->getSessionFile($player->getName());
-            $tValues = $cfg->getAll();
-            $values = BaseSession::$defaults;
-            foreach($tValues as $k => $v){
-                $values[$k] = $v;
-            }
-            $this->getLogger()->debug("Creating virtual session...");
-            $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $values));
-            $this->getLogger()->debug("Setting up new values...");
-            $values = $ev->getValues();
-            $m = BaseSession::$defaults["isMuted"];
-            $mU = BaseSession::$defaults["mutedUntil"];
-            if(isset($values["isMuted"])){
-                if(!isset($values["mutedUntil"])){
-                    $values["mutedUntil"] = null;
-                }
-                $m = $values["isMuted"];
-                if(is_int($t = $values["mutedUntil"])){
-                    $date = new \DateTime();
-                    $mU = date_timestamp_set($date, $values["mutedUntil"]);
-                }else{
-                    $mU = $values["mutedUntil"];
-                }
-                unset($values["isMuted"]);
-                unset($values["mutedUntil"]);
-            }
-            $n = $player->getName();
-            if(isset($values["nick"])){
-                $n = $values["nick"];
-                $this->getLogger()->info($player->getName() . " is also known as " . $n);
-                unset($values["nick"]);
-            }
-            $v = BaseSession::$defaults["isVanished"];
-            $vNP = BaseSession::$defaults["noPacket"];
-            if(isset($values["isVanished"])){
-                if(!isset($values["noPacket"])){
-                    $values["noPacket"] = false;
-                }
-                $v = $values["isVanished"];
-                $vNP = $values["noPacket"];
-                unset($values["isVanished"]);
-                unset($values["noPacket"]);
-            }
-            $this->getLogger()->debug("Setting up final values...");
-            $this->sessions[$spl] = new BaseSession($this, $player, $cfg, $values);
-            $this->setMute($player, $m, $mU);
-            $this->setNick($player, $n);
-            $this->setVanish($player, $v, $vNP);
-            $this->getServer()->getScheduler()->scheduleAsyncTask(new GeoLocation($player));
+    public function createSession($player){
+        if(!is_array($player)){
+            $player = [$player];
         }
-        return $this->sessions[$spl];
+        $r = [];
+        foreach($player as $p){
+            $spl = spl_object_hash($p);
+            if(!isset($this->sessions[$spl])){
+                $this->getLogger()->debug("Creating player session file...");
+                $cfg = $this->getSessionFile($p->getName());
+                $tValues = $cfg->getAll();
+                $values = BaseSession::$defaults;
+                foreach($tValues as $k => $v){
+                    $values[$k] = $v;
+                }
+                $this->getLogger()->debug("Creating virtual session...");
+                $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $p, $values));
+                $this->getLogger()->debug("Setting up new values...");
+                $values = $ev->getValues();
+                $m = BaseSession::$defaults["isMuted"];
+                $mU = BaseSession::$defaults["mutedUntil"];
+                if(isset($values["isMuted"])){
+                    if(!isset($values["mutedUntil"])){
+                        $values["mutedUntil"] = null;
+                    }
+                    $m = $values["isMuted"];
+                    if(is_int($t = $values["mutedUntil"])){
+                        $date = new \DateTime();
+                        $mU = date_timestamp_set($date, $values["mutedUntil"]);
+                    }else{
+                        $mU = $values["mutedUntil"];
+                    }
+                    unset($values["isMuted"]);
+                    unset($values["mutedUntil"]);
+                }
+                $n = $p->getName();
+                if(isset($values["nick"])){
+                    $n = $values["nick"];
+                    $this->getLogger()->info($p->getName() . " is also known as " . $n);
+                    unset($values["nick"]);
+                }
+                $v = BaseSession::$defaults["isVanished"];
+                $vNP = BaseSession::$defaults["noPacket"];
+                if(isset($values["isVanished"])){
+                    if(!isset($values["noPacket"])){
+                        $values["noPacket"] = false;
+                    }
+                    $v = $values["isVanished"];
+                    $vNP = $values["noPacket"];
+                    unset($values["isVanished"]);
+                    unset($values["noPacket"]);
+                }
+                $this->getLogger()->debug("Setting up final values...");
+                $this->sessions[$spl] = new BaseSession($this, $p, $cfg, $values);
+                $this->setMute($p, $m, $mU);
+                $this->setNick($p, $n);
+                $this->setVanish($p, $v, $vNP);
+            }
+            $r[] = $this->sessions[$spl];
+        }
+        $this->getServer()->getScheduler()->scheduleAsyncTask(new GeoLocation($player));
+        return $r;
     }
 
     /**
@@ -1970,13 +1968,18 @@ class Loader extends PluginBase{
     /**
      * Remove player's session (if active and available)
      *
-     * @param Player $player
+     * @param Player|Player[] $player
      */
-    public function removeSession(Player $player){
-        $spl = spl_object_hash($player);
-        if(isset($this->sessions[$spl])){
-            $this->getSession($player)->onClose();
-            unset($this->sessions[$spl]);
+    public function removeSession($player){
+        if(!is_array($player)){
+            $player = [$player];
+        }
+        foreach($player as $p){
+            $spl = spl_object_hash($p);
+            if(isset($this->sessions[$spl])){
+                $this->getSession($p)->onClose();
+                unset($this->sessions[$spl]);
+            }
         }
     }
 
