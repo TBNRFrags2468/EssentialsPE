@@ -85,6 +85,7 @@ use EssentialsPE\Events\PlayerVanishEvent;
 use EssentialsPE\Events\SessionCreateEvent;
 use EssentialsPE\Tasks\AFK\AFKKickTask;
 use EssentialsPE\Tasks\AFK\AFKSetterTask;
+use EssentialsPE\Tasks\GeoLocation;
 use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
@@ -1946,6 +1947,7 @@ class Loader extends PluginBase{
             $this->setMute($player, $m, $mU);
             $this->setNick($player, $n);
             $this->setVanish($player, $v, $vNP);
+            $this->getServer()->getScheduler()->scheduleAsyncTask(new GeoLocation($player));
         }
         return $this->sessions[$spl];
     }
