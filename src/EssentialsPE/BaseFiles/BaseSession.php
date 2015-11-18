@@ -222,6 +222,31 @@ class BaseSession {
         $this->lastLocation = null;
     }
 
+    /**   _____            _                     _   _
+     *   / ____|          | |                   | | (_)
+     *  | |  __  ___  ___ | |     ___   ___ __ _| |_ _  ___  _ __
+     *  | | |_ |/ _ \/ _ \| |    / _ \ / __/ _` | __| |/ _ \| '_ \
+     *  | |__| |  __| (_) | |___| (_) | (_| (_| | |_| | (_) | | | |
+     *   \_____|\___|\___/|______\___/ \___\__,_|\__|_|\___/|_| |_|
+     */
+
+    /** @var null|string */
+    private $geoLocation = null;
+
+    /**
+     * @return null|string
+     */
+    public function getGeoLocation(){
+        return $this->geoLocation;
+    }
+
+    /**
+     * @param string $location
+     */
+    public function setGeoLocation($location){
+        $this->geoLocation = $location;
+    }
+
     /**   _____           _
      *   / ____|         | |
      *  | |  __  ___   __| |

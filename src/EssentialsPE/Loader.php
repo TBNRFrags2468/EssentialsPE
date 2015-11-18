@@ -1444,6 +1444,30 @@ class Loader extends PluginBase{
         $this->setFlying($player, !$this->canFly($player));
     }
 
+    /**   _____            _                     _   _
+     *   / ____|          | |                   | | (_)
+     *  | |  __  ___  ___ | |     ___   ___ __ _| |_ _  ___  _ __
+     *  | | |_ |/ _ \/ _ \| |    / _ \ / __/ _` | __| |/ _ \| '_ \
+     *  | |__| |  __| (_) | |___| (_) | (_| (_| | |_| | (_) | | | |
+     *   \_____|\___|\___/|______\___/ \___\__,_|\__|_|\___/|_| |_|
+     */
+
+    /**
+     * @param Player $player
+     * @return string|null
+     */
+    public function geoLocation(Player $player){
+        return $this->getSession($player)->getGeoLocation();
+    }
+
+    /**
+     * @param Player $player
+     * @param $location
+     */
+    public function updateGeoLocation(Player $player, $location){
+        $this->getSession($player)->setGeoLocation($location);
+    }
+
     /**   _____           _
      *   / ____|         | |
      *  | |  __  ___   __| |
