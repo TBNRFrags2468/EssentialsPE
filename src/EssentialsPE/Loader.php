@@ -994,7 +994,7 @@ class Loader extends PluginBase{
      * @param Player $player
      * @return string|null
      */
-    public function geoLocation(Player $player){
+    public function getGeoLocation(Player $player){
         return $this->getSession($player)->getGeoLocation();
     }
 
@@ -1653,6 +1653,19 @@ class Loader extends PluginBase{
             }
         }
         return $players;
+    }
+
+    /**
+     * @param Player $player
+     * @return array
+     */
+    public function getPlayerInformation(Player $player){
+        return [
+            "name" => $player->getName(),
+            "nick" => $player->getDisplayName(),
+            "afk" => $this->isAFK($player),
+            "location" => $this->getGeoLocation($player)
+        ];
     }
 
     /**  _____                    _______          _
