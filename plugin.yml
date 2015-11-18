@@ -139,6 +139,16 @@ permissions:
             essentials.gamemode:
                 default: op
                 description: "Change your gamemode!"
+            essentials.geoip:
+                default: false
+                description: "GeoLocation nodes"
+                children:
+                    essentials.geoip.show:
+                        default: op
+                        description: "See other's location in the real world"
+                    essentials.geoip.hide:
+                        default: false
+                        description: "Hide location from other users that 'have' permissions to see it"
             essentials.getpos:
                 default: false
                 description: "Get any player's position"
@@ -532,6 +542,9 @@ permissions:
                     essentials.warp.other:
                         default: op
                         description: "Teleport other players to a warp"
+            essentials.whois:
+                default: true
+                description: "Display information about a player"
             essentials.world:
                 default: op
                 description: "Teleport to another world"
