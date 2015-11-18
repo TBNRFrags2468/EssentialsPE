@@ -141,7 +141,9 @@ class Loader extends PluginBase{
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->registerEvents();
         $this->registerCommands();
-        $this->createSession($this->getServer()->getOnlinePlayers());
+        if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
+            $this->createSession($l);
+        }
         if($this->isUpdaterEnabled()){
             $this->fetchEssentialsPEUpdate(false);
         }
@@ -149,7 +151,9 @@ class Loader extends PluginBase{
     }
 
     public function onDisable(){
-        $this->removeSession($this->getServer()->getOnlinePlayers());
+        if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
+            $this->removeSession($l);
+        }
         $this->encodeWarps(true);
     }
 

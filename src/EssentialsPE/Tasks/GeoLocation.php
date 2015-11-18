@@ -30,7 +30,7 @@ class GeoLocation extends AsyncTask{
     public function onRun(){
         $list = [];
         foreach($this->ip as $spl => $ip){
-            $data = Utils::getURL("http://ip-api.com/json/" . $this->ip);
+            $data = Utils::getURL("http://ip-api.com/json/" . $ip);
             $data = json_decode($data, true);
             $list[$spl] = $data["country"];
         }

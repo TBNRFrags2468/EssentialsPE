@@ -78,8 +78,8 @@ class PowerTool extends BaseCommand{
                 $command = substr($command, 2);
                 $this->getPlugin()->removePowerToolItemCommand($sender, $item, $command);
                 $sender->sendMessage(TextFormat::YELLOW . "Command successfully removed from this item!");
-            }elseif(count($args) === 1){
-                switch(strtolower($args[0])){
+            }elseif(count($args) === 1 && (($a = strtolower($args[0])) === "l" || $a === "d")){
+                switch($a){
                     case "l":
                         $commands = false;
                         if($this->getPlugin()->getPowerToolItemCommand($sender, $item) !== false){
