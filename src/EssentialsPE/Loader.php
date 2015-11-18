@@ -516,468 +516,6 @@ class Loader extends PluginBase{
      */
 
     /**
-     * Let you search for a player using his Display name(Nick) or Real name
-     *
-     * @param string $player
-     * @return bool|Player
-     */
-    public function getPlayer($player){
-        if(!$this->validateName($player, false)){
-            return false;
-        }
-        $player = strtolower($player);
-        $found = false;
-        foreach($this->getServer()->getOnlinePlayers() as $p){
-            if(strtolower(TextFormat::clean($p->getDisplayName(), true)) === $player || strtolower($p->getName()) === $player){
-                $found = $p;
-                break;
-            }
-        }
-        // If cannot get the exact player name/nick, try with portions of it
-        if(!$found){
-            $found = ($f = $this->getServer()->getPlayer($player)) === null ? false : $f; // PocketMine function to get from portions of name
-        }
-        /*
-         * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
-         *
-         * ALL THE RIGHTS FROM THE FOLLOWING CODE BELONGS TO POCKETMINE-MP
-         */
-        if(!$found){
-            $delta = \PHP_INT_MAX;
-            foreach($this->getServer()->getOnlinePlayers() as $p){
-                // Clean the Display Name due to colored nicks :S
-                if(\stripos(($n = TextFormat::clean($p->getDisplayName(), true)), $player) === 0){
-                    $curDelta = \strlen($n) - \strlen($player);
-                    if($curDelta < $delta){
-                        $found = $p;
-                        $delta = $curDelta;
-                    }
-                    if($curDelta === 0){
-                        break;
-                    }
-                }
-            }
-        }
-        return $found;
-    }
-    /**
-     * Let you search for a player using his Display name(Nick) or Real name
-     * Instead of returning false, this method will create an OfflinePlayer object.
-     *
-     * @param string $name
-     * @return Player|OfflinePlayer
-     */
-    public function getOfflinePlayer($name){
-        $player = $this->getPlayer($name);
-        if($player === false){
-            $player = new OfflinePlayer($this->getServer(), strtolower($name));
-        }
-        return $player;
-    }
-
-    /**
-     * Return a colored message replacing every
-     * color code (&a = §a)
-     *
-     * @param string $message
-     * @param Player|null $player
-     * @return bool|string
-     */
-    public function colorMessage($message, Player $player = null){
-        $message = preg_replace_callback(
-            "/(\\\&|\&)[0-9a-fk-or]/",
-            function(array $matches){
-                return str_replace("\\§", "&", str_replace("&", "§", $matches[0]));
-            },
-            $message
-        );
-        if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
-            $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
-            return false;
-        }
-        return $message;
-    }
-
-    /**
-     * Let you know if the item is a Tool or Armor
-     * (Items that can get "real damage")
-     *
-     * @param Item $item
-     * @return bool
-     */
-    public function isRepairable(Item $item){
-        return $item instanceof Tool || $item instanceof Armor;
-    }
-
-
-    /**
-     * Let you see who is near a specific player
-     *
-     * @param Player $player
-     * @param int $radius
-     * @return bool|Player[]
-     */
-    public function getNearPlayers(Player $player, $radius = null){
-        if($radius === null || !is_numeric($radius)){
-            $radius = $this->getConfig()->get("near-default-radius");
-        }
-        if(!is_numeric($radius)){
-            return false;
-        }
-        /** @var Player[] $players */
-        $players = [];
-        foreach($player->getLevel()->getNearbyEntities(new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius), $player) as $e){
-            if($e instanceof Player){
-                $players[] = $e;
-            }
-        }
-        return $players;
-    }
-
-    /**
-     * Change the time of a player
-     *
-     * @param Player $player
-     * @param $time
-     * @param bool $static
-     * @return bool
-     */
-    public function setPlayerTime(Player $player, $time, $static = false){
-        if(!is_numeric($time) || !is_bool($static)){
-            return false;
-        }
-        $pk = new SetTimePacket();
-        $pk->time = $time;
-        $pk->started = ($static === false);
-        $pk->encode();
-        $pk->isEncoded = true;
-        $player->dataPacket($pk);
-        if(isset($pk->__encapsulatedPacket)){
-            unset($pk->__encapsulatedPacket);
-        }
-        return true;
-    }
-
-    /**
-     * Easy get an item by name and metadata.
-     * The way this function understand the information about the item is:
-     * 'ItemNameOrID:Metadata' - Example (Granite block item):
-     *      '1:1' - or - 'stone:1'
-     *
-     * @param $item_name
-     * @return Item|ItemBlock
-     */
-    public function getItem($item_name){
-        if(strpos($item_name, ":") !== false){
-            $v = explode(":", $item_name);
-            $item_name = $v[0];
-            $damage = $v[1];
-        }else{
-            $damage = 0;
-        }
-
-        if(!is_numeric($item_name)){
-            $item = Item::fromString($item_name);
-        }else{
-            $item = Item::get($item_name);
-        }
-        $item->setDamage($damage);
-
-        return $item;
-    }
-
-    /**
-     * Return an array with the following values:
-     * 0 => Timestamp integer
-     * 1 => The rest of the string (removing any "space" between time codes)
-     *
-     * @param string $string
-     * @return array|bool
-     */
-    public function stringToTimestamp($string){
-        /**
-         * Rules:
-         * Integers without suffix are considered as seconds
-         * "s" is for seconds
-         * "m" is for minutes
-         * "h" is for hours
-         * "d" is for days
-         * "w" is for weeks
-         * "mo" is for months
-         * "y" is for years
-         */
-        if(trim($string) === ""){
-            return false;
-        }
-        $t = new \DateTime();
-        preg_match_all("/[0-9]+(y|mo|w|d|h|m|s)|[0-9]+/", $string, $found);
-        if(count($found[0]) < 1){
-            return false;
-        }
-        $found[2] = preg_replace("/[^0-9]/", "", $found[0]);
-        foreach($found[2] as $k => $i){
-            switch($c = $found[1][$k]){
-                case "y":
-                case "w":
-                case "d":
-                    $t->add(new \DateInterval("P" . $i. strtoupper($c)));
-                    break;
-                case "mo":
-                    $t->add(new \DateInterval("P" . $i. strtoupper(substr($c, 0, strlen($c) -1))));
-                    break;
-                case "h":
-                case "m":
-                case "s":
-                    $t->add(new \DateInterval("PT" . $i . strtoupper($c)));
-                    break;
-                default:
-                    $t->add(new \DateInterval("PT" . $i . "S"));
-                    break;
-            }
-            $string = str_replace($found[0][$k], "", $string);
-        }
-        return [$t, ltrim(str_replace($found[0], "", $string))];
-    }
-
-    /**
-     * Checks if a name is valid, it could be for a Nick, Home, Warp, etc...
-     *
-     * @param string $string
-     * @param bool $allowColorCodes
-     * @return bool
-     */
-    public function validateName($string, $allowColorCodes = false){
-        if(trim($string) === ""){
-            return false;
-        }
-        $format = [];
-        if($allowColorCodes){
-            $format[] = "/(\&|\§)[0-9a-fk-or]/";
-        }
-        $format[] = "/[a-zA-Z0-9_]/"; // Due to color codes can be allowed, then check for them first, so after, make a normal lookup
-        $s = preg_replace($format, "", $string);
-        if(strlen($s) !== 0){
-            return false;
-        }
-        return true;
-    }
-
-    /**
-     * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
-     *
-     * @param BaseInventory $inv
-     * @param Item|null $target
-     * @return bool
-     */
-    public function condenseItems(BaseInventory $inv, $target = null){ // TODO: Fix inventory clear...
-        $items = $target === null ? $inv->getContents() : $inv->all($target);
-        if($target !== null && !$this->canBeCondensed($target)){
-            return false;
-        }
-        $replace = Item::get(0);
-        // First step: Merge target items...
-        foreach($items as $slot => $item){
-            if(!isset($this->condenseShapes[0][$item->getId()]) && !isset($this->condenseShapes[1][$item->getId()])){
-                continue;
-            }
-            $sub = $inv->all($item);
-            foreach($sub as $index => $i){
-                /** @var Item $i */
-                if($slot !== $index){
-                    $item->setCount($item->getCount() + $i->getCount());
-                    $items[$index] = $replace;
-                    var_dump($index . " - " . $slot);
-                }
-            }
-        }
-        $inv->setContents($items);
-        // Second step: Condense items...
-        foreach($items as $slot => $item){
-            $condense = $this->condenseRecipes($item);
-            if($condense === null){
-                continue;
-            }
-            $cSlot = $slot;
-            if($item->getCount() > 0){
-                $cSlot = $inv->firstEmpty();
-                $inv->setItem($slot, $item);
-            }
-            $inv->setItem($cSlot, $condense);
-        }
-        return true;
-    }
-
-    /** @var array */
-    private $condenseShapes = [
-        [], // 2x2 Shapes
-        [Item::COAL => Item::COAL_BLOCK, Item::IRON_INGOT => Item::IRON_BLOCK, Item::GOLD_INGOT => Item::GOLD_BLOCK, Item::DIAMOND => Item::DIAMOND_BLOCK, Item::EMERALD => Item::EMERALD_BLOCK] // 3x3 Shapes
-    ];
-
-    /**
-     * @param Item $item
-     * @return Item|null
-     */
-    private function condenseRecipes(Item $item){
-        if(isset($this->condenseShapes[0][$item->getId()])){ // 2x2 Shapes
-            $shape = 4;
-        }elseif(isset($this->condenseShapes[1][$item->getId()])){ // 3x3 Shapes
-            $shape = 9;
-        }else{
-            return null;
-        }
-        $index = (int) sqrt($shape) - 2;
-        $newId = $this->condenseShapes[$index][$item->getId()];
-        $damage = 0;
-        if(is_array($newId)){
-            if(!isset($newId[1][$item->getDamage()])){
-                return null;
-            }
-            $damage = $newId[1][$item->getDamage()];
-            $newId = $newId[0];
-        }
-        $count = floor($item->getCount() / $shape);
-        if($count < 1){
-            return null;
-        }
-        $condensed = new Item($newId, $damage, $count);
-        if($condensed->getId() === Item::AIR){
-            return null;
-        }
-        $item->setCount($item->getCount() - ($count * $shape));
-        return $condensed;
-    }
-
-    /**
-     * @param Item $item
-     * @return bool
-     */
-    private function canBeCondensed(Item $item){
-        return isset($this->condenseShapes[0][$item->getId()]) || isset($this->condenseShapes[1][$item->getId()]);
-    }
-
-    /**   _____              _
-     *   / ____|            (_)
-     *  | (___   ___ ___ ___ _  ___  _ __  ___
-     *   \___ \ / _ / __/ __| |/ _ \| '_ \/ __|
-     *   ____) |  __\__ \__ | | (_) | | | \__ \
-     *  |_____/ \___|___|___|_|\___/|_| |_|___/
-     */
-
-    /** @var array  */
-    private $sessions = [];
-
-    /**
-     * Tell if a session exists for a specific player
-     *
-     * @param Player $player
-     * @return bool
-     */
-    public function sessionExists(Player $player){
-        return isset($this->sessions[spl_object_hash($player)]);
-    }
-
-    /**
-     * Creates a new Sessions for the specified player
-     *
-     * @param Player $player
-     * @return BaseSession
-     */
-    public function createSession(Player $player){
-        $spl = spl_object_hash($player);
-        if(!isset($this->sessions[$spl])){
-            $this->getLogger()->debug("Creating player session file...");
-            $cfg = $this->getSessionFile($player->getName());
-            $tValues = $cfg->getAll();
-            $values = BaseSession::$defaults;
-            foreach($tValues as $k => $v){
-                $values[$k] = $v;
-            }
-            $this->getLogger()->debug("Creating virtual session...");
-            $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $values));
-            $this->getLogger()->debug("Setting up new values...");
-            $values = $ev->getValues();
-            $m = BaseSession::$defaults["isMuted"];
-            $mU = BaseSession::$defaults["mutedUntil"];
-            if(isset($values["isMuted"])){
-                if(!isset($values["mutedUntil"])){
-                    $values["mutedUntil"] = null;
-                }
-                $m = $values["isMuted"];
-                if(is_int($t = $values["mutedUntil"])){
-                    $date = new \DateTime();
-                    $mU = date_timestamp_set($date, $values["mutedUntil"]);
-                }else{
-                    $mU = $values["mutedUntil"];
-                }
-                unset($values["isMuted"]);
-                unset($values["mutedUntil"]);
-            }
-            $n = $player->getName();
-            if(isset($values["nick"])){
-                $n = $values["nick"];
-                $this->getLogger()->info($player->getName() . " is also known as " . $n);
-                unset($values["nick"]);
-            }
-            $v = BaseSession::$defaults["isVanished"];
-            $vNP = BaseSession::$defaults["noPacket"];
-            if(isset($values["isVanished"])){
-                if(!isset($values["noPacket"])){
-                    $values["noPacket"] = false;
-                }
-                $v = $values["isVanished"];
-                $vNP = $values["noPacket"];
-                unset($values["isVanished"]);
-                unset($values["noPacket"]);
-            }
-            $this->getLogger()->debug("Setting up final values...");
-            $this->sessions[$spl] = new BaseSession($this, $player, $cfg, $values);
-            $this->setMute($player, $m, $mU);
-            $this->setNick($player, $n);
-            $this->setVanish($player, $v, $vNP);
-        }
-        return $this->sessions[$spl];
-    }
-
-    /**
-     * @param $player
-     * @return bool|Config
-     */
-    private function getSessionFile($player){
-        $this->getLogger()->info("Running");
-        if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
-            mkdir($dir);
-        }
-        if(!is_dir($dir = $dir . strtolower(substr($player, 0, 1)) . DIRECTORY_SEPARATOR)){
-            mkdir($dir);
-        }
-        return new Config($dir . strtolower($player) . ".session", Config::JSON, BaseSession::$configDefaults);
-    }
-
-    /**
-     * Remove player's session (if active and available)
-     *
-     * @param Player $player
-     */
-    public function removeSession(Player $player){
-        $spl = spl_object_hash($player);
-        if(isset($this->sessions[$spl])){
-            $this->getSession($player)->onClose();
-            unset($this->sessions[$spl]);
-        }
-    }
-
-    /**
-     * @param Player $player
-     * @return BaseSession
-     */
-    private function getSession(Player $player){
-        if(!$this->sessionExists($player)){
-            $this->createSession($player);
-        }
-        return $this->sessions[spl_object_hash($player)];
-    }
-
-    /**
      *            ______ _  __
      *      /\   |  ____| |/ /
      *     /  \  | |__  | ' /
@@ -1580,6 +1118,146 @@ class Loader extends PluginBase{
         return $this->getSession($player)->homesList($inArray);
     }
 
+    /**  _____ _
+     *  |_   _| |
+     *    | | | |_ ___ _ __ ___  ___
+     *    | | | __/ _ | '_ ` _ \/ __|
+     *   _| |_| ||  __| | | | | \__ \
+     *  |_____|\__\___|_| |_| |_|___/
+     */
+
+    /**
+     * Easy get an item by name and metadata.
+     * The way this function understand the information about the item is:
+     * 'ItemNameOrID:Metadata' - Example (Granite block item):
+     *      '1:1' - or - 'stone:1'
+     *
+     * @param $item_name
+     * @return Item|ItemBlock
+     */
+    public function getItem($item_name){
+        if(strpos($item_name, ":") !== false){
+            $v = explode(":", $item_name);
+            $item_name = $v[0];
+            $damage = $v[1];
+        }else{
+            $damage = 0;
+        }
+
+        if(!is_numeric($item_name)){
+            $item = Item::fromString($item_name);
+        }else{
+            $item = Item::get($item_name);
+        }
+        $item->setDamage($damage);
+
+        return $item;
+    }
+
+    /**
+     * Let you know if the item is a Tool or Armor
+     * (Items that can get "real damage")
+     *
+     * @param Item $item
+     * @return bool
+     */
+    public function isRepairable(Item $item){
+        return $item instanceof Tool || $item instanceof Armor;
+    }
+
+    /**
+     * Condense items into blocks in an inventory, default MCPE item calculations (recipes) are used.
+     *
+     * @param BaseInventory $inv
+     * @param Item|null $target
+     * @return bool
+     */
+    public function condenseItems(BaseInventory $inv, $target = null){ // TODO: Fix inventory clear...
+        $items = $target === null ? $inv->getContents() : $inv->all($target);
+        if($target !== null && !$this->canBeCondensed($target)){
+            return false;
+        }
+        $replace = Item::get(0);
+        // First step: Merge target items...
+        foreach($items as $slot => $item){
+            if(!isset($this->condenseShapes[0][$item->getId()]) && !isset($this->condenseShapes[1][$item->getId()])){
+                continue;
+            }
+            $sub = $inv->all($item);
+            foreach($sub as $index => $i){
+                /** @var Item $i */
+                if($slot !== $index){
+                    $item->setCount($item->getCount() + $i->getCount());
+                    $items[$index] = $replace;
+                    var_dump($index . " - " . $slot);
+                }
+            }
+        }
+        $inv->setContents($items);
+        // Second step: Condense items...
+        foreach($items as $slot => $item){
+            $condense = $this->condenseRecipes($item);
+            if($condense === null){
+                continue;
+            }
+            $cSlot = $slot;
+            if($item->getCount() > 0){
+                $cSlot = $inv->firstEmpty();
+                $inv->setItem($slot, $item);
+            }
+            $inv->setItem($cSlot, $condense);
+        }
+        return true;
+    }
+
+    /** @var array */
+    private $condenseShapes = [
+        [], // 2x2 Shapes
+        [Item::COAL => Item::COAL_BLOCK, Item::IRON_INGOT => Item::IRON_BLOCK, Item::GOLD_INGOT => Item::GOLD_BLOCK, Item::DIAMOND => Item::DIAMOND_BLOCK, Item::EMERALD => Item::EMERALD_BLOCK] // 3x3 Shapes
+    ];
+
+    /**
+     * @param Item $item
+     * @return Item|null
+     */
+    private function condenseRecipes(Item $item){
+        if(isset($this->condenseShapes[0][$item->getId()])){ // 2x2 Shapes
+            $shape = 4;
+        }elseif(isset($this->condenseShapes[1][$item->getId()])){ // 3x3 Shapes
+            $shape = 9;
+        }else{
+            return null;
+        }
+        $index = (int) sqrt($shape) - 2;
+        $newId = $this->condenseShapes[$index][$item->getId()];
+        $damage = 0;
+        if(is_array($newId)){
+            if(!isset($newId[1][$item->getDamage()])){
+                return null;
+            }
+            $damage = $newId[1][$item->getDamage()];
+            $newId = $newId[0];
+        }
+        $count = floor($item->getCount() / $shape);
+        if($count < 1){
+            return null;
+        }
+        $condensed = new Item($newId, $damage, $count);
+        if($condensed->getId() === Item::AIR){
+            return null;
+        }
+        $item->setCount($item->getCount() - ($count * $shape));
+        return $condensed;
+    }
+
+    /**
+     * @param Item $item
+     * @return bool
+     */
+    private function canBeCondensed(Item $item){
+        return isset($this->condenseShapes[0][$item->getId()]) || isset($this->condenseShapes[1][$item->getId()]);
+    }
+
     /**  _  ___ _
      *  | |/ (_| |
      *  | ' / _| |_ ___
@@ -1655,16 +1333,63 @@ class Loader extends PluginBase{
         return $this->messagesAPI;
     }
 
-    /**  __  __
-     *  |  \/  |
-     *  | \  / |___  __ _
-     *  | |\/| / __|/ _` |
-     *  | |  | \__ | (_| |
-     *  |_|  |_|___/\__, |
-     *               __/ |
-     *              |___/
+    /**
+     * Return a colored message replacing every
+     * color code (&a = §a)
+     *
+     * @param string $message
+     * @param Player|null $player
+     * @return bool|string
+     */
+    public function colorMessage($message, Player $player = null){
+        $message = preg_replace_callback(
+            "/(\\\&|\&)[0-9a-fk-or]/",
+            function(array $matches){
+                return str_replace("\\§", "&", str_replace("&", "§", $matches[0]));
+            },
+            $message
+        );
+        if(strpos($message, "§") !== false && ($player instanceof Player) && !$player->hasPermission("essentials.colorchat")){
+            $player->sendMessage(TextFormat::RED . "You can't chat using colors!");
+            return false;
+        }
+        return $message;
+    }
+
+    /**
+     * Checks if a name is valid, it could be for a Nick, Home, Warp, etc...
+     *
+     * @param string $string
+     * @param bool $allowColorCodes
+     * @return bool
+     */
+    public function validateName($string, $allowColorCodes = false){
+        if(trim($string) === ""){
+            return false;
+        }
+        $format = [];
+        if($allowColorCodes){
+            $format[] = "/(\&|\§)[0-9a-fk-or]/";
+        }
+        $format[] = "/[a-zA-Z0-9_]/"; // Due to color codes can be allowed, then check for them first, so after, make a normal lookup
+        $s = preg_replace($format, "", $string);
+        if(strlen($s) !== 0){
+            return false;
+        }
+        return true;
+    }
+
+    /**   ____        _      _    _____            _
+     *   / __ \      (_)    | |  |  __ \          | |
+     *  | |  | |_   _ _  ___| | _| |__) |___ _ __ | |_   _
+     *  | |  | | | | | |/ __| |/ |  _  // _ | '_ \| | | | |
+     *  | |__| | |_| | | (__|   <| | \ |  __| |_) | | |_| |
+     *   \___\_\\__,_|_|\___|_|\_|_|  \_\___| .__/|_|\__, |
+     *                                      | |       __/ |
+     *                                      |_|      |___/
      */
 
+    /** @var array */
     private $quickReply = [
         "console" => false,
         "rcon" => false
@@ -1834,6 +1559,100 @@ class Loader extends PluginBase{
         }
         $this->getSession($player)->setNick(null);
         return true;
+    }
+
+    /**  _____  _
+     *  |  __ \| |
+     *  | |__) | | __ _ _   _  ___ _ __
+     *  |  ___/| |/ _` | | | |/ _ | '__|
+     *  | |    | | (_| | |_| |  __| |
+     *  |_|    |_|\__,_|\__, |\___|_|
+     *                   __/ |
+     *                  |___/
+     */
+
+    /**
+     * Let you search for a player using his Display name(Nick) or Real name
+     *
+     * @param string $player
+     * @return bool|Player
+     */
+    public function getPlayer($player){
+        if(!$this->validateName($player, false)){
+            return false;
+        }
+        $player = strtolower($player);
+        $found = false;
+        foreach($this->getServer()->getOnlinePlayers() as $p){
+            if(strtolower(TextFormat::clean($p->getDisplayName(), true)) === $player || strtolower($p->getName()) === $player){
+                $found = $p;
+                break;
+            }
+        }
+        // If cannot get the exact player name/nick, try with portions of it
+        if(!$found){
+            $found = ($f = $this->getServer()->getPlayer($player)) === null ? false : $f; // PocketMine function to get from portions of name
+        }
+        /*
+         * Copy from PocketMine's function (use above xD) but modified to work with Nicknames :P
+         *
+         * ALL THE RIGHTS FROM THE FOLLOWING CODE BELONGS TO POCKETMINE-MP
+         */
+        if(!$found){
+            $delta = \PHP_INT_MAX;
+            foreach($this->getServer()->getOnlinePlayers() as $p){
+                // Clean the Display Name due to colored nicks :S
+                if(\stripos(($n = TextFormat::clean($p->getDisplayName(), true)), $player) === 0){
+                    $curDelta = \strlen($n) - \strlen($player);
+                    if($curDelta < $delta){
+                        $found = $p;
+                        $delta = $curDelta;
+                    }
+                    if($curDelta === 0){
+                        break;
+                    }
+                }
+            }
+        }
+        return $found;
+    }
+    /**
+     * Let you search for a player using his Display name(Nick) or Real name
+     * Instead of returning false, this method will create an OfflinePlayer object.
+     *
+     * @param string $name
+     * @return Player|OfflinePlayer
+     */
+    public function getOfflinePlayer($name){
+        $player = $this->getPlayer($name);
+        if($player === false){
+            $player = new OfflinePlayer($this->getServer(), strtolower($name));
+        }
+        return $player;
+    }
+
+    /**
+     * Let you see who is near a specific player
+     *
+     * @param Player $player
+     * @param int $radius
+     * @return bool|Player[]
+     */
+    public function getNearPlayers(Player $player, $radius = null){
+        if($radius === null || !is_numeric($radius)){
+            $radius = $this->getConfig()->get("near-default-radius");
+        }
+        if(!is_numeric($radius)){
+            return false;
+        }
+        /** @var Player[] $players */
+        $players = [];
+        foreach($player->getLevel()->getNearbyEntities(new AxisAlignedBB($player->getFloorX() - $radius, $player->getFloorY() - $radius, $player->getFloorZ() - $radius, $player->getFloorX() + $radius, $player->getFloorY() + $radius, $player->getFloorZ() + $radius), $player) as $e){
+            if($e instanceof Player){
+                $players[] = $e;
+            }
+        }
+        return $players;
     }
 
     /**  _____                    _______          _
@@ -2033,6 +1852,213 @@ class Loader extends PluginBase{
      */
     public function switchPvP(Player $player){
         $this->setPvP($player, !$this->isPvPEnabled($player));
+    }
+
+    /**   _____              _
+     *   / ____|            (_)
+     *  | (___   ___ ___ ___ _  ___  _ __  ___
+     *   \___ \ / _ / __/ __| |/ _ \| '_ \/ __|
+     *   ____) |  __\__ \__ | | (_) | | | \__ \
+     *  |_____/ \___|___|___|_|\___/|_| |_|___/
+     */
+
+    /** @var array  */
+    private $sessions = [];
+
+    /**
+     * Tell if a session exists for a specific player
+     *
+     * @param Player $player
+     * @return bool
+     */
+    public function sessionExists(Player $player){
+        return isset($this->sessions[spl_object_hash($player)]);
+    }
+
+    /**
+     * Creates a new Sessions for the specified player
+     *
+     * @param Player $player
+     * @return BaseSession
+     */
+    public function createSession(Player $player){
+        $spl = spl_object_hash($player);
+        if(!isset($this->sessions[$spl])){
+            $this->getLogger()->debug("Creating player session file...");
+            $cfg = $this->getSessionFile($player->getName());
+            $tValues = $cfg->getAll();
+            $values = BaseSession::$defaults;
+            foreach($tValues as $k => $v){
+                $values[$k] = $v;
+            }
+            $this->getLogger()->debug("Creating virtual session...");
+            $this->getServer()->getPluginManager()->callEvent($ev = new SessionCreateEvent($this, $player, $values));
+            $this->getLogger()->debug("Setting up new values...");
+            $values = $ev->getValues();
+            $m = BaseSession::$defaults["isMuted"];
+            $mU = BaseSession::$defaults["mutedUntil"];
+            if(isset($values["isMuted"])){
+                if(!isset($values["mutedUntil"])){
+                    $values["mutedUntil"] = null;
+                }
+                $m = $values["isMuted"];
+                if(is_int($t = $values["mutedUntil"])){
+                    $date = new \DateTime();
+                    $mU = date_timestamp_set($date, $values["mutedUntil"]);
+                }else{
+                    $mU = $values["mutedUntil"];
+                }
+                unset($values["isMuted"]);
+                unset($values["mutedUntil"]);
+            }
+            $n = $player->getName();
+            if(isset($values["nick"])){
+                $n = $values["nick"];
+                $this->getLogger()->info($player->getName() . " is also known as " . $n);
+                unset($values["nick"]);
+            }
+            $v = BaseSession::$defaults["isVanished"];
+            $vNP = BaseSession::$defaults["noPacket"];
+            if(isset($values["isVanished"])){
+                if(!isset($values["noPacket"])){
+                    $values["noPacket"] = false;
+                }
+                $v = $values["isVanished"];
+                $vNP = $values["noPacket"];
+                unset($values["isVanished"]);
+                unset($values["noPacket"]);
+            }
+            $this->getLogger()->debug("Setting up final values...");
+            $this->sessions[$spl] = new BaseSession($this, $player, $cfg, $values);
+            $this->setMute($player, $m, $mU);
+            $this->setNick($player, $n);
+            $this->setVanish($player, $v, $vNP);
+        }
+        return $this->sessions[$spl];
+    }
+
+    /**
+     * @param $player
+     * @return bool|Config
+     */
+    private function getSessionFile($player){
+        $this->getLogger()->info("Running");
+        if(!is_dir($dir = $this->getDataFolder() . "Sessions" . DIRECTORY_SEPARATOR)){
+            mkdir($dir);
+        }
+        if(!is_dir($dir = $dir . strtolower(substr($player, 0, 1)) . DIRECTORY_SEPARATOR)){
+            mkdir($dir);
+        }
+        return new Config($dir . strtolower($player) . ".session", Config::JSON, BaseSession::$configDefaults);
+    }
+
+    /**
+     * Remove player's session (if active and available)
+     *
+     * @param Player $player
+     */
+    public function removeSession(Player $player){
+        $spl = spl_object_hash($player);
+        if(isset($this->sessions[$spl])){
+            $this->getSession($player)->onClose();
+            unset($this->sessions[$spl]);
+        }
+    }
+
+    /**
+     * @param Player $player
+     * @return BaseSession
+     */
+    private function getSession(Player $player){
+        if(!$this->sessionExists($player)){
+            $this->createSession($player);
+        }
+        return $this->sessions[spl_object_hash($player)];
+    }
+
+    /**  _______ _
+     *  |__   __(_)
+     *     | |   _ _ __ ___   ___
+     *     | |  | | '_ ` _ \ / _ \
+     *     | |  | | | | | | |  __/
+     *     |_|  |_|_| |_| |_|\___|
+     */
+
+    /**
+     * Change the time of a player
+     *
+     * @param Player $player
+     * @param $time
+     * @param bool $static
+     * @return bool
+     */
+    public function setPlayerTime(Player $player, $time, $static = false){
+        if(!is_numeric($time) || !is_bool($static)){
+            return false;
+        }
+        $pk = new SetTimePacket();
+        $pk->time = $time;
+        $pk->started = ($static === false);
+        $pk->encode();
+        $pk->isEncoded = true;
+        $player->dataPacket($pk);
+        if(isset($pk->__encapsulatedPacket)){
+            unset($pk->__encapsulatedPacket);
+        }
+        return true;
+    }
+
+    /**
+     * Return an array with the following values:
+     * 0 => Timestamp integer
+     * 1 => The rest of the string (removing any "space" between time codes)
+     *
+     * @param string $string
+     * @return array|bool
+     */
+    public function stringToTimestamp($string){
+        /**
+         * Rules:
+         * Integers without suffix are considered as seconds
+         * "s" is for seconds
+         * "m" is for minutes
+         * "h" is for hours
+         * "d" is for days
+         * "w" is for weeks
+         * "mo" is for months
+         * "y" is for years
+         */
+        if(trim($string) === ""){
+            return false;
+        }
+        $t = new \DateTime();
+        preg_match_all("/[0-9]+(y|mo|w|d|h|m|s)|[0-9]+/", $string, $found);
+        if(count($found[0]) < 1){
+            return false;
+        }
+        $found[2] = preg_replace("/[^0-9]/", "", $found[0]);
+        foreach($found[2] as $k => $i){
+            switch($c = $found[1][$k]){
+                case "y":
+                case "w":
+                case "d":
+                    $t->add(new \DateInterval("P" . $i. strtoupper($c)));
+                    break;
+                case "mo":
+                    $t->add(new \DateInterval("P" . $i. strtoupper(substr($c, 0, strlen($c) -1))));
+                    break;
+                case "h":
+                case "m":
+                case "s":
+                    $t->add(new \DateInterval("PT" . $i . strtoupper($c)));
+                    break;
+                default:
+                    $t->add(new \DateInterval("PT" . $i . "S"));
+                    break;
+            }
+            $string = str_replace($found[0][$k], "", $string);
+        }
+        return [$t, ltrim(str_replace($found[0], "", $string))];
     }
 
     /**  _______ _____  _____                           _
