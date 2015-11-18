@@ -12,7 +12,7 @@ class Gamemode extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "gamemode", "Change player gamemode", "<mode> [player]", null, ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
+        parent::__construct($plugin, "gamemode", "Change player gamemode", "<mode> [player]", true, ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
         $this->setPermission("essentials.gamemode");
     }
 

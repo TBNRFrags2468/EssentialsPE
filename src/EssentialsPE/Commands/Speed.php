@@ -10,7 +10,7 @@ use pocketmine\utils\TextFormat;
 
 class Speed extends BaseCommand{
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "speed", "Change your speed limits", "<speed> [player]", null);
+        parent::__construct($plugin, "speed", "Change your speed limits", "<speed> [player]");
         $this->setPermission("essentials.speed");
     }
 

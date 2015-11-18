@@ -11,7 +11,7 @@ class Broadcast extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "broadcast", "Broadcast a message.", "<message>", null, ["bcast"]);
+        parent::__construct($plugin, "broadcast", "Broadcast a message.", "<message>", true, ["bcast"]);
         $this->setPermission("essentials.broadcast");
     }
 

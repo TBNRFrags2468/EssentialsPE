@@ -12,7 +12,7 @@ class God extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "god", "Prevent you to take any damage", "[player]", null, ["godmode", "tgm"]);
+        parent::__construct($plugin, "god", "Prevent you to take any damage", "[player]", true, ["godmode", "tgm"]);
         $this->setPermission("essentials.god.use");
     }
 

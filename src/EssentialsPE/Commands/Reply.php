@@ -14,7 +14,7 @@ class Reply extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "<message ...>", null, ["r"]);
+        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "<message ...>", true, ["r"]);
         $this->setPermission("essentials.reply");
     }
 

@@ -11,7 +11,7 @@ class DelWarp extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "delwarp", "Delete a warp", "<name>", null, ["remwarp", "removewarp", "closewarp"]);
+        parent::__construct($plugin, "delwarp", "Delete a warp", "<name>", true, ["remwarp", "removewarp", "closewarp"]);
         $this->setPermission("essentials.delwarp");
     }
 

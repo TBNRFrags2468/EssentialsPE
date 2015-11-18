@@ -12,7 +12,7 @@ class EssentialsPE extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "[update <check|install>]", null, ["essentials", "ess", "esspe"]);
+        parent::__construct($plugin, "essentials", "Get current Essentials version", "[update <check|install>]", true, ["essentials", "ess", "esspe"]);
         $this->setPermission("essentials.essentials");
     }
 

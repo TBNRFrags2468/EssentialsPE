@@ -12,7 +12,7 @@ class Mute extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "mute", "Prevent a player from chatting", "<player> [time...]", null, ["silence"]);
+        parent::__construct($plugin, "mute", "Prevent a player from chatting", "<player> [time...]", true, ["silence"]);
         $this->setPermission("essentials.mute.use");
     }
 

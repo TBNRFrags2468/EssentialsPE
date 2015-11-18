@@ -11,7 +11,7 @@ class Eco extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "eco", "Sets the balance of a player", "<give|take|set|reset> <player> [amount]", null, ["economy"]);
+        parent::__construct($plugin, "eco", "Sets the balance of a player", "<give|take|set|reset> <player> [amount]", true, ["economy"]);
         $this->setPermission("essentials.eco.use");
     }
 

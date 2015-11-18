@@ -12,7 +12,7 @@ class Nick extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nick", "Change your in-game name", "<new nick|off> [player]", null, ["nickname"]);
+        parent::__construct($plugin, "nick", "Change your in-game name", "<new nick|off> [player]", true, ["nickname"]);
         $this->setPermission("essentials.nick.use");
     }
 

@@ -12,7 +12,7 @@ class GetPos extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "getpos", "Get your/other's position", "[player]", null, ["coords", "position", "whereami", "getlocation", "getloc"]);
+        parent::__construct($plugin, "getpos", "Get your/other's position", "[player]", true, ["coords", "position", "whereami", "getlocation", "getloc"]);
         $this->setPermission("essentials.getpos.use");
     }
 

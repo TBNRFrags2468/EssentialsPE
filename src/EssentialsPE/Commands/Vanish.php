@@ -12,7 +12,7 @@ class Vanish extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "vanish", "Hide from other players!", "[player]", null, ["v"]);
+        parent::__construct($plugin, "vanish", "Hide from other players!", "[player]", true, ["v"]);
         $this->setPermission("essentials.vanish.use");
     }
 

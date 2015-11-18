@@ -12,7 +12,7 @@ class PTime extends BaseCommand{
      * @param Loader $plugin
      */
     public function __construct(Loader $plugin){
-        parent::__construct($plugin, "ptime", "Changes the time of a player", "<time> [player]", null, ["playertime"]);
+        parent::__construct($plugin, "ptime", "Changes the time of a player", "<time> [player]", true, ["playertime"]);
         $this->setPermission("essentials.ptime.use");
     }
 

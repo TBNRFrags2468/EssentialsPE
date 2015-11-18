@@ -11,8 +11,8 @@ use pocketmine\utils\TextFormat;
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
     /** @var Loader  */
     private $plugin;
-    /** @var null|string */
-    private $consoleUsageMessage = null;
+    /** @var bool|string */
+    private $consoleUsageMessage;
 
     /**
      * @param Loader $plugin
@@ -22,7 +22,7 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @param bool|null|string $consoleUsageMessage
      * @param array $aliases
      */
-    public function __construct(Loader $plugin, $name, $description = "", $usageMessage = null, $consoleUsageMessage = null, array $aliases = []){
+    public function __construct(Loader $plugin, $name, $description = "", $usageMessage = null, $consoleUsageMessage = true, array $aliases = []){
         parent::__construct($name, $description, $usageMessage, $aliases);
         $this->plugin = $plugin;
         $this->consoleUsageMessage = $consoleUsageMessage;
@@ -56,12 +56,12 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
     public function sendUsage(CommandSender $sender, $alias){
         $message = TextFormat::RED . "Usage: " . TextFormat::GRAY . "/$alias ";
         if(!$sender instanceof Player){
-            if($this->consoleUsageMessage === null){
-                $message .= str_replace("[player]", "<player>", parent::getUsage());
+            if(is_string($this->consoleUsageMessage)){
+                $message .= $this->consoleUsageMessage;
             }elseif(!$this->consoleUsageMessage){
                 $message = TextFormat::RED . "[Error] Please run this command in-game";
             }else{
-                $message .= $this->consoleUsageMessage;
+                $message .= str_replace("[player]", "<player>", parent::getUsage());
             }
         }else{
             $message .= parent::getUsage();
