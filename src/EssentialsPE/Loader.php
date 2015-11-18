@@ -1665,6 +1665,7 @@ class Loader extends PluginBase{
         return [
             "name" => $player->getName(),
             "nick" => $player->getDisplayName(),
+            //"money" => $this->getPlayerBalance($player), TODO
             "afk" => $this->isAFK($player),
             "location" => $this->getGeoLocation($player)
         ];
