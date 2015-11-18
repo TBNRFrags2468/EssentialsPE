@@ -90,6 +90,7 @@ use EssentialsPE\Tasks\TPRequestTask;
 use EssentialsPE\Tasks\Updater\AutoFetchCallerTask;
 use EssentialsPE\Tasks\Updater\UpdateFetchTask;
 use EssentialsPE\Tasks\Updater\UpdateInstallTask;
+use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\entity\Entity;
@@ -506,6 +507,10 @@ class Loader extends PluginBase{
      *  '----------------'  '----------------'  '----------------'
      *
      */
+
+    const TRANSPARENT_BLOCKS_JUMP = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::BUSH, Block::DANDELION,
+        Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
+        Block::PUMPKIN_STEM, Block::MELON_STEM, Block::VINE, Block::CARROT_BLOCK, Block::POTATO_BLOCK, Block::DOUBLE_PLANT];
 
     /**
      *            ______ _  __

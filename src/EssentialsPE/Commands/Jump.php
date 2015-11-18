@@ -3,7 +3,6 @@ namespace EssentialsPE\Commands;
 
 use EssentialsPE\BaseFiles\BaseCommand;
 use EssentialsPE\Loader;
-use pocketmine\block\Block;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
@@ -31,10 +30,7 @@ class Jump extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $transparent = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::BUSH, Block::DANDELION,
-            Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
-            Block::PUMPKIN_STEM, Block::MELON_STEM, Block::VINE, Block::CARROT_BLOCK, Block::POTATO_BLOCK, Block::DOUBLE_PLANT];
-        $block = $sender->getTargetBlock(100, $transparent);
+        $block = $sender->getTargetBlock(100, Loader::TRANSPARENT_BLOCKS_JUMP);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;
