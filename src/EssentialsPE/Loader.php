@@ -194,7 +194,7 @@ class Loader extends PluginBase{
             new AFK($this),
             new Antioch($this),
             new Back($this),
-            //new BigTreeCommand($this), //TODO
+            //new BigTreeCommand($this), TODO
             new BreakCommand($this),
             new Broadcast($this),
             new Burn($this),
@@ -233,9 +233,10 @@ class Loader extends PluginBase{
             new Suicide($this),
             new TempBan($this),
             new Top($this),
-            //new TreeCommand($this), //TODO
+            //new TreeCommand($this), TODO
             new Unlimited($this),
             new Vanish($this),
+            //new Whois($this), TODO
             new World($this),
 
             //Economy
