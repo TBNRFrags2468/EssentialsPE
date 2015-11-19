@@ -1,28 +1,25 @@
 <?php
 namespace EssentialsPE\Events;
 
-use EssentialsPE\Loader;
-use pocketmine\event\plugin\PluginEvent;
+use EssentialsPE\BaseFiles\BaseAPI;
+use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\Player;
 
-class SessionCreateEvent extends PluginEvent{
+class SessionCreateEvent extends BaseCustomEvent{
     public static $handlerList = null;
 
-    /** @var Loader  */
-    public $plugin;
     /** @var Player  */
     public $player;
     /** @var array  */
     public $values;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param array $values
      */
-    public function __construct(Loader $plugin, Player $player, array $values){
-        parent::__construct($plugin);
-        $this->plugin = $plugin;
+    public function __construct(BaseAPI $api, Player $player, array $values){
+        parent::__construct($api);
         $this->player = $player;
         $this->values = $values;
     }

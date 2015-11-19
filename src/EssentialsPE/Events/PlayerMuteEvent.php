@@ -1,12 +1,12 @@
 <?php
 namespace EssentialsPE\Events;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
+use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\event\Cancellable;
-use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerMuteEvent extends PluginEvent implements Cancellable{
+class PlayerMuteEvent extends BaseCustomEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var Player  */
@@ -19,15 +19,15 @@ class PlayerMuteEvent extends PluginEvent implements Cancellable{
     protected $expires;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param bool $mode
      * @param \DateTime $expires
      */
-    public function __construct(Loader $plugin, Player $player, $mode, \DateTime $expires = null){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api, Player $player, $mode, \DateTime $expires = null){
+        parent::__construct($api);
         $this->player = $player;
-        $this->isMuted = $plugin->isMuted($player);
+        $this->isMuted = $api->isMuted($player);
         $this->mode = $mode;
         $this->expires = $expires;
     }

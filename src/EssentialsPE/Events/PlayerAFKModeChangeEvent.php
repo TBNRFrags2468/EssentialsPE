@@ -1,12 +1,12 @@
 <?php
 namespace EssentialsPE\Events;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
+use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\event\Cancellable;
-use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
+class PlayerAFKModeChangeEvent extends BaseCustomEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var Player */
@@ -19,15 +19,15 @@ class PlayerAFKModeChangeEvent extends PluginEvent implements Cancellable{
     protected $broadcast;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param bool $mode
      * @param bool $broadcast
      */
-    public function __construct(Loader $plugin, Player $player, $mode, $broadcast){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api, Player $player, $mode, $broadcast){
+        parent::__construct($api);
         $this->player = $player;
-        $this->isAFK = $plugin->isAFK($player);
+        $this->isAFK = $api->isAFK($player);
         $this->mode = $mode;
         $this->broadcast = $broadcast;
     }

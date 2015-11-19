@@ -2,12 +2,12 @@
 namespace EssentialsPE\Events;
 
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
+use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\event\Cancellable;
-use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerNickChangeEvent extends PluginEvent implements Cancellable{
+class PlayerNickChangeEvent extends BaseCustomEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var Player  */
@@ -20,13 +20,13 @@ class PlayerNickChangeEvent extends PluginEvent implements Cancellable{
     protected $nametag;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param string $new_nick
      * @param mixed $nametag
      */
-    public function __construct(Loader $plugin, Player $player, $new_nick, $nametag = false){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api, Player $player, $new_nick, $nametag = false){
+        parent::__construct($api);
         $this->player = $player;
         $this->new_nick = $new_nick;
         $this->old_nick = $player->getDisplayName();

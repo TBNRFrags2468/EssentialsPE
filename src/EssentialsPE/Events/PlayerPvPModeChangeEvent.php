@@ -1,12 +1,12 @@
 <?php
 namespace EssentialsPE\Events;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
+use EssentialsPE\BaseFiles\BaseCustomEvent;
 use pocketmine\event\Cancellable;
-use pocketmine\event\plugin\PluginEvent;
 use pocketmine\Player;
 
-class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
+class PlayerPvPModeChangeEvent extends BaseCustomEvent implements Cancellable{
     public static $handlerList = null;
 
     /** @var Player  */
@@ -17,14 +17,14 @@ class PlayerPvPModeChangeEvent extends PluginEvent implements Cancellable{
     protected $mode;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param bool $mode
      */
-    public function __construct(Loader $plugin, Player $player, $mode){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api, Player $player, $mode){
+        parent::__construct($api);
         $this->player = $player;
-        $this->isEnabled = $plugin->isPvPEnabled($player);
+        $this->isEnabled = $api->isPvPEnabled($player);
         $this->mode = $mode;
     }
 

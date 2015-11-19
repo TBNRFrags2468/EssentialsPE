@@ -2,9 +2,9 @@
 namespace EssentialsPE\BaseFiles;
 
 use EssentialsPE\Loader;
-use pocketmine\event\Listener;
+use pocketmine\event\plugin\PluginEvent;
 
-abstract class BaseEventHandler implements Listener{
+abstract class BaseCustomEvent extends PluginEvent{
     /** @var BaseAPI */
     private $api;
 
@@ -12,6 +12,7 @@ abstract class BaseEventHandler implements Listener{
      * @param BaseAPI $api
      */
     public function __construct(BaseAPI $api){
+        parent::__construct($api->getEssentialsPEPlugin());
         $this->api = $api;
     }
 
