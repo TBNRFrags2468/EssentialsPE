@@ -108,18 +108,18 @@ class SignEvents extends BaseEventHandler{
                     return;
                }else{
                     if(($v = $tile->getText()[1]) === "Hand"){
-                        if($this->getPlugin()->isReparable($item = $event->getPlayer()->getInventory()->getItemInHand())){
+                        if($this->getPlugin()->isRepairable($item = $event->getPlayer()->getInventory()->getItemInHand())){
                             $item->setDamage(0);
                             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         }
                     }elseif($v === "All"){
                         foreach ($event->getPlayer()->getInventory()->getContents() as $item){
-                            if($this->getPlugin()->isReparable($item)){
+                            if($this->getPlugin()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
                         foreach ($event->getPlayer()->getInventory()->getArmorContents() as $item){
-                            if($this->getPlugin()->isReparable($item)){
+                            if($this->getPlugin()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
