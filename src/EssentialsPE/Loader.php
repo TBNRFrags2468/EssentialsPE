@@ -1256,7 +1256,7 @@ class Loader extends PluginBase{
      * @param Item $item
      * @return bool
      */
-    private function canBeCondensed(Item $item){
+    public function canBeCondensed(Item $item){
         return isset($this->condenseShapes[0][$item->getId()]) || isset($this->condenseShapes[1][$item->getId()]);
     }
 
