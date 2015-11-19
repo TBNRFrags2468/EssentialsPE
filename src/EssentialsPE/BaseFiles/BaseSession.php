@@ -7,9 +7,9 @@ use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\utils\Config;
 
-class BaseSession {
-    /** @var Loader */
-    private $plugin;
+class BaseSession{
+    /** @var BaseAPI */
+    private $api;
     /** @var Player */
     private $player;
     /** @var Config */
@@ -54,13 +54,13 @@ class BaseSession {
     ];
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $player
      * @param Config $config
      * @param array $values
      */
-    public function __construct(Loader $plugin, Player $player, Config $config, array $values){
-        $this->plugin = $plugin;
+    public function __construct(BaseAPI $api, Player $player, Config $config, array $values){
+        $this->api = $api;
         $this->player = $player;
         $this->config = $config;
         self::$defaults["lastMovement"] = !$player->hasPermission("essentals.afk.preventauto") ? time() : null;
@@ -95,9 +95,9 @@ class BaseSession {
 
         // Let's revert some things to their original state...
         $this->setNick(null);
-        $this->getPlugin()->removeTPRequest($this->getPlayer());
+        $this->getAPI()->removeTPRequest($this->getPlayer());
         if($this->isVanished()){
-            $this->getPlugin()->setVanish($this->getPlayer(), false, $this->noPacket());
+            $this->getAPI()->setVanish($this->getPlayer(), false, $this->noPacket());
         }
     }
 
@@ -105,7 +105,14 @@ class BaseSession {
      * @return Loader
      */
     public final function getPlugin(){
-        return $this->plugin;
+        return $this->getAPI()->getEssentialsPEPlugin();
+    }
+
+    /**
+     * @return BaseAPI
+     */
+    public final function getAPI(){
+        return $this->api;
     }
 
     /**
@@ -318,7 +325,7 @@ class BaseSession {
      * @return bool
      */
     public function homeExists($home){
-        return $this->getPlugin()->validateName($home) && isset($this->homes[$home]) && $this->homes[$home] instanceof BaseLocation;
+        return $this->getAPI()->validateName($home) && isset($this->homes[$home]) && $this->homes[$home] instanceof BaseLocation;
     }
 
     /**
@@ -338,7 +345,7 @@ class BaseSession {
      * @return bool
      */
     public function setHome($home, Location $pos){
-        if(!$this->getPlugin()->validateName($home, false)){
+        if(!$this->getAPI()->validateName($home, false)){
             return false;
         }
         $this->homes[$home] = $pos instanceof BaseLocation ? $pos : BaseLocation::fromPosition($home, $pos);
