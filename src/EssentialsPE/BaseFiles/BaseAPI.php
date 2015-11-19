@@ -42,6 +42,7 @@ use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\network\protocol\SetTimePacket;
 use pocketmine\OfflinePlayer;
+use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\Server;
 use pocketmine\utils\Config;
@@ -54,12 +55,24 @@ class BaseAPI{
     /** @var BaseAPI */
     private static $instance;
 
+    /** @var Config */
+    private $economy;
+    /** @var array */
+    private $kits = [];
+    /** @var array */
+    private $warps = [];
+
     /**
      * @param Loader $ess
      */
     public function __construct(Loader $ess){
         $this->ess = $ess;
         self::$instance = $this;
+        $this->saveConfigs();
+    }
+
+    public function __destruct(){
+        $this->encodeWarps(true);
     }
 
     /**
@@ -81,6 +94,113 @@ class BaseAPI{
      */
     public static function getInstance(){
         return self::$instance;
+    }
+
+    private final function saveConfigs(){
+        /**$this->economy = new Config($this->getDataFolder() . "Economy.yml", Config::YAML);
+        $keys = ["default-balance", "max-money", "min-money"];
+        foreach($keys as $k){
+        if(!is_int($k)){
+        $value = 0;
+        switch($k){
+        case "default-balance":
+        $value = 0;
+        break;
+        case "max-money":
+        $value = 10000000000000;
+        break;
+        case "min-money":
+        $value = -10000;
+        break;
+        }
+        $this->economy->set($k, $value);
+        }
+        }*/
+
+        $this->loadKits();
+        $this->loadWarps();
+        $this->updateHomesAndNicks();
+    }
+
+    private final function updateHomesAndNicks(){
+        if(file_exists($f = $this->getEssentialsPEPlugin()->getDataFolder() . "Homes.yml")){
+            $cfg = new Config($f, Config::YAML);
+            foreach($cfg->getAll() as $player => $home){
+                if(is_array($home)){
+                    continue;
+                }
+                $pCfg = $this->getSessionFile($player);
+                foreach($home as $name => $values){
+                    if(!$this->validateName($name, false) || !is_array($values)){
+                        continue;
+                    }
+                    $pCfg->setNested("homes." . $name, $values);
+                }
+                $pCfg->save();
+            }
+            unlink($f);
+        }
+        if(file_exists($f = $this->getEssentialsPEPlugin()->getDataFolder() . "Nicks.yml")){
+            $cfg = new Config($f, Config::YAML);
+            foreach($cfg->getAll() as $player => $nick){
+                $pCfg = $this->getSessionFile($player);
+                $pCfg->set("nick", $nick);
+                $pCfg->save();
+            }
+            unlink($f);
+        }
+    }
+
+    private final function loadKits(){
+        $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Kits.yml", Config::YAML);
+        $children = [];
+        foreach($cfg->getAll() as $n => $i){
+            $this->kits[$n] = new BaseKit($n, $i);
+            $children[] = new Permission("essentials.kits." . $n);
+        }
+        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.kits", null, null, $children));
+    }
+
+    private final function loadWarps(){
+        $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Warps.yml", Config::YAML);
+        $cfg->reload();
+        $children = [];
+        foreach($cfg->getAll() as $n => $v){
+            if($this->getServer()->isLevelGenerated($v[3])){
+                if(!$this->getServer()->isLevelLoaded($v[3])){
+                    $this->getServer()->loadLevel($v[3]);
+                }
+                $this->warps[$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
+                $children[] = new Permission("essentials.warps." . $n);
+            }
+        }
+        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.warps", null, null, $children));
+    }
+
+    /**
+     * @param bool $save
+     */
+    private final function encodeWarps($save = false){
+        $warps = [];
+        foreach($this->warps as $name => $object){
+            if($object instanceof BaseLocation){
+                $warps[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
+            }
+        }
+        if($save){
+            $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Warps.yml", Config::YAML);
+            $cfg->setAll($warps);
+            $cfg->save();
+        }
+        $this->warps = $warps;
+    }
+
+    public function reloadFiles(){
+        $this->getEssentialsPEPlugin()->getConfig()->reload();
+        //$this->economy->reload();
+        $this->loadKits();
+        $this->loadWarps();
+        $this->updateHomesAndNicks();
     }
 
     /*
@@ -907,7 +1027,7 @@ class BaseAPI{
     private $messagesAPI = null;
 
     public function loadMessagesAPI(){
-        $this->messagesAPI = new MessagesAPI($this, $this->getFile() . "resources/Messages.yml");
+        //$this->messagesAPI = new MessagesAPI($this, $this->getFile() . "resources/Messages.yml"); TODO Directly implement in this class
     }
 
     /**

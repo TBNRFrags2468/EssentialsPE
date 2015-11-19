@@ -2,8 +2,6 @@
 namespace EssentialsPE;
 
 use EssentialsPE\BaseFiles\BaseAPI;
-use EssentialsPE\BaseFiles\BaseKit;
-use EssentialsPE\BaseFiles\BaseLocation;
 use EssentialsPE\Commands\AFK;
 use EssentialsPE\Commands\Antioch;
 use EssentialsPE\Commands\Back;
@@ -73,60 +71,58 @@ use EssentialsPE\Commands\World;
 use EssentialsPE\EventHandlers\OtherEvents;
 use EssentialsPE\EventHandlers\PlayerEvents;
 use EssentialsPE\EventHandlers\SignEvents;
+use EssentialsPE\Events\CreateAPIEvent;
 use pocketmine\entity\Entity;
 use pocketmine\level\Level;
 use pocketmine\nbt\tag\Enum;
 use pocketmine\network\protocol\AddEntityPacket;
 use pocketmine\network\protocol\MobEffectPacket;
-use pocketmine\permission\Permission;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\Server;
-use pocketmine\utils\Config;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
-    /** @var Config */
-    private $economy;
+    /** @var BaseAPI */
+    private $api;
 
-    /** @var array */
-    private $kits = [];
-
-    /** @var array */
-    private $warps = [];
+    public function onLoad(){
+        $this->getServer()->getPluginManager()->callEvent($ev = new CreateAPIEvent($this, BaseAPI::class));
+        $class = $ev->getClass();
+        $this->api = new $class($this);
+    }
 
     public function onEnable(){
         if(!is_dir($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
         $this->checkConfig();
-        $this->saveConfigs();
 	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
         $this->registerEvents();
         $this->registerCommands();
         if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
-            $this->createSession($l);
+            $this->getAPI()->createSession($l);
         }
-        if($this->isUpdaterEnabled()){
-            $this->fetchEssentialsPEUpdate(false);
+        if($this->getAPI()->isUpdaterEnabled()){
+            $this->getAPI()->fetchEssentialsPEUpdate(false);
         }
-        $this->scheduleAutoAFKSetter();
+        $this->getAPI()->scheduleAutoAFKSetter();
     }
 
     public function onDisable(){
         if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
-            $this->removeSession($l);
+            $this->getAPI()->removeSession($l);
         }
-        $this->encodeWarps(true);
+        $this->getAPI()->__destruct();
     }
 
     /**
      * Function to register all the Event Handlers that EssentialsPE provide
      */
     public function registerEvents(){
-        $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new PlayerEvents($this), $this);
-        $this->getServer()->getPluginManager()->registerEvents(new SignEvents($this), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new OtherEvents($this->getAPI()), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new PlayerEvents($this->getAPI()), $this);
+        $this->getServer()->getPluginManager()->registerEvents(new SignEvents($this->getAPI()), $this);
     }
 
     /**
@@ -158,91 +154,91 @@ class Loader extends PluginBase{
 
         //Register the new commands
         $this->getServer()->getCommandMap()->registerAll("EssentialsPE", [
-            new AFK($this),
-            new Antioch($this),
-            new Back($this),
-            //new BigTreeCommand($this), TODO
-            new BreakCommand($this),
-            new Broadcast($this),
-            new Burn($this),
-            new ClearInventory($this),
-            new Compass($this),
-            new Condense($this),
-            new Depth($this),
-            new EssentialsPE($this),
-            new Extinguish($this),
-            new Fly($this),
-            new GetPos($this),
-            new God($this),
-            //new Hat($this), TODO: Implement when MCPE implements "Hat rendering"
-            new Heal($this),
-            new ItemCommand($this),
-            new ItemDB($this),
-            new Jump($this),
-            new KickAll($this),
-            new Kit($this),
-            new Lightning($this),
-            new More($this),
-            new Mute($this),
-            new Near($this),
-            new Nick($this),
-            new Nuke($this),
-            new Ping($this),
-            new PTime($this),
-            new PvP($this),
-            new RealName($this),
-            new Repair($this),
-            new Seen($this),
-            new SetSpawn($this),
-            new Spawn($this),
-            //new Speed($this), TODO
-            new Sudo($this),
-            new Suicide($this),
-            new TempBan($this),
-            new Top($this),
-            //new TreeCommand($this), TODO
-            new Unlimited($this),
-            new Vanish($this),
-            //new Whois($this), TODO
-            new World($this),
+            new AFK($this->getAPI()),
+            new Antioch($this->getAPI()),
+            new Back($this->getAPI()),
+            //new BigTreeCommand($this->$this->getAPI()), TODO
+            new BreakCommand($this->getAPI()),
+            new Broadcast($this->getAPI()),
+            new Burn($this->getAPI()),
+            new ClearInventory($this->getAPI()),
+            new Compass($this->getAPI()),
+            new Condense($this->getAPI()),
+            new Depth($this->getAPI()),
+            new EssentialsPE($this->getAPI()),
+            new Extinguish($this->getAPI()),
+            new Fly($this->getAPI()),
+            new GetPos($this->getAPI()),
+            new God($this->getAPI()),
+            //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Hat rendering"
+            new Heal($this->getAPI()),
+            new ItemCommand($this->getAPI()),
+            new ItemDB($this->getAPI()),
+            new Jump($this->getAPI()),
+            new KickAll($this->getAPI()),
+            new Kit($this->getAPI()),
+            new Lightning($this->getAPI()),
+            new More($this->getAPI()),
+            new Mute($this->getAPI()),
+            new Near($this->getAPI()),
+            new Nick($this->getAPI()),
+            new Nuke($this->getAPI()),
+            new Ping($this->getAPI()),
+            new PTime($this->getAPI()),
+            new PvP($this->getAPI()),
+            new RealName($this->getAPI()),
+            new Repair($this->getAPI()),
+            new Seen($this->getAPI()),
+            new SetSpawn($this->getAPI()),
+            new Spawn($this->getAPI()),
+            //new Speed($this->$this->getAPI()), TODO
+            new Sudo($this->getAPI()),
+            new Suicide($this->getAPI()),
+            new TempBan($this->getAPI()),
+            new Top($this->getAPI()),
+            //new TreeCommand($this->$this->getAPI()), TODO
+            new Unlimited($this->getAPI()),
+            new Vanish($this->getAPI()),
+            //new Whois($this->$this->getAPI()), TODO
+            new World($this->getAPI()),
 
             //Economy
-            //new Balance($this),
-            //new Eco($this),
-            //new Pay($this),
-            //new Sell($this),
-            //new SetWorth($this),
-            //new Worth($this),
+            //new Balance($this->$this->getAPI()),
+            //new Eco($this->$this->getAPI()),
+            //new Pay($this->$this->getAPI()),
+            //new Sell($this->$this->getAPI()),
+            //new SetWorth($this->$this->getAPI()),
+            //new Worth($this->$this->getAPI()),
 
             //Home
-            new DelHome($this),
-            new Home($this),
-            new SetHome($this),
+            new DelHome($this->getAPI()),
+            new Home($this->getAPI()),
+            new SetHome($this->getAPI()),
 
             // Messages
-            new Msg($this),
-            new Reply($this),
+            new Msg($this->getAPI()),
+            new Reply($this->getAPI()),
 
             //PowerTool
-            new PowerTool($this),
-            new PowerToolToggle($this),
+            new PowerTool($this->getAPI()),
+            new PowerToolToggle($this->getAPI()),
 
             //Teleport
-            new TPA($this),
-            new TPAccept($this),
-            new TPAHere($this),
-            new TPAll($this),
-            new TPDeny($this),
-            new TPHere($this),
+            new TPA($this->getAPI()),
+            new TPAccept($this->getAPI()),
+            new TPAHere($this->getAPI()),
+            new TPAll($this->getAPI()),
+            new TPDeny($this->getAPI()),
+            new TPHere($this->getAPI()),
 
             //Warp
-            new DelWarp($this),
-            new Setwarp($this),
-            new Warp($this),
+            new DelWarp($this->getAPI()),
+            new Setwarp($this->getAPI()),
+            new Warp($this->getAPI()),
 
             //Override
-            new Gamemode($this),
-            new Kill($this)
+            new Gamemode($this->getAPI()),
+            new Kill($this->getAPI())
         ]);
     }
 
@@ -354,117 +350,10 @@ class Loader extends PluginBase{
         }
     }
 
-    private function saveConfigs(){
-        /**$this->economy = new Config($this->getDataFolder() . "Economy.yml", Config::YAML);
-        $keys = ["default-balance", "max-money", "min-money"];
-        foreach($keys as $k){
-            if(!is_int($k)){
-                $value = 0;
-                switch($k){
-                    case "default-balance":
-                        $value = 0;
-                        break;
-                    case "max-money":
-                        $value = 10000000000000;
-                        break;
-                    case "min-money":
-                        $value = -10000;
-                        break;
-                }
-                $this->economy->set($k, $value);
-            }
-        }*/
-
-        $this->loadKits();
-        $this->loadWarps();
-        $this->updateHomesAndNicks();
-    }
-
-    private function updateHomesAndNicks(){
-        if(file_exists($f = $this->getDataFolder() . "Homes.yml")){
-            $cfg = new Config($f, Config::YAML);
-            foreach($cfg->getAll() as $player => $home){
-                if(is_array($home)){
-                    continue;
-                }
-                $pCfg = $this->getSessionFile($player);
-                foreach($home as $name => $values){
-                    if(!$this->validateName($name, false) || !is_array($values)){
-                        continue;
-                    }
-                    $pCfg->setNested("homes." . $name, $values);
-                }
-                $pCfg->save();
-            }
-            unlink($f);
-        }
-        if(file_exists($f = $this->getDataFolder() . "Nicks.yml")){
-            $cfg = new Config($f, Config::YAML);
-            foreach($cfg->getAll() as $player => $nick){
-                $pCfg = $this->getSessionFile($player);
-                $pCfg->set("nick", $nick);
-                $pCfg->save();
-            }
-            unlink($f);
-        }
-    }
-
-    private function loadKits(){
-        $cfg = new Config($this->getDataFolder() . "Kits.yml", Config::YAML);
-        $children = [];
-        foreach($cfg->getAll() as $n => $i){
-            $this->kits[$n] = new BaseKit($n, $i);
-            $children[] = new Permission("essentials.kits." . $n);
-        }
-        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.kits", null, null, $children));
-    }
-
-    private function loadWarps(){
-        $cfg = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-        $cfg->reload();
-        $children = [];
-        foreach($cfg->getAll() as $n => $v){
-            if($this->getServer()->isLevelGenerated($v[3])){
-                if(!$this->getServer()->isLevelLoaded($v[3])){
-                    $this->getServer()->loadLevel($v[3]);
-                }
-                $this->warps[$n] = new BaseLocation($n, $v[0], $v[1], $v[2], $this->getServer()->getLevelByName($v[3]), $v[4], $v[5]);
-                $children[] = new Permission("essentials.warps." . $n);
-            }
-        }
-        $this->getServer()->getPluginManager()->addPermission(new Permission("essentials.warps", null, null, $children));
-    }
-
-    /**
-     * @param bool $save
-     */
-    private function encodeWarps($save = false){
-        $warps = [];
-        foreach($this->warps as $name => $object){
-            if($object instanceof BaseLocation){
-                $warps[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
-            }
-        }
-        if($save){
-            $cfg = new Config($this->getDataFolder() . "Warps.yml", Config::YAML);
-            $cfg->setAll($warps);
-            $cfg->save();
-        }
-        $this->warps = $warps;
-    }
-
-    public function reloadFiles(){
-        $this->getConfig()->reload();
-        //$this->economy->reload();
-        $this->loadKits();
-        $this->loadWarps();
-        $this->updateHomesAndNicks();
-    }
-
     /**
      * @return BaseAPI
      */
     public function getAPI(){
-        return BaseAPI::getInstance(); // TODO: Create event
+        return $this->api;
     }
 }
