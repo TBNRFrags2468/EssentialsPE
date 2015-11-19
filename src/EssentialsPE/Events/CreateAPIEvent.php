@@ -6,6 +6,8 @@ use EssentialsPE\Loader;
 use pocketmine\event\plugin\PluginEvent;
 
 class CreateAPIEvent extends PluginEvent{
+    public static $handlerList = null;
+
     /** @var BaseAPI */
     private $class;
 
