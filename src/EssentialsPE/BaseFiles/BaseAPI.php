@@ -51,12 +51,15 @@ use pocketmine\utils\TextFormat;
 class BaseAPI{
     /** @var Loader */
     private $ess;
+    /** @var BaseAPI */
+    private static $instance;
 
     /**
      * @param Loader $ess
      */
     public function __construct(Loader $ess){
         $this->ess = $ess;
+        self::$instance = $this;
     }
 
     /**
@@ -71,6 +74,13 @@ class BaseAPI{
      */
     public function getServer(){
         return $this->getEssentialsPEPlugin()->getServer();
+    }
+
+    /**
+     * @return BaseAPI
+     */
+    public static function getInstance(){
+        return self::$instance;
     }
 
     /*
