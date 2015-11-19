@@ -32,7 +32,7 @@ class SignEvents extends BaseEventHandler{
                     $item_name = $tile->getText()[1];
                     $damage = $tile->getText()[2];
 
-                    $item = $this->getPlugin()->getItem($item_name . ":" . $damage);
+                    $item = $this->getAPI()->getItem($item_name . ":" . $damage);
 
                     $event->getPlayer()->getInventory()->addItem($item);
                     $event->getPlayer()->sendMessage(TextFormat::YELLOW . "Giving " . TextFormat::RED . $item->getCount() . TextFormat::YELLOW . " of " . TextFormat::RED . ($item->getName() === "Unknown" ? $item_name : $item->getName()));
@@ -84,7 +84,7 @@ class SignEvents extends BaseEventHandler{
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] You're in " . $event->getPlayer()->getServer()->getGamemodeString($event->getPlayer()->getGamemode()) . " mode");
                     return;
                 }else{
-                    if(!($kit = $this->getPlugin()->getKit($tile->getText()[1]))){
+                    if(!($kit = $this->getAPI()->getKit($tile->getText()[1]))){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exists");
                         return;
                     }elseif(!$event->getPlayer()->hasPermission("essentials.kits." . $kit->getName())){
@@ -108,18 +108,18 @@ class SignEvents extends BaseEventHandler{
                     return;
                }else{
                     if(($v = $tile->getText()[1]) === "Hand"){
-                        if($this->getPlugin()->isRepairable($item = $event->getPlayer()->getInventory()->getItemInHand())){
+                        if($this->getAPI()->isRepairable($item = $event->getPlayer()->getInventory()->getItemInHand())){
                             $item->setDamage(0);
                             $event->getPlayer()->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
                         }
                     }elseif($v === "All"){
                         foreach ($event->getPlayer()->getInventory()->getContents() as $item){
-                            if($this->getPlugin()->isRepairable($item)){
+                            if($this->getAPI()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
                         foreach ($event->getPlayer()->getInventory()->getArmorContents() as $item){
-                            if($this->getPlugin()->isRepairable($item)){
+                            if($this->getAPI()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
@@ -164,7 +164,7 @@ class SignEvents extends BaseEventHandler{
                 if(!$event->getPlayer()->hasPermission("essentials.sign.use.warp")){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
                }else{
-                    $warp = $this->getPlugin()->getWarp($tile->getText()[1]);
+                    $warp = $this->getAPI()->getWarp($tile->getText()[1]);
                     if(!$warp){
                         $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
                         return;
@@ -188,7 +188,7 @@ class SignEvents extends BaseEventHandler{
              * if(!$event->getPlayer()->hasPermission("essentials.sign.use.balance")){
              * $event->getPlayer()->sendMessage(TextFormat::RED . "You don't have permissions to use this sign");
              * }else{
-             * $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getPlugin()->getCurrencySymbol() . $this->getPlugin()->getPlayerBalance($event->getPlayer()));
+             * $event->getPlayer()->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getAPI()->getCurrencySymbol() . $this->getAPI()->getPlayerBalance($event->getPlayer()));
              * }
              * }*/
 
@@ -235,7 +235,7 @@ class SignEvents extends BaseEventHandler{
                     $damage = 0;
                 }
 
-                $item = $this->getPlugin()->getItem($item_name . ":" . $damage);
+                $item = $this->getAPI()->getItem($item_name . ":" . $damage);
 
                 if($item->getID() === 0 || $item->getName() === "Air"){
                     $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Invalid item name/ID");
@@ -290,7 +290,7 @@ class SignEvents extends BaseEventHandler{
 
         // Kit sign
         elseif(strtolower(TextFormat::clean($event->getLine(0), true)) === "[kit]" && $event->getPlayer()->hasPermission("essentials.sign.create.kit")){
-            if(!$this->getPlugin()->kitExists($event->getLine(1))){
+            if(!$this->getAPI()->kitExists($event->getLine(1))){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Kit doesn't exist");
                 return;
             }
@@ -359,7 +359,7 @@ class SignEvents extends BaseEventHandler{
         // Warp sign
         elseif(strtolower(TextFormat::clean($event->getLine(0), true)) === "[warp]" && $event->getPlayer()->hasPermission("essentials.sign.create.warp")){
             $warp = $event->getLine(1);
-            if(!$this->getPlugin()->warpExists($warp)){
+            if(!$this->getAPI()->warpExists($warp)){
                 $event->getPlayer()->sendMessage(TextFormat::RED . "[Error] Warp doesn't exists");
                 $event->setCancelled(true);
             }else{
@@ -371,7 +371,7 @@ class SignEvents extends BaseEventHandler{
         // Colored Sign
         elseif($event->getPlayer()->hasPermission("essentials.sign.color")){
             for($i = 0 ; $i < 4 ; $i++){
-                $event->setLine($i, $this->getPlugin()->colorMessage($event->getLine($i)));
+                $event->setLine($i, $this->getAPI()->colorMessage($event->getLine($i)));
             }
         }
     }

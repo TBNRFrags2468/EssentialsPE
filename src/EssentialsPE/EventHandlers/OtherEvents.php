@@ -13,7 +13,7 @@ class OtherEvents extends BaseEventHandler{
      * @param ServerCommandEvent $event
      */
     public function onServerCommand(ServerCommandEvent $event){
-        $command = $this->getPlugin()->colorMessage($event->getCommand());
+        $command = $this->getAPI()->colorMessage($event->getCommand());
         if($command === false){
             $event->setCancelled(true);
         }
@@ -35,7 +35,7 @@ class OtherEvents extends BaseEventHandler{
      * @priority HIGH
      */
     public function onBlockTap(PlayerInteractEvent $event){// PowerTool
-        if($this->getPlugin()->executePowerTool($event->getPlayer(), $event->getItem())){
+        if($this->getAPI()->executePowerTool($event->getPlayer(), $event->getItem())){
             $event->setCancelled(true);
         }
     }
@@ -47,12 +47,12 @@ class OtherEvents extends BaseEventHandler{
      */
     public function onBlockPlace(BlockPlaceEvent $event){
         // PowerTool
-        if($this->getPlugin()->executePowerTool($event->getPlayer(), $event->getItem())){
+        if($this->getAPI()->executePowerTool($event->getPlayer(), $event->getItem())){
             $event->setCancelled(true);
         }
 
         // Unlimited block placing
-        elseif($this->getPlugin()->isUnlimitedEnabled($event->getPlayer())){
+        elseif($this->getAPI()->isUnlimitedEnabled($event->getPlayer())){
             $event->setCancelled(true);
             $pos = new Vector3($event->getBlockReplaced()->getX(), $event->getBlockReplaced()->getY(), $event->getBlockReplaced()->getZ());
             $event->getPlayer()->getLevel()->setBlock($pos, $event->getBlock(), true);
