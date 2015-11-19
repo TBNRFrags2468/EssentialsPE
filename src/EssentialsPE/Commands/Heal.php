@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityRegainHealthEvent;
 use pocketmine\level\particle\HeartParticle;
@@ -11,10 +11,10 @@ use pocketmine\utils\TextFormat;
 
 class Heal extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "heal", "Heal yourself or other player", "[player]");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "heal", "Heal yourself or other player", "[player]");
         $this->setPermission("essentials.heal.use");
     }
 
@@ -43,7 +43,7 @@ class Heal extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($player = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

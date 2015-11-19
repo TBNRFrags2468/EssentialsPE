@@ -2,16 +2,16 @@
 namespace EssentialsPE\Commands;
 
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 
 class Ping extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "ping", "Pong!");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "ping", "Pong!");
         $this->setPermission("essentials.ping");
     }
     /**

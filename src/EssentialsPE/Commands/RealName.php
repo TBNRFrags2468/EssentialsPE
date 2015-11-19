@@ -1,17 +1,17 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
 class RealName extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "realname", "Check the realname of a player", "<player>");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "realname", "Check the realname of a player", "<player>");
         $this->setPermission("essentials.realname");
     }
 
@@ -29,7 +29,7 @@ class RealName extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+        if(!($player = $this->getAPI()->getPlayer($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Warp;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Warp extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "warp", "Teleport to a warp", "[name] [player]", "[<name> <player>]", ["warps"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "warp", "Teleport to a warp", "[name] [player]", "[<name> <player>]", ["warps"]);
         $this->setPermission("essentials.warp.use");
     }
 
@@ -27,14 +27,14 @@ class Warp extends BaseCommand{
             return false;
         }
         if(count($args) === 0){
-            if(($list = $this->getPlugin()->warpList(false)) === false){
+            if(($list = $this->getAPI()->warpList(false)) === false){
                 $sender->sendMessage(TextFormat::AQUA . "There are no Warps currently available");
                 return false;
             }
             $sender->sendMessage(TextFormat::AQUA . "Available warps:\n" . $list);
             return true;
         }
-        if(!($warp = $this->getPlugin()->getWarp($args[0]))){
+        if(!($warp = $this->getAPI()->getWarp($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exist");
             return false;
         }
@@ -60,7 +60,7 @@ class Warp extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to that warp");
                     return false;
                 }
-                $player = $this->getPlugin()->getPlayer($args[1]);
+                $player = $this->getAPI()->getPlayer($args[1]);
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;

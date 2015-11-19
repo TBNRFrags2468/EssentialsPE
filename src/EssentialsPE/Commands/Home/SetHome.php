@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Home;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetHome extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sethome", "Create or update a home position", "<name>", false, ["createhome"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "sethome", "Create or update a home position", "<name>", false, ["createhome"]);
         $this->setPermission("essentials.sethome");
     }
 
@@ -37,8 +37,8 @@ class SetHome extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Home name");
             return false;
         }
-        $existed = $this->getPlugin()->homeExists($sender, $args[0]);
-        if(!$this->getPlugin()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
+        $existed = $this->getAPI()->homeExists($sender, $args[0]);
+        if(!$this->getAPI()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
             $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
             return false;
         }

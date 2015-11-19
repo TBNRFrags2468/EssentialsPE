@@ -1,17 +1,17 @@
 <?php
 namespace EssentialsPE\Commands\Economy;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "eco", "Sets the balance of a player", "<give|take|set|reset> <player> [amount]", true, ["economy"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "eco", "Sets the balance of a player", "<give|take|set|reset> <player> [amount]", true, ["economy"]);
         $this->setPermission("essentials.eco.use");
     }
 
@@ -28,7 +28,7 @@ class Eco extends BaseCommand{
         switch(count($args)){
             case 2:
             case 3:
-                if(!($player = $this->getPlugin()->getPlayer($args[1]))){
+                if(!($player = $this->getAPI()->getPlayer($args[1]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
@@ -40,22 +40,22 @@ class Eco extends BaseCommand{
                     case "give":
                         $balance = (int) $args[2];
                         $sender->sendMessage(TextFormat::YELLOW . "Adding the balance...");
-                        $this->getPlugin()->addToPlayerBalance($player, $balance);
+                        $this->getAPI()->addToPlayerBalance($player, $balance);
                         break;
                     case "take":
                         $balance = (int) $args[2];
                         $balance = $balance - ($balance * 2);
                         $sender->sendMessage(TextFormat::YELLOW . "Taking the balance...");
-                        $this->getPlugin()->addToPlayerBalance($player, $balance);
+                        $this->getAPI()->addToPlayerBalance($player, $balance);
                         break;
                     case "set":
                         $balance = (int) $args[2];
                         $sender->sendMessage(TextFormat::YELLOW . "Setting the balance...");
-                        $this->getPlugin()->setPlayerBalance($player, $balance);
+                        $this->getAPI()->setPlayerBalance($player, $balance);
                         break;
                     case "reset":
                         $sender->sendMessage(TextFormat::YELLOW . "Resetting balance...");
-                        $this->getPlugin()->setPlayerBalance($player, $this->getPlugin()->getDefaultBalance());
+                        $this->getAPI()->setPlayerBalance($player, $this->getAPI()->getDefaultBalance());
                         break;
                 }
                 break;

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Vanish extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "vanish", "Hide from other players!", "[player]", true, ["v"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "vanish", "Hide from other players!", "[player]", true, ["v"]);
         $this->setPermission("essentials.vanish.use");
     }
 
@@ -32,21 +32,21 @@ class Vanish extends BaseCommand{
                     $this->sendUsage($sender, $alias);
                     return false;
                 }
-                $this->getPlugin()->switchVanish($sender);
-                $sender->sendMessage(TextFormat::GRAY . "You're now " . ($this->getPlugin()->isVanished($sender) ? "vanished!" : "visible!"));
+                $this->getAPI()->switchVanish($sender);
+                $sender->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($sender) ? "vanished!" : "visible!"));
                 break;
             case 1:
                 if(!$sender->hasPermission("essentials.vanish.other")){
                     $sender->sendMessage($this->getPermissionMessage());
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($player = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                $this->getPlugin()->switchVanish($player);
-                $sender->sendMessage(TextFormat::GRAY .  $player->getDisplayName() . " is now " . ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!"));
-                $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getPlugin()->isVanished($player) ? "vanished!" : "visible!"));
+                $this->getAPI()->switchVanish($player);
+                $sender->sendMessage(TextFormat::GRAY .  $player->getDisplayName() . " is now " . ($this->getAPI()->isVanished($player) ? "vanished!" : "visible!"));
+                $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($player) ? "vanished!" : "visible!"));
                 break;
             default:
                 $this->sendUsage($sender, $alias);

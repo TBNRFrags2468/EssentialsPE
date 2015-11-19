@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetSpawn extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setspawn", "Change your server main spawn point", null, false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "setspawn", "Change your server main spawn point", null, false);
         $this->setPermission("essentials.setspawn");
     }
 

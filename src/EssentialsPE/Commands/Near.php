@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Near extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "near", "List the players near to you", "[player]", true, ["nearby"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "near", "List the players near to you", "[player]", true, ["nearby"]);
         $this->setPermission("essentials.near.use");
     }
 
@@ -39,7 +39,7 @@ class Near extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($player = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
@@ -59,7 +59,7 @@ class Near extends BaseCommand{
      * @return string
      */
     private function broadcastPlayers(Player $player, $who){
-        if(count($near = $this->getPlugin()->getNearPlayers($player)) < 1){
+        if(count($near = $this->getAPI()->getNearPlayers($player)) < 1){
             $msg = TextFormat::GRAY . "** There are no players near to " . $who . "! **";
         }else{
             $msg = TextFormat::YELLOW . "** There " . (count($near) > 1 ? "are " : "is ") . TextFormat::AQUA . count($near) . TextFormat::YELLOW . "player" . (count($near) > 1 ? "s " : " ") . "near to " . $who . ":";

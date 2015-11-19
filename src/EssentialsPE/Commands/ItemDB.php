@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class ItemDB extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "itemdb", "Display the information attached to the item you hold", "[name|id|meta]", false, ["itemno", "durability", "dura"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "itemdb", "Display the information attached to the item you hold", "[name|id|meta]", false, ["itemno", "durability", "dura"]);
         $this->setPermission("essentials.itemdb");
     }
 
@@ -33,7 +33,7 @@ class ItemDB extends BaseCommand{
         $item = $sender->getInventory()->getItemInHand();
         switch(count($args)){
             case 0:
-                $sender->sendMessage(TextFormat::AQUA . "This item " . ($this->getPlugin()->isRepairable($item) ? "has " . TextFormat::RED . $item->getDamage() . TextFormat::AQUA . " points of damage" : "metadata is " . TextFormat::RED . $item->getDamage()));
+                $sender->sendMessage(TextFormat::AQUA . "This item " . ($this->getAPI()->isRepairable($item) ? "has " . TextFormat::RED . $item->getDamage() . TextFormat::AQUA . " points of damage" : "metadata is " . TextFormat::RED . $item->getDamage()));
                 break;
             case 1:
                 switch(strtolower($args[0])){
@@ -47,7 +47,7 @@ class ItemDB extends BaseCommand{
                     case "dura":
                     case "metadata":
                     case "meta":
-                        $sender->sendMessage(TextFormat::AQUA . "This item " . ($this->getPlugin()->isRepairable($item) ? "has " . TextFormat::RED . $item->getDamage() . TextFormat::AQUA . " points of damage" : "metadata is " . TextFormat::RED . $item->getDamage()));
+                        $sender->sendMessage(TextFormat::AQUA . "This item " . ($this->getAPI()->isRepairable($item) ? "has " . TextFormat::RED . $item->getDamage() . TextFormat::AQUA . " points of damage" : "metadata is " . TextFormat::RED . $item->getDamage()));
                         break;
                 }
                 break;

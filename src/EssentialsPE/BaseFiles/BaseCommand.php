@@ -9,22 +9,22 @@ use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
-    /** @var Loader  */
-    private $plugin;
+    /** @var BaseAPI  */
+    private $api;
     /** @var bool|string */
     private $consoleUsageMessage;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param string $name
      * @param string $description
      * @param null|string $usageMessage
      * @param bool|null|string $consoleUsageMessage
      * @param array $aliases
      */
-    public function __construct(Loader $plugin, $name, $description = "", $usageMessage = null, $consoleUsageMessage = true, array $aliases = []){
+    public function __construct(BaseAPI $api, $name, $description = "", $usageMessage = null, $consoleUsageMessage = true, array $aliases = []){
         parent::__construct($name, $description, $usageMessage, $aliases);
-        $this->plugin = $plugin;
+        $this->api = $api;
         $this->consoleUsageMessage = $consoleUsageMessage;
     }
 
@@ -32,7 +32,14 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @return Loader
      */
     public final function getPlugin(){
-        return $this->plugin;
+        return $this->getAPI()->getEssentialsPEPlugin();
+    }
+
+    /**
+     * @return BaseAPI
+     */
+    public final function getAPI(){
+        return $this->api;
     }
 
     /**

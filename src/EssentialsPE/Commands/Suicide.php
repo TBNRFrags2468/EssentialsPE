@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
 
 class Suicide extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "suicide", "Kill yourself", null, false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "suicide", "Kill yourself", null, false);
         $this->setPermission("essentials.suicide");
     }
 

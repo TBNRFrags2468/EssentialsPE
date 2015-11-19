@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Home;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class DelHome extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "delhome", "Remove a home", "<name>", false, ["remhome", "removehome"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "delhome", "Remove a home", "<name>", false, ["remhome", "removehome"]);
         $this->setPermission("essentials.delhome");
     }
 
@@ -30,11 +30,11 @@ class DelHome extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!$this->getPlugin()->homeExists($sender, $args[0])){
+        if(!$this->getAPI()->homeExists($sender, $args[0])){
             $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exist");
             return false;
         }
-        $this->getPlugin()->removeHome($sender, $args[0]);
+        $this->getAPI()->removeHome($sender, $args[0]);
         $sender->sendMessage(TextFormat::GREEN . "Home successfully removed!");
         return true;
     }

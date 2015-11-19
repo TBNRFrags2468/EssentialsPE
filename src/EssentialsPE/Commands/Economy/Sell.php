@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands\Economy;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -10,10 +10,10 @@ use pocketmine\utils\TextFormat;
 
 class Sell extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "sell", "Sell the specified item", "<item|hand> [amount]", false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "sell", "Sell the specified item", "<item|hand> [amount]", false);
         $this->setPermission("essentials.sell");
     }
 
@@ -32,7 +32,7 @@ class Sell extends BaseCommand{
             return false;
         }
         if($sender->getGamemode() === Player::CREATIVE || $sender->getGamemode() === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($sender->getGamemode()) . " mode");
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($sender->getGamemode()) . " mode");
             return false;
         }
         if(strtolower($args[0]) === "hand"){
@@ -61,7 +61,7 @@ class Sell extends BaseCommand{
             return false;
         }
 
-        $amount = $this->getPlugin()->sellPlayerItem($sender, $item, (isset($args[1]) ? $args[1] : null));
+        $amount = $this->getAPI()->sellPlayerItem($sender, $item, (isset($args[1]) ? $args[1] : null));
         if(!$amount){
             $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
             return false;
@@ -71,9 +71,9 @@ class Sell extends BaseCommand{
         }
 
         if(is_array($amount)){
-            $sender->sendMessage(TextFormat::RED . "Sold " . $amount[0] . " items! You got" . $this->getPlugin()->getCurrencySymbol() . ($amount[1] * $amount[0]));
+            $sender->sendMessage(TextFormat::RED . "Sold " . $amount[0] . " items! You got" . $this->getAPI()->getCurrencySymbol() . ($amount[1] * $amount[0]));
         }else{
-            $sender->sendMessage(TextFormat::GREEN . "Item sold! You got " . $this->getPlugin()->getCurrencySymbol() . $amount);
+            $sender->sendMessage(TextFormat::GREEN . "Item sold! You got " . $this->getAPI()->getCurrencySymbol() . $amount);
         }
         return true;
     }

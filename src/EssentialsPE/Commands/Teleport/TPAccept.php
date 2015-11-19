@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Teleport;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPAccept extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpaccept", "Accept a teleport request", "[player]", false, ["tpyes"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tpaccept", "Accept a teleport request", "[player]", false, ["tpyes"]);
         $this->setPermission("essentials.tpaccept");
     }
 
@@ -30,14 +30,14 @@ class TPAccept extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $request = $this->getPlugin()->hasARequest($sender);
+        $request = $this->getAPI()->hasARequest($sender);
         if(!$request){
             $sender->sendMessage(TextFormat::RED . "[Error] You don't have any request yet");
             return false;
         }
         switch(count($args)){
             case 0:
-                $player = $this->getPlugin()->getPlayer(($name = $this->getPlugin()->getLatestRequest($sender)));
+                $player = $this->getAPI()->getPlayer(($name = $this->getAPI()->getLatestRequest($sender)));
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Request unavailable");
                     return false;
@@ -49,15 +49,15 @@ class TPAccept extends BaseCommand{
                 }else{
                     $sender->teleport($player);
                 }
-                $this->getPlugin()->removeTPRequest($player, $sender);
+                $this->getAPI()->removeTPRequest($player, $sender);
                 break;
             case 1:
-                $player = $this->getPlugin()->getPlayer($args[0]);
+                $player = $this->getAPI()->getPlayer($args[0]);
                 if(!$player) {
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                if(!($request = $this->getPlugin()->hasARequestFrom($sender, $player))){
+                if(!($request = $this->getAPI()->hasARequestFrom($sender, $player))){
                     $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $player->getDisplayName());
                     return false;
                 }
@@ -68,7 +68,7 @@ class TPAccept extends BaseCommand{
                 }else{
                     $sender->teleport($player);
                 }
-                $this->getPlugin()->removeTPRequest($player, $sender);
+                $this->getAPI()->removeTPRequest($player, $sender);
                 break;
             default:
                 $this->sendUsage($sender, $alias);

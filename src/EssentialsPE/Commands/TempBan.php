@@ -1,17 +1,17 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
 class TempBan extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tempban", "Temporary bans the specified player", "<player> <time...> [reason ...]");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tempban", "Temporary bans the specified player", "<player> <time...> [reason ...]");
         $this->setPermission("essentials.tempban");
     }
 
@@ -29,14 +29,14 @@ class TempBan extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!($info = $this->getPlugin()->stringToTimestamp(implode(" ", $args)))){
+        if(!($info = $this->getAPI()->stringToTimestamp(implode(" ", $args)))){
             $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid time");
             return false;
         }
         /** @var \DateTime $date */
         $date = $info[0];
         $reason = $info[1];
-        if(($player = $this->getPlugin()->getPlayer($name = array_shift($args))) !== false){
+        if(($player = $this->getAPI()->getPlayer($name = array_shift($args))) !== false){
             if($player->hasPermission("essentials.ban.exempt")){
                 $sender->sendMessage(TextFormat::RED . "[Error] " . $name . " can't be banned");
                 return false;

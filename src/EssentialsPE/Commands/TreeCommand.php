@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
 use pocketmine\level\generator\object\Tree;
@@ -12,10 +12,10 @@ use pocketmine\utils\TextFormat;
 
 class TreeCommand extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tree", "Spawns a tree", "<tree|birch|redwood|jungle>", false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tree", "Spawns a tree", "<tree|birch|redwood|jungle>", false);
         $this->setPermission("essentials.tree");
     }
 
@@ -33,7 +33,7 @@ class TreeCommand extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
+        $block = $sender->getTargetBlock(100, BaseAPI::NON_SOLID_BLOCKS);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Compass extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "compass", "Display your current bearing direction", null, false, ["direction"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "compass", "Display your current bearing direction", null, false, ["direction"]);
         $this->setPermission("essentials.compass");
     }
 

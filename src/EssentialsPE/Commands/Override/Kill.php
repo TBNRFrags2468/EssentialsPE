@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands\Override;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
@@ -10,10 +10,10 @@ use pocketmine\utils\TextFormat;
 
 class Kill extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kill", "Kill other people", "[player]");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "kill", "Kill other people", "[player]");
         $this->setPermission("essentials.kill.use");
     }
 
@@ -37,13 +37,13 @@ class Kill extends BaseCommand{
                 $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
             }
-            $player = $this->getPlugin()->getPlayer($args[0]);
+            $player = $this->getAPI()->getPlayer($args[0]);
             if(!$player instanceof Player){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                 return false;
             }
         }
-        if($this->getPlugin()->isGod($player)){
+        if($this->getAPI()->isGod($player)){
             $sender->sendMessage(TextFormat::RED . $args[0] . " can't be killed!");
             return false;
         }

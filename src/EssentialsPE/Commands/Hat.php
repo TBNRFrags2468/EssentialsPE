@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
@@ -10,10 +10,10 @@ use pocketmine\utils\TextFormat;
 
 class Hat extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "hat", "Get some new cool headgear", "[remove]", false, ["head"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "hat", "Get some new cool headgear", "[remove]", false, ["head"]);
         $this->setPermission("essentials.hat");
     }
 

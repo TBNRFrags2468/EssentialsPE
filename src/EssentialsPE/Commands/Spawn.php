@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Spawn extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "spawn", "Teleport to server's main spawn", "[player]");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "spawn", "Teleport to server's main spawn", "[player]");
         $this->setPermission("essentials.spawn.use");
     }
 
@@ -40,7 +40,7 @@ class Spawn extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to spawn");
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($player = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

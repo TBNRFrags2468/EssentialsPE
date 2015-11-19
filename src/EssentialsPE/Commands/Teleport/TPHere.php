@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Teleport;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPHere extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tphere", "Teleport a player to you", "<player>", false, ["s"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tphere", "Teleport a player to you", "<player>", false, ["s"]);
         $this->setPermission("essentials.tphere");
     }
 
@@ -30,7 +30,7 @@ class TPHere extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($args[0]);
+        $player = $this->getAPI()->getPlayer($args[0]);
         if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;

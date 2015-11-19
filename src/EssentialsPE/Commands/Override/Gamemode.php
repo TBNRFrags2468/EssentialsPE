@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Override;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Gamemode extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "gamemode", "Change player gamemode", "<mode> [player]", true, ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "gamemode", "Change player gamemode", "<mode> [player]", true, ["gm", "gma", "gmc", "gms", "gmt", "adventure", "creative", "survival", "spectator", "viewer"]);
         $this->setPermission("essentials.gamemode");
     }
 
@@ -63,7 +63,7 @@ class Gamemode extends BaseCommand{
             return false;
         }
         if(isset($args[1])){
-            $player = $this->getPlugin()->getPlayer($args[1]);
+            $player = $this->getAPI()->getPlayer($args[1]);
             if(!$player){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                 return false;
@@ -114,7 +114,7 @@ class Gamemode extends BaseCommand{
                     break;
             }
         }
-        $gmstring = $this->getPlugin()->getServer()->getGamemodeString($gm);
+        $gmstring = $this->getAPI()->getServer()->getGamemodeString($gm);
         if($player->getGamemode() === $gm){
             $player->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "You're" : $args[1] . " is") . " already in " . $gmstring . " mode");
             return false;

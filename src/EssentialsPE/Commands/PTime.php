@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\level\Level;
 use pocketmine\utils\TextFormat;
 
 class PTime extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "ptime", "Changes the time of a player", "<time> [player]", true, ["playertime"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "ptime", "Changes the time of a player", "<time> [player]", true, ["playertime"]);
         $this->setPermission("essentials.ptime.use");
     }
 
@@ -58,12 +58,12 @@ class PTime extends BaseCommand{
                         $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                         return false;
                     }
-                    if(!($player = $this->getPlugin()->getPlayer($args[1]))){
+                    if(!($player = $this->getAPI()->getPlayer($args[1]))){
                         $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                         return false;
                     }
                 }
-                if(!$this->getPlugin()->setPlayerTime($player, (int) $time)){
+                if(!$this->getAPI()->setPlayerTime($player, (int) $time)){
                     $sender->sendMessage(TextFormat::RED . "Something went wrong while setting the time");
                     return false;
                 }

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Condense extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "condense", "Compact your inventory!", "[item name|id|hand|inventory|all]", false, ["compact", "toblocks"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "condense", "Compact your inventory!", "[item name|id|hand|inventory|all]", false, ["compact", "toblocks"]);
         $this->setPermission("essentials.condense");
     }
 
@@ -42,14 +42,14 @@ class Condense extends BaseCommand{
                 $target = null;
                 break;
             default: // Item name|id
-                $target = $this->getPlugin()->getItem($args[0]);
+                $target = $this->getAPI()->getItem($args[0]);
                 if($target->getId() === 0){
                     $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $args[0] . "\"");
                     return false;
                 }
                 break;
         }
-        if(!$this->getPlugin()->condenseItems($sender->getInventory(), $target)){
+        if(!$this->getAPI()->condenseItems($sender->getInventory(), $target)){
             $sender->sendMessage(TextFormat::RED . "[Error] This item can't be condensed");
         }
         $sender->sendMessage(TextFormat::YELLOW . "Condensing items...");

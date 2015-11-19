@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Back extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "back", "Teleport to your previous location", null, false, ["return"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "back", "Teleport to your previous location", null, false, ["return"]);
         $this->setPermission("essentials.back.use");
     }
 
@@ -30,7 +30,7 @@ class Back extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!($pos = $this->getPlugin()->getLastPlayerPosition($sender))){
+        if(!($pos = $this->getAPI()->getLastPlayerPosition($sender))){
             $sender->sendMessage(TextFormat::RED . "[Error] No previous position available");
         }else{
             $sender->sendMessage(TextFormat::GREEN . "Teleporting...");

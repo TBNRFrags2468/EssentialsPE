@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Depth extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "depth", "Display your depth related to sea-level", null, false, ["height"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "depth", "Display your depth related to sea-level", null, false, ["height"]);
         $this->setPermission("essentials.depth");
     }
 

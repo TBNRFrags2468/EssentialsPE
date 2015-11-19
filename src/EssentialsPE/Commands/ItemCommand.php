@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class ItemCommand extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "item", "Gives yourself an item", "<item[:damage]> [amount]", false, ["i"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "item", "Gives yourself an item", "<item[:damage]> [amount]", false, ["i"]);
         $this->setPermission("essentials.item");
     }
 
@@ -31,7 +31,7 @@ class ItemCommand extends BaseCommand{
             return false;
         }
         if(($gm = $sender->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
         if(count($args) < 1 || count($args) > 2){
@@ -41,7 +41,7 @@ class ItemCommand extends BaseCommand{
 
         //Getting the item...
         $item_name = array_shift($args);
-        $item = $this->getPlugin()->getItem($item_name);
+        $item = $this->getAPI()->getItem($item_name);
 
         if($item->getID() === 0){
             $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $item_name . "\"");

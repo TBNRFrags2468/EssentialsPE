@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Kit extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kit", "Get a pre-defined kit!", "[name] [player]", "[<name> <player>]", ["kits"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "kit", "Get a pre-defined kit!", "[name] [player]", "[<name> <player>]", ["kits"]);
         $this->setPermission("essentials.kit.use");
     }
 
@@ -27,14 +27,14 @@ class Kit extends BaseCommand{
             return false;
         }
         if($alias === "kits" || count($args) === 0){
-            if(($list = $this->getPlugin()->kitList(false)) === false){
+            if(($list = $this->getAPI()->kitList(false)) === false){
                 $sender->sendMessage(TextFormat::AQUA . "There are no Kits currently available");
                 return false;
             }
             $sender->sendMessage(TextFormat::AQUA . "Available kits:\n" . $list);
             return true;
         }
-        if(!($kit = $this->getPlugin()->getKit($args[0]))){
+        if(!($kit = $this->getAPI()->getKit($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Kit doesn't exist");
             return false;
         }
@@ -60,7 +60,7 @@ class Kit extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[1]))){
+                if(!($player = $this->getAPI()->getPlayer($args[1]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }

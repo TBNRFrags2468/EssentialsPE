@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\block\Sapling;
 use pocketmine\command\CommandSender;
 use pocketmine\level\generator\object\BigTree;
@@ -11,10 +11,10 @@ use pocketmine\utils\TextFormat;
 
 class BigTreeCommand extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "bigtree", "Spawns a big tree", "<tree|redwood|jungle>", false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "bigtree", "Spawns a big tree", "<tree|redwood|jungle>", false);
         $this->setPermission("essentials.bigtree");
     }
 
@@ -37,7 +37,7 @@ class BigTreeCommand extends BaseCommand{
             return false;
         }
         #$transparent = [];
-        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
+        $block = $sender->getTargetBlock(100, BaseAPI::NON_SOLID_BLOCKS);
         /*while(!$block->isSolid){
             if($block === null){
                 break;

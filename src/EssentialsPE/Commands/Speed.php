@@ -1,16 +1,16 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\entity\Effect;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Speed extends BaseCommand{
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "speed", "Change your speed limits", "<speed> [player]");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "speed", "Change your speed limits", "<speed> [player]");
         $this->setPermission("essentials.speed");
     }
 
@@ -27,7 +27,7 @@ class Speed extends BaseCommand{
             return false;
         }
         $player = $sender;
-        if(isset($args[1]) && !($player = $this->getPlugin()->getPlayer($args[1]))){
+        if(isset($args[1]) && !($player = $this->getAPI()->getPlayer($args[1]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }

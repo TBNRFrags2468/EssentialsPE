@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Lightning extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "lightning", "Strike a lightning!", "[player [damage]]", "<player> [damage]", ["strike", "smite", "thor", "shock"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "lightning", "Strike a lightning!", "[player [damage]]", "<player> [damage]", ["strike", "smite", "thor", "shock"]);
         $this->setPermission("essentials.lightning.use");
     }
 
@@ -37,7 +37,7 @@ class Lightning extends BaseCommand{
                 break;
             case 1:
             case 2:
-                if(!($pos = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($pos = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }
@@ -54,7 +54,7 @@ class Lightning extends BaseCommand{
                 return false;
                 break;
         }
-        $this->getPlugin()->strikeLightning($pos, $damage);
+        $this->getAPI()->strikeLightning($pos, $damage);
         $sender->sendMessage(TextFormat::YELLOW . "Lightning summoned!");
         return true;
     }

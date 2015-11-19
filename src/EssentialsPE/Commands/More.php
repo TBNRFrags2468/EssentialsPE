@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class More extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "more", "Get a stack of the item you're holding", null, false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "more", "Get a stack of the item you're holding", null, false);
         $this->setPermission("essentials.more");
     }
 
@@ -31,7 +31,7 @@ class More extends BaseCommand{
             return false;
         }
         if(($gm = $sender->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
+            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
         if(count($args) != 0){

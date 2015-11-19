@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Nick extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "nick", "Change your in-game name", "<new nick|off> [player]", true, ["nickname"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "nick", "Change your in-game name", "<new nick|off> [player]", true, ["nickname"]);
         $this->setPermission("essentials.nick.use");
     }
 
@@ -33,9 +33,9 @@ class Nick extends BaseCommand{
                     return false;
                 }
                 if(($nickname = $args[0]) === "off"){
-                    $this->getPlugin()->removeNick($sender);
+                    $this->getAPI()->removeNick($sender);
                 }else{
-                    if(!$this->getPlugin()->setNick($sender, $nickname)){
+                    if(!$this->getAPI()->setNick($sender, $nickname)){
                         $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to use 'colored' nicknames");
                     }
                 }
@@ -46,14 +46,14 @@ class Nick extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[1]))){
+                if(!($player = $this->getAPI()->getPlayer($args[1]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
                 if(($nickname = $args[0]) === "off"){
-                    $this->getPlugin()->removeNick($player);
+                    $this->getAPI()->removeNick($player);
                 }else{
-                    if(!$this->getPlugin()->setNick($player, $nickname)){
+                    if(!$this->getAPI()->setNick($player, $nickname)){
                         $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to give 'colored' nicknames");
                     }
                 }

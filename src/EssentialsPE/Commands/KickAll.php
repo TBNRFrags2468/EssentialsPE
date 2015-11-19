@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class KickAll extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "kickall", "Kick all the players", "<reason>");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "kickall", "Kick all the players", "<reason>");
         $this->setPermission("essentials.kickall");
     }
 
@@ -26,7 +26,7 @@ class KickAll extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(($count = count($this->getPlugin()->getServer()->getOnlinePlayers())) < 1 || ($sender instanceof Player && $count < 2)){
+        if(($count = count($this->getAPI()->getServer()->getOnlinePlayers())) < 1 || ($sender instanceof Player && $count < 2)){
             $sender->sendMessage(TextFormat::RED . "[Error] There are no more players in the server");
             return false;
         }
@@ -35,7 +35,7 @@ class KickAll extends BaseCommand{
         }else{
             $reason = implode(" ", $args);
         }
-        foreach($this->getPlugin()->getServer()->getOnlinePlayers() as $p){
+        foreach($this->getAPI()->getServer()->getOnlinePlayers() as $p){
             if($p != $sender){
                 $p->kick($reason, false);
             }

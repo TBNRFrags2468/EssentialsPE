@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Teleport;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPDeny extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpdeny", "Decline a Teleport Request", "[player]", false, ["tpno"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tpdeny", "Decline a Teleport Request", "[player]", false, ["tpno"]);
         $this->setPermission("essentials.tpdeny");
     }
 
@@ -30,35 +30,35 @@ class TPDeny extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $request = $this->getPlugin()->hasARequest($sender);
+        $request = $this->getAPI()->hasARequest($sender);
         if(!$request){
             $sender->sendMessage(TextFormat::RED . "[Error] You don't have any request yet");
             return false;
         }
         switch(count($args)){
             case 0:
-                $player = $this->getPlugin()->getPlayer(($name = $this->getPlugin()->getLatestRequest($sender)));
+                $player = $this->getAPI()->getPlayer(($name = $this->getAPI()->getLatestRequest($sender)));
                 if(!$player){
                     $sender->sendMessage(TextFormat::RED . "[Error] Request unavailable");
                     return false;
                 }
                 $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::RED . " denied your teleport request");
                 $sender->sendMessage(TextFormat::GREEN . "Denied " . TextFormat::AQUA . $player->getName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . TextFormat::RED . " teleport request");
-                $this->getPlugin()->removeTPRequest($player, $sender);
+                $this->getAPI()->removeTPRequest($player, $sender);
                 break;
             case 1:
-                $player = $this->getPlugin()->getPlayer($args[0]);
+                $player = $this->getAPI()->getPlayer($args[0]);
                 if(!$player) {
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                     return false;
                 }
-                if(!($request = $this->getPlugin()->hasARequestFrom($sender, $player))){
+                if(!($request = $this->getAPI()->hasARequestFrom($sender, $player))){
                     $sender->sendMessage(TextFormat::RED . "[Error] You don't have any requests from " . TextFormat::AQUA . $player->getName());
                     return false;
                 }
                 $player->sendMessage(TextFormat::AQUA . $sender->getDisplayName() . TextFormat::RED . " denied your teleport request");
                 $sender->sendMessage(TextFormat::GREEN . "Denied " . TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . TextFormat::RED . " teleport request");
-                $this->getPlugin()->removeTPRequest($player, $sender);
+                $this->getAPI()->removeTPRequest($player, $sender);
                 break;
             default:
                 $this->sendUsage($sender, $alias);

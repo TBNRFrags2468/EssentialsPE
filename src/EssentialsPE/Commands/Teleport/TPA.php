@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Teleport;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class TPA extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "tpa", "Asks the player if you can telepor to them", "<player>", false, ["call", "tpask"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "tpa", "Asks the player if you can telepor to them", "<player>", false, ["call", "tpask"]);
         $this->setPermission("essentials.tpa");
     }
 
@@ -30,7 +30,7 @@ class TPA extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $player = $this->getPlugin()->getPlayer($args[0]);
+        $player = $this->getAPI()->getPlayer($args[0]);
         if(!$player){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
@@ -39,7 +39,7 @@ class TPA extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide another player name");
             return false;
         }
-        $this->getPlugin()->requestTPTo($sender, $player);
+        $this->getAPI()->requestTPTo($sender, $player);
         $player->sendMessage(TextFormat::AQUA . $sender->getName() . TextFormat::GREEN . " wants to teleport to you, please use:\n/tpaccept to accepts the request\n/tpdeny to decline the invitation");
         $sender->sendMessage(TextFormat::GREEN . "Teleport request sent to " . $player->getDisplayName() . "!");
         return true;

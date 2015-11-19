@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands\Economy;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class SetWorth extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "setworth", "Sets the worth of the item you're holding", "<worth>", false);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "setworth", "Sets the worth of the item you're holding", "<worth>", false);
         $this->setPermission("essentials.setworth");
     }
 
@@ -36,7 +36,7 @@ class SetWorth extends BaseCommand{
         }
         $sender->sendMessage(TextFormat::YELLOW . "Setting worth...");
         $id = $sender->getInventory()->getItemInHand()->getId();
-        $this->getPlugin()->setItemWorth($id, (int) $args[0]);
+        $this->getAPI()->setItemWorth($id, (int) $args[0]);
         return true;
     }
 }

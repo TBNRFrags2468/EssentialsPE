@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class EssentialsPE extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "essentials", "Get current Essentials version", "[update <check|install>]", true, ["essentials", "ess", "esspe"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "essentials", "Get current Essentials version", "[update <check|install>]", true, ["essentials", "ess", "esspe"]);
         $this->setPermission("essentials.essentials");
     }
 
@@ -40,7 +40,7 @@ class EssentialsPE extends BaseCommand{
                             return false;
                         }
                         if(isset($args[1]) && (($a = strtolower($args[1])) === "check" || $a === "c" || $a === "install" || $a === "i")){
-                            if(!$this->getPlugin()->fetchEssentialsPEUpdate($a === "i" || $a === "install")){
+                            if(!$this->getAPI()->fetchEssentialsPEUpdate($a === "i" || $a === "install")){
                                 $sender->sendMessage(TextFormat::YELLOW . "The updater is already working... Please wait a few moments and try again");
                             }
                             return true;

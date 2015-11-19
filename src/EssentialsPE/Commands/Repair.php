@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Repair extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "repair", "Repair the item you're holding", "[all|hand]", false, ["fix"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "repair", "Repair the item you're holding", "[all|hand]", false, ["fix"]);
         $this->setPermission("essentials.repair.use");
     }
 
@@ -32,7 +32,7 @@ class Repair extends BaseCommand{
         }
         switch(count($args)){
             case 0:
-                if(!$this->getPlugin()->isRepairable($item = $sender->getInventory()->getItemInHand())){
+                if(!$this->getAPI()->isRepairable($item = $sender->getInventory()->getItemInHand())){
                     $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
                     return false;
                 }
@@ -48,7 +48,7 @@ class Repair extends BaseCommand{
                             return false;
                         }
                         foreach($sender->getInventory()->getContents() as $item){
-                            if($this->getPlugin()->isRepairable($item)){
+                            if($this->getAPI()->isRepairable($item)){
                                 $item->setDamage(0);
                             }
                         }
@@ -62,7 +62,7 @@ class Repair extends BaseCommand{
                         $sender->sendMessage($r);
                         break;
                     case "hand":
-                        if(!$this->getPlugin()->isRepairable($item = $sender->getInventory()->getItemInHand())){
+                        if(!$this->getAPI()->isRepairable($item = $sender->getInventory()->getItemInHand())){
                             $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
                             return false;
                         }

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Jump extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "jump", "Teleport you to the block you're looking at", null, false, ["j", "jumpto"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "jump", "Teleport you to the block you're looking at", null, false, ["j", "jumpto"]);
         $this->setPermission("essentials.jump");
     }
 
@@ -30,7 +30,7 @@ class Jump extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $block = $sender->getTargetBlock(100, Loader::NON_SOLID_BLOCKS);
+        $block = $sender->getTargetBlock(100, BaseAPI::NON_SOLID_BLOCKS);
         if($block === null){
             $sender->sendMessage(TextFormat::RED . "There isn't a reachable block");
             return false;

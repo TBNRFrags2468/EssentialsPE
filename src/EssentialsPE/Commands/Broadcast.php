@@ -1,17 +1,17 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\utils\TextFormat;
 
 class Broadcast extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "broadcast", "Broadcast a message.", "<message>", true, ["bcast"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "broadcast", "Broadcast a message.", "<message>", true, ["bcast"]);
         $this->setPermission("essentials.broadcast");
     }
 

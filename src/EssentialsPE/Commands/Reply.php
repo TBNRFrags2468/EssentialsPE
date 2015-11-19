@@ -1,8 +1,8 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\command\RemoteConsoleCommandSender;
@@ -11,10 +11,10 @@ use pocketmine\utils\TextFormat;
 
 class Reply extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "reply", "Quickly reply to the last person that messaged you", "<message ...>", true, ["r"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "reply", "Quickly reply to the last person that messaged you", "<message ...>", true, ["r"]);
         $this->setPermission("essentials.reply");
     }
 
@@ -32,14 +32,14 @@ class Reply extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!($t = $this->getPlugin()->getQuickReply($sender))){
+        if(!($t = $this->getAPI()->getQuickReply($sender))){
             $sender->sendMessage(TextFormat::RED . "[Error] No target available for QuickReply");
             return false;
         }
         if(strtolower($t) !== "console" && strtolower($t) !== "rcon"){
-            if(!($t = $this->getPlugin()->getPlayer($t))){
+            if(!($t = $this->getAPI()->getPlayer($t))){
                 $sender->sendMessage(TextFormat::RED . "[Error] No player available for QuickReply");
-                $this->getPlugin()->removeQuickReply($sender);
+                $this->getAPI()->removeQuickReply($sender);
                 return false;
             }
         }
@@ -50,7 +50,7 @@ class Reply extends BaseCommand{
         }else{
             $this->getPlugin()->getLogger()->info($m);
         }
-        $this->getPlugin()->setQuickReply(($t instanceof Player ? $t : ($t === "console" ? new ConsoleCommandSender() : new RemoteConsoleCommandSender())), $sender);
+        $this->getAPI()->setQuickReply(($t instanceof Player ? $t : ($t === "console" ? new ConsoleCommandSender() : new RemoteConsoleCommandSender())), $sender);
         return true;
     }
 }

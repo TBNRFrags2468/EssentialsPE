@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class ClearInventory extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "clearinventory", "Clear your/other's inventory", "[player]", true, ["ci", "clean", "clearinvent"]);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "clearinventory", "Clear your/other's inventory", "[player]", true, ["ci", "clean", "clearinvent"]);
         $this->setPermission("essentials.clearinventory.use");
     }
 
@@ -33,7 +33,7 @@ class ClearInventory extends BaseCommand{
                     return false;
                 }
                 if(($gm = $sender->getGamemode()) === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getPlugin()->getServer()->getGamemodeString($gm) . " mode");
+                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
                     return false;
                 }
                 $sender->getInventory()->clearAll();
@@ -44,7 +44,7 @@ class ClearInventory extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                     return false;
                 }
-                if(!($player = $this->getPlugin()->getPlayer($args[0]))){
+                if(!($player = $this->getAPI()->getPlayer($args[0]))){
                     $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
                     return false;
                 }

@@ -1,18 +1,18 @@
 <?php
 namespace EssentialsPE\Commands;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
-use EssentialsPE\Loader;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
 class Seen extends BaseCommand{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin, "seen", "See player's last played time", "<player>");
+    public function __construct(BaseAPI $api){
+        parent::__construct($api, "seen", "See player's last played time", "<player>");
         $this->setPermission("essentials.seen");
     }
 
@@ -30,7 +30,7 @@ class Seen extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(($player = $this->getPlugin()->getOfflinePlayer($args[0])) instanceof Player){
+        if(($player = $this->getAPI()->getOfflinePlayer($args[0])) instanceof Player){
             $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " is online!");
             return true;
         }
