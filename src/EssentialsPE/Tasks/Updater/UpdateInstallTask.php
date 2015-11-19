@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Tasks\Updater;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
 use pocketmine\utils\TextFormat;
@@ -13,20 +13,20 @@ class UpdateInstallTask extends AsyncTask{
     private $pluginPath;
     /** @var string */
     private $newVersion;
-    /** @var Loader */
-    private $plugin;
+    /** @var BaseAPI */
+    private $api;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param $url
      * @param $pluginPath
      * @param $newVersion
      */
-    public function __construct(Loader $plugin, $url, $pluginPath, $newVersion){
+    public function __construct(BaseAPI $api, $url, $pluginPath, $newVersion){
         $this->url = $url;
         $this->pluginPath = $pluginPath;
         $this->newVersion = $newVersion;
-        $this->plugin = $plugin;
+        $this->api = $api;
     }
 
     public function onRun(){
@@ -56,6 +56,6 @@ class UpdateInstallTask extends AsyncTask{
      */
     public function onCompletion(Server $server){
         $server->getLogger()->info(TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " Successfully updated to version " . TextFormat::GREEN . $this->newVersion . TextFormat::YELLOW . ". To start using the new features, please fully restart your server.");
-        $this->plugin->scheduleUpdaterTask();
+        $this->api->scheduleUpdaterTask();
     }
 }

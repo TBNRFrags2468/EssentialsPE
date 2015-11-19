@@ -1,6 +1,7 @@
 <?php
 namespace EssentialsPE;
 
+use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseKit;
 use EssentialsPE\BaseFiles\BaseLocation;
 use EssentialsPE\Commands\AFK;
@@ -460,7 +461,10 @@ class Loader extends PluginBase{
         $this->updateHomesAndNicks();
     }
 
+    /**
+     * @return BaseAPI
+     */
     public function getAPI(){
-        // TODO
+        return BaseAPI::getInstance(); // TODO: Create event
     }
 }

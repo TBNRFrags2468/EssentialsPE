@@ -62,11 +62,11 @@ class UpdateFetchTask extends AsyncTask{
      * @param Server $server
      */
     public function onCompletion(Server $server){
-        /** @var Loader $esspe */
-        $esspe = $server->getPluginManager()->getPlugin("EssentialsPE");
+        /** @var Loader $ess */
+        $ess = $server->getPluginManager()->getPlugin("EssentialsPE");
 
         // Tricky move for better "version" comparison...
-        $currentVersion = $this->correctVersion($esspe->getDescription()->getVersion());
+        $currentVersion = $this->correctVersion($ess->getDescription()->getVersion());
         $v = $this->getResult()["version"];
 
         if($currentVersion < $v){
@@ -76,10 +76,10 @@ class UpdateFetchTask extends AsyncTask{
             $continue = false;
             $message = TextFormat::AQUA . "[EssentialsPE]" . TextFormat::YELLOW . " No new version found, you're using the latest version of EssentialsPE";
         }
-        $esspe->broadcastUpdateAvailability($message);
+        $ess->getAPI()->broadcastUpdateAvailability($message);
         if($continue && $this->install){
-            $server->getScheduler()->scheduleAsyncTask($task = new UpdateInstallTask($esspe, $this->getResult()["downloadURL"], $server->getPluginPath(), $v));
-            $esspe->updaterDownloadTask = $task;
+            $server->getScheduler()->scheduleAsyncTask($task = new UpdateInstallTask($ess->getAPI(), $this->getResult()["downloadURL"], $server->getPluginPath(), $v));
+            $ess->getAPI()->updaterDownloadTask = $task;
         }
     }
 

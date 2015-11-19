@@ -2,7 +2,7 @@
 namespace EssentialsPE\Tasks;
 
 use EssentialsPE\BaseFiles\BaseTask;
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -11,11 +11,11 @@ class TPRequestTask extends BaseTask{
     protected $requester;
 
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      * @param Player $requester
      */
-    public function __construct(Loader $plugin, Player $requester){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api, Player $requester){
+        parent::__construct($api);
         $this->requester = $requester;
     }
 
@@ -24,8 +24,8 @@ class TPRequestTask extends BaseTask{
      */
     public function onRun($currentTick){
         if($this->requester instanceof Player && $this->requester->isOnline()) {
-            $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's TPRequestTask");
-            $this->getPlugin()->removeTPRequest($this->requester);
+            $this->getAPI()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's TPRequestTask");
+            $this->getAPI()->removeTPRequest($this->requester);
         }
     }
 } 

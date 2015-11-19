@@ -2,22 +2,22 @@
 namespace EssentialsPE\Tasks\Updater;
 
 use EssentialsPE\BaseFiles\BaseTask;
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\utils\TextFormat;
 
 class AutoFetchCallerTask extends BaseTask{
     /**
-     * @param Loader $plugin
+     * @param BaseAPI $api
      */
-    public function __construct(Loader $plugin){
-        parent::__construct($plugin);
+    public function __construct(BaseAPI $api){
+        parent::__construct($api);
     }
 
     /**
      * @param int $currentTick
      */
     public function onRun($currentTick){
-        $this->getPlugin()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AutoFetchCallerTask");
-        $this->getPlugin()->fetchEssentialsPEUpdate(false);
+        $this->getAPI()->getServer()->getLogger()->debug(TextFormat::YELLOW . "Running EssentialsPE's AutoFetchCallerTask");
+        $this->getAPI()->fetchEssentialsPEUpdate(false);
     }
 }

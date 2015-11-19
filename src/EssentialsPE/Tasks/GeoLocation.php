@@ -1,7 +1,7 @@
 <?php
 namespace EssentialsPE\Tasks;
 
-use EssentialsPE\Loader;
+use EssentialsPE\BaseFiles\BaseAPI;
 use pocketmine\Player;
 use pocketmine\scheduler\AsyncTask;
 use pocketmine\Server;
@@ -41,7 +41,7 @@ class GeoLocation extends AsyncTask{
      * @param Server $server
      */
     public function onCompletion(Server $server){
-        /** @var Loader $api */
+        /** @var BaseAPI $api */
         $api = $server->getPluginManager()->getPlugin("EssentialsPE");
         foreach($this->getResult() as $spl => $ip){
             $api->updateGeoLocation($this->player[$spl], $ip);
