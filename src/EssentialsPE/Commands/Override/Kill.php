@@ -2,13 +2,12 @@
 namespace EssentialsPE\Commands\Override;
 
 use EssentialsPE\BaseFiles\BaseAPI;
-use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\event\entity\EntityDamageEvent;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Kill extends BaseCommand{
+class Kill extends BaseOverrideCommand{
     /**
      * @param BaseAPI $api
      */

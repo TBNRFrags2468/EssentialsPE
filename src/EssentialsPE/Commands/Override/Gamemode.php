@@ -2,12 +2,11 @@
 namespace EssentialsPE\Commands\Override;
 
 use EssentialsPE\BaseFiles\BaseAPI;
-use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Gamemode extends BaseCommand{
+class Gamemode extends BaseOverrideCommand{
     /**
      * @param BaseAPI $api
      */

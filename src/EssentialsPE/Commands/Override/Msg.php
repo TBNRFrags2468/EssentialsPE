@@ -2,19 +2,18 @@
 namespace EssentialsPE\Commands\Override;
 
 use EssentialsPE\BaseFiles\BaseAPI;
-use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\command\ConsoleCommandSender;
 use pocketmine\command\RemoteConsoleCommandSender;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
-class Msg extends BaseCommand{
+class Msg extends BaseOverrideCommand{
     /**
      * @param BaseAPI $api
      */
     public function __construct(BaseAPI $api){
-        parent::__construct($api, "Msg", "Send private messages to other players", "<player> <message ...>", true, ["tell", "m", "t", "whisper"]);
+        parent::__construct($api, "tell", "Send private messages to other players", "<player> <message ...>", true, ["msg", "m", "t", "whisper"]);
         $this->setPermission("essentials.msg");
     }
 

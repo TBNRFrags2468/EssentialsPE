@@ -127,136 +127,115 @@ class Loader extends PluginBase{
     }
 
     /**
-     * Function to easily disable commands
-     *
-     * @param array $commands
-     */
-    public function unregisterCommands(array $commands){
-        $commandmap = $this->getServer()->getCommandMap();
-
-        foreach($commands as $commandlabel){
-            $command = $commandmap->getCommand($commandlabel);
-            $command->setLabel($commandlabel . "_disabled");
-            $command->unregister($commandmap);
-        }
-    }
-
-    /**
      * Function to register all EssentialsPE's commands...
      * And to override some default ones
      */
     private function registerCommands(){
-        //Unregister commands to override
-        $this->unregisterCommands([
-           "gamemode",
-            "kill",
-            "tell"
-        ]);
+        $commands = [
+            new AFK($this->getAPI()),
+            new Antioch($this->getAPI()),
+            new Back($this->getAPI()),
+            //new BigTreeCommand($this->$this->getAPI()), TODO
+            new BreakCommand($this->getAPI()),
+            new Broadcast($this->getAPI()),
+            new Burn($this->getAPI()),
+            new ClearInventory($this->getAPI()),
+            new Compass($this->getAPI()),
+            new Condense($this->getAPI()),
+            new Depth($this->getAPI()),
+            new EssentialsPE($this->getAPI()),
+            new Extinguish($this->getAPI()),
+            new Fly($this->getAPI()),
+            new GetPos($this->getAPI()),
+            new God($this->getAPI()),
+            //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Hat rendering"
+            new Heal($this->getAPI()),
+            new ItemCommand($this->getAPI()),
+            new ItemDB($this->getAPI()),
+            new Jump($this->getAPI()),
+            new KickAll($this->getAPI()),
+            new Kit($this->getAPI()),
+            new Lightning($this->getAPI()),
+            new More($this->getAPI()),
+            new Mute($this->getAPI()),
+            new Near($this->getAPI()),
+            new Nick($this->getAPI()),
+            new Nuke($this->getAPI()),
+            new Ping($this->getAPI()),
+            new PTime($this->getAPI()),
+            new PvP($this->getAPI()),
+            new RealName($this->getAPI()),
+            new Repair($this->getAPI()),
+            new Seen($this->getAPI()),
+            new SetSpawn($this->getAPI()),
+            new Spawn($this->getAPI()),
+            //new Speed($this->$this->getAPI()), TODO
+            new Sudo($this->getAPI()),
+            new Suicide($this->getAPI()),
+            new TempBan($this->getAPI()),
+            new Top($this->getAPI()),
+            //new TreeCommand($this->$this->getAPI()), TODO
+            new Unlimited($this->getAPI()),
+            new Vanish($this->getAPI()),
+            //new Whois($this->$this->getAPI()), TODO
+            new World($this->getAPI()),
 
-        //Register the new commands
-        $commands = [];
-        $cfg = $this->getConfig()->get("commands", []);
+            //Economy
+            //new Balance($this->$this->getAPI()),
+            //new Eco($this->$this->getAPI()),
+            //new Pay($this->$this->getAPI()),
+            //new Sell($this->$this->getAPI()),
+            //new SetWorth($this->$this->getAPI()),
+            //new Worth($this->$this->getAPI()),
 
-        foreach([
-                    new AFK($this->getAPI()),
-                    new Antioch($this->getAPI()),
-                    new Back($this->getAPI()),
-                    //new BigTreeCommand($this->$this->getAPI()), TODO
-                    new BreakCommand($this->getAPI()),
-                    new Broadcast($this->getAPI()),
-                    new Burn($this->getAPI()),
-                    new ClearInventory($this->getAPI()),
-                    new Compass($this->getAPI()),
-                    new Condense($this->getAPI()),
-                    new Depth($this->getAPI()),
-                    new EssentialsPE($this->getAPI()),
-                    new Extinguish($this->getAPI()),
-                    new Fly($this->getAPI()),
-                    new GetPos($this->getAPI()),
-                    new God($this->getAPI()),
-                    //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Hat rendering"
-                    new Heal($this->getAPI()),
-                    new ItemCommand($this->getAPI()),
-                    new ItemDB($this->getAPI()),
-                    new Jump($this->getAPI()),
-                    new KickAll($this->getAPI()),
-                    new Kit($this->getAPI()),
-                    new Lightning($this->getAPI()),
-                    new More($this->getAPI()),
-                    new Mute($this->getAPI()),
-                    new Near($this->getAPI()),
-                    new Nick($this->getAPI()),
-                    new Nuke($this->getAPI()),
-                    new Ping($this->getAPI()),
-                    new PTime($this->getAPI()),
-                    new PvP($this->getAPI()),
-                    new RealName($this->getAPI()),
-                    new Repair($this->getAPI()),
-                    new Seen($this->getAPI()),
-                    new SetSpawn($this->getAPI()),
-                    new Spawn($this->getAPI()),
-                    //new Speed($this->$this->getAPI()), TODO
-                    new Sudo($this->getAPI()),
-                    new Suicide($this->getAPI()),
-                    new TempBan($this->getAPI()),
-                    new Top($this->getAPI()),
-                    //new TreeCommand($this->$this->getAPI()), TODO
-                    new Unlimited($this->getAPI()),
-                    new Vanish($this->getAPI()),
-                    //new Whois($this->$this->getAPI()), TODO
-                    new World($this->getAPI()),
+            //Home
+            new DelHome($this->getAPI()),
+            new Home($this->getAPI()),
+            new SetHome($this->getAPI()),
 
-                    //Economy
-                    //new Balance($this->$this->getAPI()),
-                    //new Eco($this->$this->getAPI()),
-                    //new Pay($this->$this->getAPI()),
-                    //new Sell($this->$this->getAPI()),
-                    //new SetWorth($this->$this->getAPI()),
-                    //new Worth($this->$this->getAPI()),
+            // Messages
+            new Msg($this->getAPI()),
+            new Reply($this->getAPI()),
 
-                    //Home
-                    new DelHome($this->getAPI()),
-                    new Home($this->getAPI()),
-                    new SetHome($this->getAPI()),
+            //PowerTool
+            new PowerTool($this->getAPI()),
+            new PowerToolToggle($this->getAPI()),
 
-                    // Messages
-                    new Msg($this->getAPI()),
-                    new Reply($this->getAPI()),
+            //Teleport
+            new TPA($this->getAPI()),
+            new TPAccept($this->getAPI()),
+            new TPAHere($this->getAPI()),
+            new TPAll($this->getAPI()),
+            new TPDeny($this->getAPI()),
+            new TPHere($this->getAPI()),
 
-                    //PowerTool
-                    new PowerTool($this->getAPI()),
-                    new PowerToolToggle($this->getAPI()),
+            //Warp
+            new DelWarp($this->getAPI()),
+            new Setwarp($this->getAPI()),
+            new Warp($this->getAPI()),
 
-                    //Teleport
-                    new TPA($this->getAPI()),
-                    new TPAccept($this->getAPI()),
-                    new TPAHere($this->getAPI()),
-                    new TPAll($this->getAPI()),
-                    new TPDeny($this->getAPI()),
-                    new TPHere($this->getAPI()),
-
-                    //Warp
-                    new DelWarp($this->getAPI()),
-                    new Setwarp($this->getAPI()),
-                    new Warp($this->getAPI()),
-
-                    //Override
-                    new Gamemode($this->getAPI()),
-                    new Kill($this->getAPI())
-                ] as $cmd){
+            //Override
+            new Gamemode($this->getAPI()),
+            new Kill($this->getAPI())
+        ];
+        $aliased = [];
+        foreach($commands as $cmd){
             /** @var BaseCommand $cmd */
-            if(in_array($cmd->getName(), $cfg)){
-                $commands[] = $cmd;
+            $commands[$cmd->getName()] = $cmd;
+            $aliased[$cmd->getName()] = $cmd->getName();
+            foreach($cmd->getAliases() as $alias){
+                $aliased[$alias] = $cmd->getName();
+            }
+        }
+        $cfg = $this->getConfig()->get("commands", []);
+        foreach($cfg as $del){
+            if(isset($alias[$del])){
+                unset($commands[$alias[$del]]);
             }else{
-                foreach($cmd->getAliases() as $alias){
-                    if(in_array($alias, $cfg)){
-                        $commands[] = $cmd;
-                    }
-                }
+                $this->getLogger()->debug("\"$del\" command not found inside EssentialsPE, skipping...");
             }
         }
         $this->getServer()->getCommandMap()->registerAll("EssentialsPE", $commands);
-        // TODO: Swap system from CMD -> CFG into CFG -> CMD... Where CFG includes the commands to remove...
     }
 
     public function checkConfig(){
