@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
+use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,32 +27,22 @@ class Spawn extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $sender->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
-                $sender->sendMessage(TextFormat::GREEN . "Teleporting...");
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.spawn.other")){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to spawn");
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $player->teleport($sender->getServer()->getDefaultLevel()->getSpawnLocation());
-                $player->sendMessage(TextFormat::GREEN . "Teleporting...");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.spawn.other")){
+                $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport other players to spawn");
+                return false;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        $player->teleport(Location::fromObject($this->getAPI()->getServer()->getDefaultLevel()->getSpawnLocation(), $this->getAPI()->getServer()->getDefaultLevel()));
+        $player->sendMessage(TextFormat::GREEN . "Teleporting...");
         return true;
     }
 } 

@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
+use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,7 +27,7 @@ class More extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) !== 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
@@ -34,17 +35,12 @@ class More extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
-        if(count($args) != 0){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
-        $item = clone($sender->getInventory()->getItemInHand());
-        if($item->getID() === 0){
+        $item = $sender->getInventory()->getItemInHand();
+        if($item->getID() === Item::AIR){
             $sender->sendMessage(TextFormat::RED . "You can't get a stack of AIR");
             return false;
         }
-        $item->setCount(($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
-        $sender->getInventory()->setItemInHand($item);
+        $item->setCount($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize());
         $sender->sendMessage(TextFormat::AQUA . "Filled up the item stack to " . $item->getCount());
         return true;
     }

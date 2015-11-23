@@ -12,7 +12,7 @@ class PvP extends BaseCommand{
      * @param BaseAPI $api
      */
     public function __construct(BaseAPI $api){
-        parent::__construct($api, "pvp", "Toggle PvP on/off", "<on|off>", false);
+        parent::__construct($api, "pvp", "Toggle PvP on/off", "<on|true|enable|off|false|disable>", false);
         $this->setPermission("essentials.pvp");
     }
 
@@ -26,25 +26,12 @@ class PvP extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }elseif(count($args) != 1){
+        if(!$sender instanceof Player || count($args) != 1 || !((($s = strtolower($args[0])) === "on" || (bool) $s || $s === "enable") || ($s === "off" || !((bool) $s)) || $s === "disable")){
             $this->sendUsage($sender, $alias);
             return false;
         }
-
-        switch(strtolower($args[0])){
-            case "on":
-            case "off":
-                $this->getAPI()->setPvP($sender, ($state = strtolower($args[0]) === "on" ? true : false));
-                $sender->sendMessage(TextFormat::GREEN . "PvP " . ($state ? "enabled!" : "disabled!"));
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
-        }
+        $this->getAPI()->setPvP($sender, $s);
+        $sender->sendMessage(TextFormat::GREEN . "PvP mode " . ($s ? "enabled" : "disabled"));
         return true;
     }
 }

@@ -26,55 +26,43 @@ class Repair extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || count($args) > 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$this->getAPI()->isRepairable($item = $sender->getInventory()->getItemInHand())){
-                    $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
-                    return false;
-                }
-                $item->setDamage(0);
-                $sender->getInventory()->setItemInHand($item);
-                $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
-                break;
-            case 1:
-                switch(strtolower($args[0])){
-                    case "all":
-                        if(!$sender->hasPermission("essentials.repair.all")){
-                            $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                            return false;
-                        }
-                        foreach($sender->getInventory()->getContents() as $item){
-                            if($this->getAPI()->isRepairable($item)){
-                                $item->setDamage(0);
-                            }
-                        }
-                        $r = TextFormat::GREEN . "All the tools on your inventory were repaired!";
-                        if($sender->hasPermission("essentials.repair.armor")){
-                            foreach($sender->getInventory()->getArmorContents() as $item){
-                                $item->setDamage(0);
-                            }
-                            $r .= TextFormat::AQUA . "\n(including the equipped Armor)";
-                        }
-                        $sender->sendMessage($r);
-                        break;
-                    case "hand":
-                        if(!$this->getAPI()->isRepairable($item = $sender->getInventory()->getItemInHand())){
-                            $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
-                            return false;
-                        }
-                        $item->setDamage(0);
-                        $sender->sendMessage(TextFormat::GREEN . "Item successfully repaired!");
-                        break;
-                    default:
-                        $this->sendUsage($sender, $alias);
-                        return false;
-                        break;
-                }
+        $a = strtolower($args[0]);
+        if(isset($args[0]) && !($a === "hand" || $a === "all")){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        if($a === "all"){
+            if(!$sender->hasPermission("essentials.repair.all")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }
+            foreach($sender->getInventory()->getContents() as $item){
+                if($this->getAPI()->isRepairable($item)){
+                    $item->setDamage(0);
+                }
+            }
+            $m = TextFormat::GREEN . "All the tools on your inventory were repaired!";
+            if($sender->hasPermission("essentials.repair.armor")){
+                foreach($sender->getInventory()->getArmorContents() as $item){
+                    if($this->getAPI()->isRepairable($item)){
+                        $item->setDamage(0);
+                    }
+                }
+                $m .= TextFormat::AQUA . " (Including the equipped Armor)";
+            }
+        }else{
+            if(!$this->getAPI()->isRepairable($sender->getInventory()->getItemInHand())){
+                $sender->sendMessage(TextFormat::RED . "[Error] This item can't be repaired!");
+                return false;
+            }
+            $sender->getInventory()->getItemInHand()->setDamage(0);
+            $m = TextFormat::GREEN . "Item successfully repaired!";
+        }
+        $sender->sendMessage($m);
         return true;
     }
 }

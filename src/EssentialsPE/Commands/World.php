@@ -44,8 +44,7 @@ class World extends BaseCommand{
                 return false;
             }
         }
-        $world = $sender->getServer()->getLevelByName($args[0]);
-        $sender->teleport($world->getSpawnLocation(), 0, 0);
+        $sender->teleport($this->getAPI()->getServer()->getLevelByName($args[0])->getSpawnLocation(), 0, 0);
         $sender->sendMessage(TextFormat::YELLOW . "Teleporting...");
         return true;
     }

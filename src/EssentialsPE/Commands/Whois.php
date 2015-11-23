@@ -37,11 +37,11 @@ class Whois extends BaseCommand{
         if(!$sender->hasPermission("essentials.geoip.show") || $player->hasPermission("essentials.geoip.hide")){
             unset($data["location"]);
         }
-        $message =TextFormat::AQUA . "Information:\n";
+        $m =TextFormat::AQUA . "Information:\n";
         foreach($data as $k => $v){
-            $message .= TextFormat::GRAY . " * " . ucfirst($k) . ": $v";
+            $m .= TextFormat::GRAY . " * " . ucfirst($k) . ": $v";
         }
-        $sender->sendMessage($message);
+        $sender->sendMessage($m);
         return true;
     }
 }

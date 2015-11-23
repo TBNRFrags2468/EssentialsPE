@@ -26,40 +26,28 @@ class Unlimited extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                if(($gm = $sender->getServer()->getGamemodeString($sender->getGamemode())) === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
-                    return false;
-                }
-                $this->getAPI()->switchUnlimited($sender);
-                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($sender) ? "enabled!" : "disabled!"));
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.unlimited.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                if(($gm = $player->getGamemode()) === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] " .  $player->getDisplayName() . " is in " . $this->getAPI()->getServer()->getGamemodeString($gm));
-                    return false;
-                }
-                $this->getAPI()->switchUnlimited($player);
-                $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($player) ? "enabled" : "disabled") . " for player " .  $player->getDisplayName());
-                $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($this->getAPI()->isUnlimitedEnabled($player) ? "enabled!" : "disabled!"));
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.unlimited.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
-                break;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        if(($gm = $player->getGamemode()) === Player::CREATIVE || $gm === Player::SPECTATOR){
+            $sender->sendMessage(TextFormat::RED . "[Error] " . ($player === $sender ? "you are" : $player->getDisplayName() . " is") . " in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+            return false;
+        }
+        $this->getAPI()->switchUnlimited($player);
+        $player->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks " . ($s = $this->getAPI()->isUnlimitedEnabled($player) ? "enabled" : "disabled"));
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . "Unlimited placing of blocks $s");
         }
         return true;
     }

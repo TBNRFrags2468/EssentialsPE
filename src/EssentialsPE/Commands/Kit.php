@@ -26,15 +26,20 @@ class Kit extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if($alias === "kits" || count($args) === 0){
+        if(count($args) > 2){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }elseif(count($args) === 0){
             if(($list = $this->getAPI()->kitList(false)) === false){
                 $sender->sendMessage(TextFormat::AQUA . "There are no Kits currently available");
                 return false;
             }
             $sender->sendMessage(TextFormat::AQUA . "Available kits:\n" . $list);
             return true;
-        }
-        if(!($kit = $this->getAPI()->getKit($args[0]))){
+        }elseif(!isset($args[1]) && !$sender instanceof Player){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }elseif(!($kit = $this->getAPI()->getKit($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Kit doesn't exist");
             return false;
         }
@@ -72,6 +77,24 @@ class Kit extends BaseCommand{
                 $this->sendUsage($sender, $alias);
                 return false;
                 break;
+        }
+        $player = $sender;
+        if(isset($args[1])){
+            if(!$sender->hasPermission("essentials.kit.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[1]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        if(!$sender->hasPermission("essentials.kits.*") && !$sender->hasPermission("essentials.kits." . strtolower($args[0]))){
+            $sender->sendMessage(TextFormat::RED . "[Error] You can't get this kit");
+            return false;
+        }
+        $player->sendMessage(TextFormat::GREEN . "Getting kit " . TextFormat::AQUA . $kit->getName() . "...");
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . "Giving " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " kit " . TextFormat::AQUA . $kit->getName() . TextFormat::GREEN . "...");
         }
         return true;
     }

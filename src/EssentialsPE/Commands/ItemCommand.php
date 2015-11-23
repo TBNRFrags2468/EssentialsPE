@@ -4,6 +4,7 @@ namespace EssentialsPE\Commands;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
+use pocketmine\item\Item;
 use pocketmine\Player;
 use pocketmine\utils\TextFormat;
 
@@ -26,7 +27,7 @@ class ItemCommand extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(!$sender instanceof Player){
+        if(!$sender instanceof Player || (count($args) < 1 || count($args) > 2)){
             $this->sendUsage($sender, $alias);
             return false;
         }
@@ -34,16 +35,11 @@ class ItemCommand extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
             return false;
         }
-        if(count($args) < 1 || count($args) > 2){
-            $this->sendUsage($sender, $alias);
-            return false;
-        }
 
         //Getting the item...
-        $item_name = array_shift($args);
-        $item = $this->getAPI()->getItem($item_name);
+        $item = $this->getAPI()->getItem($item_name = array_shift($args));
 
-        if($item->getID() === 0){
+        if($item->getID() === Item::AIR){
             $sender->sendMessage(TextFormat::RED . "Unknown item \"" . $item_name . "\"");
             return false;
         }elseif(!$sender->hasPermission("essentials.itemspawn.item-all") && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getName() && !$sender->hasPermission("essentials.itemspawn.item-" . $item->getID()))){
@@ -53,15 +49,7 @@ class ItemCommand extends BaseCommand{
 
         //Setting the amount...
         $amount = array_shift($args);
-        if(!isset($amount) || !is_numeric($amount)){
-            if(!$sender->hasPermission("essentials.oversizedstacks")){
-                $item->setCount($item->getMaxStackSize());
-            }else{
-                $item->setCount($this->getPlugin()->getConfig()->get("oversized-stacks"));
-            }
-        }else{
-            $item->setCount($amount);
-        }
+        $item->setCount(isset($amount) && is_numeric($amount) ? $amount : ($sender->hasPermission("essentials.oversizedstacks") ? $this->getPlugin()->getConfig()->get("oversized-stacks") : $item->getMaxStackSize()));
 
         //Getting other values... TODO
         /*foreach($args as $a){

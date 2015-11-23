@@ -26,44 +26,31 @@ class Nick extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 1:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                if(($nickname = $args[0]) === "off"){
-                    $this->getAPI()->removeNick($sender);
-                }else{
-                    if(!$this->getAPI()->setNick($sender, $nickname)){
-                        $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to use 'colored' nicknames");
-                    }
-                }
-                $sender->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
-                break;
-            case 2:
-                if(!$sender->hasPermission("essentials.nick.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[1]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                if(($nickname = $args[0]) === "off"){
-                    $this->getAPI()->removeNick($player);
-                }else{
-                    if(!$this->getAPI()->setNick($player, $nickname)){
-                        $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to give 'colored' nicknames");
-                    }
-                }
-                $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
-                $player->sendMessage(TextFormat::GREEN . "Your nick " . ($nickname === "off" ? "has been removed" : "is now " . $nickname));
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
+        if((!isset($args[1]) && !$sender instanceof Player) || (count($args) < 1 || count($args) > 2)){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $nick = ($n = strtolower($alias[0])) === "off" || $n === "remove" || (bool) $n === false ? false : $args[0];
+        $player = $sender;
+        if(isset($args[1])){
+            if(!$sender->hasPermission("essentials.nick.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
-                break;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[1]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        if(!$nick){
+            $this->getAPI()->removeNick($player);
+        }else{
+            if(!$this->getAPI()->setNick($player, $nick)){
+                $sender->sendMessage(TextFormat::RED . "[Error] You don't have permissions to give 'colored' nicknames");
+            }
+        }
+        $player->sendMessage(TextFormat::GREEN . "Your nick " . ($m = !$nick ? "has been removed" : "is now " . TextFormat::RESET . $nick));
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . $player->getName() . (substr($player->getName(), -1, 1) === "s" ? "'" : "'s") . " nick " . $m);
         }
         return true;
     }
