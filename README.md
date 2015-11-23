@@ -19,6 +19,7 @@ If you are planning to use PocketMine-MP _Dev_ builds keep in mind that Essentia
 - [ ] Add _Special Signs_ documentation.
 - [ ] Implement _Messages API_ (Multi-language update)
 - [ ] Implement _Online-Player Checking_ to prevent crashes
+- [x] Customizable API
 - [x] Optimize commands' code
 
 
