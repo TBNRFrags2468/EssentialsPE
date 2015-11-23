@@ -30,8 +30,7 @@ class Setwarp extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $existed = $this->getAPI()->warpExists($args[0]);
-        if($existed && !$sender->hasPermission("essentials.warp.override.*") && !$sender->hasPermission("essentials.warp.override.$args[0]")){
+        if(($existed = $this->getAPI()->warpExists($args[0])) && !$sender->hasPermission("essentials.warp.override.*") && !$sender->hasPermission("essentials.warp.override.$args[0]")){
             $sender->sendMessage(TextFormat::RED . "[Error] You can't modify this warp position");
             return false;
         }

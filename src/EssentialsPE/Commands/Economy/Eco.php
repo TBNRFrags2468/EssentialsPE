@@ -36,20 +36,17 @@ class Eco extends BaseCommand{
                     $sender->sendMessage(TextFormat::RED . "[Error] Please specify a" . (isset($args[2]) ? " valid" : "n") . " amount");
                     return false;
                 }
+                $balance = (int) $args[2];
                 switch(strtolower($args[0])){
                     case "give":
-                        $balance = (int) $args[2];
                         $sender->sendMessage(TextFormat::YELLOW . "Adding the balance...");
                         $this->getAPI()->addToPlayerBalance($player, $balance);
                         break;
                     case "take":
-                        $balance = (int) $args[2];
-                        $balance = $balance - ($balance * 2);
                         $sender->sendMessage(TextFormat::YELLOW . "Taking the balance...");
-                        $this->getAPI()->addToPlayerBalance($player, $balance);
+                        $this->getAPI()->addToPlayerBalance($player, -$balance);
                         break;
                     case "set":
-                        $balance = (int) $args[2];
                         $sender->sendMessage(TextFormat::YELLOW . "Setting the balance...");
                         $this->getAPI()->setPlayerBalance($player, $balance);
                         break;

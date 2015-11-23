@@ -40,7 +40,7 @@ class EssentialsPE extends BaseCommand{
                             return false;
                         }
                         if(isset($args[1]) && (($a = strtolower($args[1])) === "check" || $a === "c" || $a === "install" || $a === "i")){
-                            if(!$this->getAPI()->fetchEssentialsPEUpdate($a === "i" || $a === "install")){
+                            if(!$this->getAPI()->fetchEssentialsPEUpdate($a[0] === "i")){
                                 $sender->sendMessage(TextFormat::YELLOW . "The updater is already working... Please wait a few moments and try again");
                             }
                             return true;
@@ -49,7 +49,7 @@ class EssentialsPE extends BaseCommand{
                         break;
                     case "version":
                     case "v":
-                    $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::YELLOW . "v" . TextFormat::GREEN . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
+                        $sender->sendMessage(TextFormat::YELLOW . "You're using " . TextFormat::AQUA . "EssentialsPE " . TextFormat::YELLOW . "v" . TextFormat::GREEN . $sender->getServer()->getPluginManager()->getPlugin("EssentialsPE")->getDescription()->getVersion());
                         break;
                     default:
                         $this->sendUsage($sender, $alias);

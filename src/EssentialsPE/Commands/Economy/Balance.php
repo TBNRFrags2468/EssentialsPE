@@ -26,26 +26,21 @@ class Balance extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::AQUA . "Your current balance is " . TextFormat::YELLOW . $this->getAPI()->getCurrencySymbol() . $this->getAPI()->getPlayerBalance($sender));
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.balance.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!$player = $this->getAPI()->getPlayer($args[0])){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has " . TextFormat::YELLOW . $this->getAPI()->getCurrencySymbol() . $this->getAPI()->getPlayerBalance($player));
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.balance.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }elseif(!$player = $this->getAPI()->getPlayer($args[0])){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        $sender->sendMessage(TextFormat::AQUA . ($player === $sender ? "Your current balance is " : $player->getDisplayName() . TextFormat::AQUA . " has ") . TextFormat::YELLOW . $this->getAPI()->getCurrencySymbol() . $this->getAPI()->getPlayerBalance($player));
         return true;
     }
 }

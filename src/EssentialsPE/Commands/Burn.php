@@ -29,17 +29,16 @@ class Burn extends BaseCommand{
             $this->sendUsage($sender, $alias);
             return false;
         }
-        $time = $args[1];
         if(!($player = $this->getAPI()->getPlayer($args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
         }
-        if(!is_numeric($time)){
+        if(!is_numeric($time = $args[1])){
             $sender->sendMessage(TextFormat::RED . "[Error] Invalid burning time");
-        }else{
-            $player->setOnFire($time);
-            $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " is now on fire!");
+            return false;
         }
+        $player->setOnFire($time);
+        $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . " is now on fire!");
         return true;
     }
 }

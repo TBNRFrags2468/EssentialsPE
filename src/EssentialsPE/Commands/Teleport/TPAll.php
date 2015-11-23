@@ -26,39 +26,22 @@ class TPAll extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                foreach($this->getAPI()->getServer()->getOnlinePlayers() as $p){
-                    if($p !== $sender){
-                        $p->teleport($sender);
-                        $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $sender->getDisplayName() . "...");
-                    }
-                }
-                $sender->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
-                break;
-            case 1:
-                $player = $this->getAPI()->getPlayer($args[0]);
-                if(!$player){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                foreach($this->getAPI()->getServer()->getOnlinePlayers() as $p){
-                    if($p !== $player){
-                        $p->teleport($player);
-                        $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
-                    }
-                }
-                $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        $player = $sender;
+        if(isset($args[0]) && !($player = $this->getAPI()->getPlayer($args[0]))){
+            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+            return false;
+        }
+        foreach($this->getAPI()->getServer()->getOnlinePlayers() as $p){
+            if($p !== $player){
+                $p->teleport($player);
+                $p->sendMessage(TextFormat::YELLOW . "Teleporting to " . $player->getDisplayName() . "...");
+            }
+        }
+        $player->sendMessage(TextFormat::YELLOW . "Teleporting players to you...");
         return true;
     }
 } 

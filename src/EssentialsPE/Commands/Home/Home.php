@@ -38,8 +38,7 @@ class Home extends BaseCommand{
             $sender->sendMessage(TextFormat::AQUA . "Available homes:\n" . $list);
             return true;
         }
-        $home = $this->getAPI()->getHome($sender, $args[0]);
-        if(!$home){
+        if(!($home = $this->getAPI()->getHome($sender, $args[0]))){
             $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists or the world is not available");
             return false;
         }

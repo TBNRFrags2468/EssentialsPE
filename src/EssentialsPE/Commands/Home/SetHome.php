@@ -37,12 +37,11 @@ class SetHome extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Home name");
             return false;
         }
-        $existed = $this->getAPI()->homeExists($sender, $args[0]);
         if(!$this->getAPI()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
             $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
             return false;
         }
-        $sender->sendMessage(TextFormat::GREEN . "Home successfully " . ($existed ? "updated" : "created"));
+        $sender->sendMessage(TextFormat::GREEN . "Home successfully " . ($this->getAPI()->homeExists($sender, $args[0]) ? "updated" : "created"));
         return true;
     }
 } 

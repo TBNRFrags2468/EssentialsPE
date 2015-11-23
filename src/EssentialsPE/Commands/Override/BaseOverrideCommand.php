@@ -17,13 +17,8 @@ abstract class BaseOverrideCommand extends BaseCommand{
         parent::__construct($api, $name, $description, $usageMessage, $consoleUsageMessage, $aliases);
         // Special part :D
         $commandMap = $api->getServer()->getCommandMap();
-        $aliases[] = $name;
-        foreach($aliases as $label){
-            $command = $commandMap->getCommand($label);
-            if($command !== null){
-                $command->setLabel($label . "_disabled");
-                $command->unregister($commandMap);
-            }
-        }
+        $command = $commandMap->getCommand($name);
+        $command->setLabel($name . "_disabled");
+        $command->unregister($commandMap);
     }
 }

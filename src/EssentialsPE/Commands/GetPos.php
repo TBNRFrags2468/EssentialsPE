@@ -26,30 +26,21 @@ class GetPos extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::GREEN . "You're in world: " . TextFormat::AQUA . $sender->getLevel()->getName() . "\n" . TextFormat::GREEN . "Your Coordinates are:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . $sender->getFloorX() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . $sender->getFloorY() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . $sender->getFloorZ());
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.getpos.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " is in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates:" . TextFormat::YELLOW . " X: " . TextFormat::AQUA . $player->getFloorX() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Y: " . TextFormat::AQUA . $player->getFloorY() . TextFormat::GREEN . "," . TextFormat::YELLOW . " Z: " . TextFormat::AQUA . $player->getFloorZ());
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.getpos.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        $sender->sendMessage(TextFormat::GREEN . ($player === $sender ? "You're" : $player->getDisplayName() . TextFormat::GRAY . "is") . "in world: " . TextFormat::AQUA . $player->getLevel()->getName() . "\n" . TextFormat::GREEN . "Coordinates: " . TextFormat::YELLOW . "X: " . TextFormat::AQUA . $player->getFloorX() . TextFormat::GREEN . ", " . TextFormat::YELLOW . "Y: " . TextFormat::AQUA . $player->getFloorY() . TextFormat::GREEN . ", " . TextFormat::YELLOW . "Z: " . TextFormat::AQUA . $player->getFloorZ());
         return true;
     }
 }

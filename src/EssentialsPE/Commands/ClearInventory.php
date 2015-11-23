@@ -26,40 +26,28 @@ class ClearInventory extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                if(($gm = $sender->getGamemode()) === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
-                    return false;
-                }
-                $sender->getInventory()->clearAll();
-                $sender->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.clearinventory.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                    return false;
-                }
-                if(($gm = $player->getGamemode()) === 1 || $gm === 3){
-                    $sender->sendMessage(TextFormat::RED . "[Error] " . $player->getDisplayName() . " is on " . ($gm === 1 ? "creative" : "adventure") . " mode");
-                    return false;
-                }
-                $player->getInventory()->clearAll();
-                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
-                $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
+        if((!isset($args[0]) &&  !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.clearinventory.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
-                break;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        if(($gm = $player->getGamemode()) === 1 || $gm === 3){
+            $sender->sendMessage(TextFormat::RED . "[Error] " . (isset($args[0]) ? $player->getDisplayName() . "is" : "You are") . " in " . $this->getAPI()->getServer()->getGamemodeString($gm) . " mode");
+            return false;
+        }
+        $player->getInventory()->clearAll();
+        $player->sendMessage(TextFormat::AQUA . "Your inventory was cleared");
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . (substr($player->getDisplayName(), -1, 1) === "s" ? "'" : "'s") . " inventory was cleared");
         }
         return true;
     }

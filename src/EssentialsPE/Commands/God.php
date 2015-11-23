@@ -26,32 +26,24 @@ class God extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $this->getAPI()->switchGodMode($sender);
-                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getAPI()->isGod($sender) ? "enabled!" : "disabled"));
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.god.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $this->getAPI()->switchGodMode($player);
-                $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getAPI()->isGod($player) ? "enabled" : "disabled") . " for " . $player->getDisplayName());
-                $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getAPI()->isGod($player) ? "enabled!" : "disabled"));
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.god.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
-                break;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        $this->getAPI()->switchGodMode($player);
+        $player->sendMessage(TextFormat::AQUA . "God mode " . ($this->getAPI()->isGod($player) ? "enabled" : "disabled"));
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::AQUA . "God mode " . ($this->getAPI()->isGod($player) ? "enabled" : "disabled") . " for " . $player->getDisplayName());
         }
         return true;
     }

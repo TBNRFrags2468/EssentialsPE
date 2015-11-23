@@ -36,8 +36,7 @@ class Kill extends BaseOverrideCommand{
                 $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
             }
-            $player = $this->getAPI()->getPlayer($args[0]);
-            if(!$player instanceof Player){
+            if(!($player = $this->getAPI()->getPlayer($args[0])) instanceof Player){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
                 return false;
             }

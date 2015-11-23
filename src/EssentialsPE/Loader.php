@@ -73,14 +73,8 @@ use EssentialsPE\EventHandlers\OtherEvents;
 use EssentialsPE\EventHandlers\PlayerEvents;
 use EssentialsPE\EventHandlers\SignEvents;
 use EssentialsPE\Events\CreateAPIEvent;
-use pocketmine\entity\Entity;
-use pocketmine\level\Level;
-use pocketmine\nbt\tag\Enum;
-use pocketmine\network\protocol\AddEntityPacket;
-use pocketmine\network\protocol\MobEffectPacket;
 use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
-use pocketmine\Server;
 use pocketmine\utils\TextFormat;
 
 class Loader extends PluginBase{
@@ -148,7 +142,7 @@ class Loader extends PluginBase{
             new Fly($this->getAPI()),
             new GetPos($this->getAPI()),
             new God($this->getAPI()),
-            //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Hat rendering"
+            //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Block-Hat rendering"
             new Heal($this->getAPI()),
             new ItemCommand($this->getAPI()),
             new ItemDB($this->getAPI()),

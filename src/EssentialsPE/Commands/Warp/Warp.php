@@ -12,7 +12,7 @@ class Warp extends BaseCommand{
      * @param BaseAPI $api
      */
     public function __construct(BaseAPI $api){
-        parent::__construct($api, "warp", "Teleport to a warp", "[name] [player]", "[<name> <player>]", ["warps"]);
+        parent::__construct($api, "warp", "Teleport to a warp", "[[name] [player]]", true, ["warps"]);
         $this->setPermission("essentials.warp.use");
     }
 
@@ -38,41 +38,28 @@ class Warp extends BaseCommand{
             $sender->sendMessage(TextFormat::RED . "[Error] Warp doesn't exist");
             return false;
         }
-        switch(count($args)){
-            case 1:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps." . strtolower($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
-                    return false;
-                }
-                $sender->teleport($warp);
-                $sender->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $warp->getName() . "...");
-                break;
-            case 2:
-                if(!$sender->hasPermission("essentials.warp.other")){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You can't warp other players");
-                    return false;
-                }
-                if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps." . strtolower($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport another one to that warp");
-                    return false;
-                }
-                $player = $this->getAPI()->getPlayer($args[1]);
-                if(!$player){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $player->teleport($warp);
-                $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
-                $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
+        if(!isset($args[0]) && !$sender instanceof Player){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $player = $sender;
+        if(isset($args[1])){
+            if(!$sender->hasPermission("essentials.warp.other")){
+                $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport other players to that warp");
                 return false;
-                break;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player nor found");
+                return false;
+            }
+        }
+        if(!$sender->hasPermission("essentials.warps.*") && !$sender->hasPermission("essentials.warps.$args[0]")){
+            $sender->sendMessage(TextFormat::RED . "[Error] You can't teleport to that warp");
+            return false;
+        }
+        $player->teleport($warp);
+        $player->sendMessage(TextFormat::GREEN . "Warping to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . "Warping " . TextFormat::YELLOW . $player->getDisplayName() . TextFormat::GREEN . " to " . TextFormat::AQUA . $warp->getName() . TextFormat::GREEN . "...");
         }
         return true;
     }

@@ -26,32 +26,22 @@ class Extinguish extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $sender->extinguish();
-                $sender->sendMessage(TextFormat::AQUA . "You were extinguished!");
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.extinguish.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found.");
-                    return false;
-                }
-                $player->extinguish();
-                $sender->sendMessage(TextFormat::AQUA . $player->getDisplayName() . " has been extinguished!");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
         }
+        $player = $sender;
+        if(isset($args[0])){
+            if(!$sender->hasPermission("essentials.extinguish.other")){
+                $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
+                return false;
+            }elseif(!($player = $this->getAPI()->getPlayer($args[0]))){
+                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+                return false;
+            }
+        }
+        $player->extinguish();
+        $sender->sendMessage(TextFormat::AQUA . ($player === $sender ? "You were" : $player->getDisplayName() . "has been") . TextFormat::AQUA . " extinguished");
         return true;
     }
 }

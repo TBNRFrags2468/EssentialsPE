@@ -28,34 +28,20 @@ class Heal extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $sender->heal($sender->getMaxHealth(), new EntityRegainHealthEvent($sender, $sender->getMaxHealth() - $sender->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
-                $sender->getLevel()->addParticle(new HeartParticle($sender->add(0, 2), 4));
-                $sender->sendMessage(TextFormat::GREEN . "You have been healed!");
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.heal.other")){
-                    $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $player->heal($player->getMaxHealth(), new EntityRegainHealthEvent($player, $player->getMaxHealth() - $player->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
-                $player->getLevel()->addParticle(new HeartParticle($player->add(0, 2), 4));
-                $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " has been healed!");
-                $player->sendMessage(TextFormat::GREEN . "You have been healed!");
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
+            $this->sendUsage($sender, $alias);
+            return false;
+        }
+        $player = $sender;
+        if(isset($args[0]) && !($player = $this->getAPI()->getPlayer($args[0]))){
+            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+            return false;
+        }
+        $player->heal($player->getMaxHealth(), new EntityRegainHealthEvent($player, $player->getMaxHealth() - $player->getHealth(), EntityRegainHealthEvent::CAUSE_CUSTOM));
+        $player->getLevel()->addParticle(new HeartParticle($player->add(0, 2), 4));
+        $player->sendMessage(TextFormat::GREEN . "You have been healed!");
+        if($player !== $sender){
+            $sender->sendMessage(TextFormat::GREEN . $player->getDisplayName() . " has been healed!");
         }
         return true;
     }

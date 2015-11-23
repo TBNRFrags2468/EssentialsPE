@@ -12,7 +12,7 @@ class Worth extends BaseCommand{
      * @param BaseAPI $api
      */
     public function __construct(BaseAPI $api){
-        parent::__construct($api, "worth", "Get the price of an item", "<hand|item>", "<item>");
+        parent::__construct($api, "worth", "Get the price of an item", "[item]", "<item>");
         $this->setPermission("essentials.worth");
     }
 
@@ -26,32 +26,20 @@ class Worth extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        if(count($args) !== 1){
+        if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        switch(strtolower($args[0])){
-            case "hand":
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $id = $sender->getInventory()->getItemInHand()->getId();
-                if(!($worth = $this->getAPI()->getItemWorth($id))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::AQUA . "This item worth is " . $this->getAPI()->getCurrencySymbol() . $worth);
-                break;
-            default:
-                $item = $this->getAPI()->getItem($args[0]);
-                if(!($worth = $this->getAPI()->getItemWorth($item->getId()))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
-                    return false;
-                }
-                $sender->sendMessage(TextFormat::AQUA . "This item worth is " . $this->getAPI()->getCurrencySymbol() . $worth);
-                break;
+        if(!isset($args[0])){
+            $id = $sender->getInventory()->getItemInHand()->getId();
+        }else{
+            $id = $this->getAPI()->getItem($args[0])->getId();
         }
+        if(!($worth = $this->getAPI()->getItemWorth($id))){
+            $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
+            return false;
+        }
+        $sender->sendMessage(TextFormat::AQUA . "Item's worth is " . $this->getAPI()->getCurrencySymbol() . $worth);
         return true;
     }
 }

@@ -53,20 +53,13 @@ class Gamemode extends BaseOverrideCommand{
                     break;
             }
         }
-        if(count($args) < 1){
+        if(count($args) < 1 || (!($player = $sender) instanceof Player && !isset($args[1]))){
             $this->sendUsage($sender, $alias);
             return false;
         }
-        if(!($player = $sender) instanceof Player && !isset($args[1])){
-            $this->sendUsage($sender, $alias);
+        if(isset($args[1]) && !($player = $this->getAPI()->getPlayer($args[1]))){
+            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
             return false;
-        }
-        if(isset($args[1])){
-            $player = $this->getAPI()->getPlayer($args[1]);
-            if(!$player){
-                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                return false;
-            }
         }
 
         /**
@@ -127,7 +120,7 @@ class Gamemode extends BaseOverrideCommand{
 
     public function sendUsage(CommandSender $sender, $alias){
         $usage = $this->usageMessage;
-        if($alias !== "gamemode" && $alias !== "gm"){
+        if(strtolower($alias) !== "gamemode" && strtolower($alias) !== "gm"){
             $usage = str_replace("<mode> ", "", $usage);
         }
         if(!$sender instanceof Player){
