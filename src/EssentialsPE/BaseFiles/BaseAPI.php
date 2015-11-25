@@ -1050,6 +1050,10 @@ class BaseAPI{
      */
     public function getMessage($message, ...$args){
         $string = $this->language->getNested($message, $message);
+        $p = explode(".", $message);
+        if($this->language->exists($p = array_shift($p) . ".prefix")){
+            $string = $this->language->get($p, "") . $string;
+        }
         if(count($args) > 0){
             /** @var string[] $args */
             for($i = 0; $i < count($args); $i++){
@@ -1254,7 +1258,7 @@ class BaseAPI{
      * @return null|string
      */
     public function getNick(Player $player){
-        return $this->getSession($player)->getNick();
+        return $this->getSession($player)->getNick() . TextFormat::RESET;
     }
 
     /**

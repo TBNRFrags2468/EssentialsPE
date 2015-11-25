@@ -6,6 +6,7 @@ use pocketmine\command\CommandSender;
 use pocketmine\level\Location;
 use pocketmine\Player;
 use pocketmine\utils\Config;
+use pocketmine\utils\TextFormat;
 
 class BaseSession{
     /** @var BaseAPI */
@@ -470,7 +471,7 @@ class BaseSession{
      * @param null|string $nick
      */
     public function setNick($nick){
-        $this->nick = $nick;
+        $this->nick = ($nick .= TextFormat::RESET);
         $this->getPlayer()->setDisplayName($nick === null ? $this->getPlayer()->getName() : $nick);
         $this->getPlayer()->setNameTag($nick === null ? $this->getPlayer()->getName() : $nick);
     }

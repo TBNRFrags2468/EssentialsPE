@@ -37,7 +37,7 @@ class Balance extends BaseCommand{
                 return false;
             }elseif(!$player = $this->getAPI()->getPlayer($args[0])){
                 $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                #$sender->sendMessage(TextFormat::RED . $this->getAPI()->getMessage("error.prefix") . $this->getAPI()->getMessage("error.player.notfound"));
+                #$sender->sendMessage($this->getAPI()->getMessage("error.player.notfound"));
                 return false;
             }
         }

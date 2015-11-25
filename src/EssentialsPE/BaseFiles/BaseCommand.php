@@ -26,7 +26,7 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
         parent::__construct($name, $description, $usageMessage, $aliases);
         $this->api = $api;
         $this->consoleUsageMessage = $consoleUsageMessage;
-        $this->setPermissionMessage(TextFormat::RED . $this->getAPI()->getMessage("error.player.permission"));
+        $this->setPermissionMessage($this->getAPI()->getMessage("error.permission"));
     }
 
     /**
@@ -62,7 +62,7 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @param string $alias
      */
     public function sendUsage(CommandSender $sender, $alias){
-        $message = TextFormat::RED . $this->getAPI()->getMessage("usage") . TextFormat::GRAY . "/$alias ";
+        $message = $this->getAPI()->getMessage("error.usage", "/$alias");
         if(!$sender instanceof Player){
             if(is_string($this->consoleUsageMessage)){
                 $message .= $this->consoleUsageMessage;
