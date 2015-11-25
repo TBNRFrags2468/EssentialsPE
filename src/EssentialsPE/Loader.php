@@ -63,6 +63,7 @@ use EssentialsPE\Commands\Teleport\TPDeny;
 use EssentialsPE\Commands\Teleport\TPHere;
 use EssentialsPE\Commands\TempBan;
 use EssentialsPE\Commands\Top;
+use EssentialsPE\Commands\TreeCommand;
 use EssentialsPE\Commands\Unlimited;
 use EssentialsPE\Commands\Vanish;
 use EssentialsPE\Commands\Warp\DelWarp;
@@ -92,7 +93,7 @@ class Loader extends PluginBase{
             mkdir($this->getDataFolder());
         }
         $this->checkConfig();
-	    $this->getLogger()->info(TextFormat::YELLOW . "Loading...");
+	    $this->getLogger()->info(TextFormat::YELLOW . $this->getAPI()->getMessage("load"));
         $this->registerEvents();
         $this->registerCommands();
         if(count($l = $this->getServer()->getOnlinePlayers()) > 0){
@@ -129,7 +130,7 @@ class Loader extends PluginBase{
             new AFK($this->getAPI()),
             new Antioch($this->getAPI()),
             new Back($this->getAPI()),
-            //new BigTreeCommand($this->$this->getAPI()), TODO
+            //new BigTreeCommand($this->getAPI()), TODO
             new BreakCommand($this->getAPI()),
             new Broadcast($this->getAPI()),
             new Burn($this->getAPI()),
@@ -142,7 +143,7 @@ class Loader extends PluginBase{
             new Fly($this->getAPI()),
             new GetPos($this->getAPI()),
             new God($this->getAPI()),
-            //new Hat($this->$this->getAPI()), TODO: Implement when MCPE implements "Block-Hat rendering"
+            //new Hat($this->getAPI()), TODO: Implement when MCPE implements "Block-Hat rendering"
             new Heal($this->getAPI()),
             new ItemCommand($this->getAPI()),
             new ItemDB($this->getAPI()),
@@ -163,24 +164,24 @@ class Loader extends PluginBase{
             new Seen($this->getAPI()),
             new SetSpawn($this->getAPI()),
             new Spawn($this->getAPI()),
-            //new Speed($this->$this->getAPI()), TODO
+            //new Speed($this->getAPI()), TODO
             new Sudo($this->getAPI()),
             new Suicide($this->getAPI()),
             new TempBan($this->getAPI()),
             new Top($this->getAPI()),
-            //new TreeCommand($this->$this->getAPI()), TODO
+            new TreeCommand($this->getAPI()), #TODO
             new Unlimited($this->getAPI()),
             new Vanish($this->getAPI()),
-            //new Whois($this->$this->getAPI()), TODO
+            //new Whois($this->getAPI()), TODO
             new World($this->getAPI()),
 
             //Economy
-            //new Balance($this->$this->getAPI()),
-            //new Eco($this->$this->getAPI()),
-            //new Pay($this->$this->getAPI()),
-            //new Sell($this->$this->getAPI()),
-            //new SetWorth($this->$this->getAPI()),
-            //new Worth($this->$this->getAPI()),
+            //new Balance($this->getAPI()),
+            //new Eco($this->getAPI()),
+            //new Pay($this->getAPI()),
+            //new Sell($this->getAPI()),
+            //new SetWorth($this->getAPI()),
+            //new Worth($this->getAPI()),
 
             //Home
             new DelHome($this->getAPI()),

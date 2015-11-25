@@ -26,33 +26,6 @@ class Vanish extends BaseCommand{
         if(!$this->testPermission($sender)){
             return false;
         }
-        switch(count($args)){
-            case 0:
-                if(!$sender instanceof Player){
-                    $this->sendUsage($sender, $alias);
-                    return false;
-                }
-                $this->getAPI()->switchVanish($sender);
-                $sender->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($sender) ? "vanished!" : "visible!"));
-                break;
-            case 1:
-                if(!$sender->hasPermission("essentials.vanish.other")){
-                    $sender->sendMessage($this->getPermissionMessage());
-                    return false;
-                }
-                if(!($player = $this->getAPI()->getPlayer($args[0]))){
-                    $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                    return false;
-                }
-                $this->getAPI()->switchVanish($player);
-                $sender->sendMessage(TextFormat::GRAY .  $player->getDisplayName() . " is now " . ($this->getAPI()->isVanished($player) ? "vanished!" : "visible!"));
-                $player->sendMessage(TextFormat::GRAY . "You're now " . ($this->getAPI()->isVanished($player) ? "vanished!" : "visible!"));
-                break;
-            default:
-                $this->sendUsage($sender, $alias);
-                return false;
-                break;
-        }
         if((!isset($args[0]) && !$sender instanceof Player) || count($args) > 1){
             $this->sendUsage($sender, $alias);
             return false;

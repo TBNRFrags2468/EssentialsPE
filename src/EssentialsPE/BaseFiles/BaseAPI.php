@@ -61,6 +61,8 @@ class BaseAPI{
     private $kits = [];
     /** @var array */
     private $warps = [];
+    /** @var Config */
+    private $language;
 
     /**
      * @param Loader $ess
@@ -69,6 +71,7 @@ class BaseAPI{
         $this->ess = $ess;
         self::$instance = $this;
         $this->saveConfigs();
+        $this->loadLanguages();
     }
 
     public function __destruct(){
@@ -1023,21 +1026,44 @@ class BaseAPI{
      *                             |___/
      */
 
-    /** @var MessagesAPI */
-    private $messagesAPI = null;
-
-    public function loadMessagesAPI(){
-        //$this->messagesAPI = new MessagesAPI($this, $this->getFile() . "resources/Messages.yml"); TODO Directly implement in this class
+    private function loadLanguages(){
+        if(\Phar::running(true) !== ""){
+            $path = \Phar::running(true) . DIRECTORY_SEPARATOR;
+        }else{
+            $path = $this->getServer()->getPluginPath() . DIRECTORY_SEPARATOR . "EssentialsPE" . DIRECTORY_SEPARATOR;
+        }
+        if(!file_exists(($path .= "src" . DIRECTORY_SEPARATOR . "EssentialsPE" . DIRECTORY_SEPARATOR .  "Languages" . DIRECTORY_SEPARATOR) . ($lang = $this->getEssentialsPEPlugin()->getConfig()->get("language", "en") . ".yml"))){
+            $this->getServer()->getLogger()->warning(TextFormat::RED . "[EssentialsPE] " . TextFormat::YELLOW . "Language " . TextFormat::RED . $lang . TextFormat::YELLOW . " not found, going to use 'English' instead");
+            $lang = "en.yml";
+        }
+        $this->language = new Config($path . $lang, Config::YAML);
+        if(file_exists($path = $this->getServer()->getPluginPath() . "EssentialsPE" . DIRECTORY_SEPARATOR . "language.yml")){
+            $custom = new Config($path, Config::YAML);
+            $this->language->setAll(array_replace_recursive($custom->getAll(), $this->language->getAll()));
+        }
     }
 
     /**
-     * @return MessagesAPI
+     * @param string $message
+     * @param string[] ...$args
+     * @return string
      */
-    public function getMessagesAPI(){
-        if($this->messagesAPI === null){
-            $this->loadMessagesAPI();
+    public function getMessage($message, ...$args){
+        $string = $this->language->getNested($message, $message);
+        if(count($args) > 0){
+            /** @var string[] $args */
+            for($i = 0; $i < count($args); $i++){
+                $a = $args[$i];
+                if(is_string($a) && $a[0] === "%"){
+                    $a = $this->getMessage($a);
+                }elseif(is_array($a)){
+                    $a = $this->getMessage(array_shift($a), ...$a);
+                }
+                $string = str_replace("{" . $i . "}", $a, $string);
+            }
+            return $string;
         }
-        return $this->messagesAPI;
+        return $string;
     }
 
     /**

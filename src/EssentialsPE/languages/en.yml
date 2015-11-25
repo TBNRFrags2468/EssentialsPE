@@ -1,0 +1,18 @@
+balance:
+  sign: "$"
+  message:
+    other: "{0} has {1}."
+    self: "You have {1}."
+error:
+  prefix: "[Error] "
+  player:
+    gamemode:
+      other: "{0} is already in {1} mode."
+      self: "You're already in {1}."
+    notfound: "Player not found."
+    permission: "You don't have enough permissions to run this command."
+load: "Loading..."
+usage: "Usage: "
+vanish:
+  other: "{0} is now {1}."
+  self: "You are now {1}."
