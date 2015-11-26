@@ -31,22 +31,23 @@ class Pay extends BaseCommand{
             return false;
         }
         if(!($player = $this->getAPI()->getPlayer($args[0]))){
-            $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
+            $this->sendMessage($sender, "error.playernotfound");
             return false;
         }
-        if(substr($args[1], 0, 1) === "-"){
-            $sender->sendMessage(TextFormat::RED . "[Error] You can't pay a negative value");
+        if(($args[1] = (int) $args[1]) < 1){
+            $this->sendMessage($sender, "error.economy.negative");
             return false;
         }
         $balance = $this->getAPI()->getPlayerBalance($sender);
-        $newBalance = $balance - (int) $args[1];
+        $newBalance = $balance - $args[1];
         if($balance < $args[1] || $newBalance < $this->getAPI()->getMinBalance() || ($newBalance < 0 && !$player->hasPermission("essentials.eco.loan"))){
             $sender->sendMessage(TextFormat::RED . "[Error] You don't have enough money to pay");
+            $this->sendMessage($sender, "error.economy.profit");
             return false;
         }
-        $sender->sendMessage(TextFormat::YELLOW . "Paying...");
+        $this->sendMessage($sender, "economy.balance.pay");
         $this->getAPI()->setPlayerBalance($sender, $newBalance); //Take out from the payer balance.
-        $this->getAPI()->addToPlayerBalance($player, (int) $args[1]); //Pay to the other player
+        $this->getAPI()->addToPlayerBalance($player, $args[1]); //Pay to the other player
         return true;
     }
 }

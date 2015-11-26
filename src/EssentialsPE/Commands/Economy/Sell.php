@@ -32,13 +32,13 @@ class Sell extends BaseCommand{
             return false;
         }
         if($sender->getGamemode() === Player::CREATIVE || $sender->getGamemode() === Player::SPECTATOR){
-            $sender->sendMessage(TextFormat::RED . "[Error] You're in " . $this->getAPI()->getServer()->getGamemodeString($sender->getGamemode()) . " mode");
+            $this->sendMessage($sender, "error.gamemode.self", $this->getAPI()->getServer()->getGamemodeString($sender->getGamemode()));
             return false;
         }
         if(strtolower($args[0]) === "hand"){
             $item = $sender->getInventory()->getItemInHand();
             if($item->getId() === 0){
-                $sender->sendMessage(TextFormat::RED . "[Error] You don't have anything in your hand");
+                $this->sendMessage($sender, "error.item.in.hand");
                 return false;
             }
         }else{
@@ -47,34 +47,38 @@ class Sell extends BaseCommand{
             }else{
                 $item = Item::get($args[0]);
             }
-            if($item->getId() === 0){
-                $sender->sendMessage(TextFormat::RED . "[Error] Unknown item");
+            if($item->getId() === Item::AIR){
+                $this->sendMessage($sender, "error.item.unknown");
                 return false;
             }
         }
         if(!$sender->getInventory()->contains($item)){
-            $sender->sendMessage(TextFormat::RED . "[Error] You don't have that item in your inventory");
+            $this->sendMessage($sender, "error.item.in.inventory");
             return false;
         }
         if(isset($args[1]) && !is_numeric($args[1])){
-            $sender->sendMessage(TextFormat::RED . "[Error] Please specify a valid amount to sell");
+            $this->sendMessage($sender, "error.economy.amount");
             return false;
         }
 
         $amount = $this->getAPI()->sellPlayerItem($sender, $item, (isset($args[1]) ? $args[1] : null));
         if(!$amount){
-            $sender->sendMessage(TextFormat::RED . "[Error] Worth not available for this item");
+            $this->sendMessage($sender, "error.economy.worth.unknown");
             return false;
         }elseif($amount === -1){
-            $sender->sendMessage(TextFormat::RED . "[Error] You don't have that amount of items");
+            $this->sendMessage($sender, "error.item.quantity");
             return false;
         }
-
+        $profit = $this->getAPI()->getCurrencySymbol();
+        $m = "single";
         if(is_array($amount)){
-            $sender->sendMessage(TextFormat::RED . "Sold " . $amount[0] . " items! You got" . $this->getAPI()->getCurrencySymbol() . ($amount[1] * $amount[0]));
+            $profit .= $amount[0] * $amount[1];
+            $amount = $amount[0];
+            $m = "much";
         }else{
-            $sender->sendMessage(TextFormat::GREEN . "Item sold! You got " . $this->getAPI()->getCurrencySymbol() . $amount);
+            $profit .= $amount;
         }
+        $this->sendMessage($sender, "economy.sold.$m", $amount, $profit);
         return true;
     }
 }

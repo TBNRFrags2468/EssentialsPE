@@ -1,16 +1,41 @@
-balance:
+economy:
   sign: "$"
-  message:
-    other: "&f{0} has &e{1}."
-    self: "You have &e{1}."
+  balance:
+    add: "&eAdding balance..."
+    message:
+      other: "&f{0} &bhas &e{1}."
+      self: "&bYou have &e{1}."
+    pay: "&ePaying..."
+    reset: "&eResetting balance..."
+    set: "&eSetting balance..."
+    take: "&eTaking balance..."
+  sold:
+    single: "&aSold &e{0} &aitems! You got &b{1}"
+    much: "&aItem sold! You got &b{1}"
+  worth:
+    set: "&eSetting worth..."
+    get: "&bThe worth for this item is &a{0}"
 error:
   prefix: "&c[Error] "
+  economy:
+    amount: "&cPlease specify a valid amount."
+    negative: "&cYou can't pay a negative value."
+    profit: "&cYou don't have enough profit to pay."
+    worth:
+      unknown: "&cWorth not available for this item."
+      invalid: "&cPlease provide a valid worth."
+  gamemode:
+    other: "&f{0} &cis in &e{1} &cmode."
+    self: "You're in {1}."
   ingame: "&cPlease run this command in-game."
-  player:
-    gamemode:
-      other: "&f{0} &cis already in &e{1} &cmode."
-      self: "You're already in {1}."
-    notfound: "Player not found."
+  item:
+    in:
+      hand: "&cYou don't have anything in your hand."
+      inventory: "&c You don't have that item in your inventory."
+    invalid: "&cPlease provide a valid item."
+    unknown: "&cUnknown Item."
+    quantity: "&cYou don't have that amount of items."
+  playernotfound: "Player not found."
   permission: "You don't have enough permissions to run this command."
   usage: "&cUsage: &e{0}"
 essentials:

@@ -62,18 +62,26 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @param string $alias
      */
     public function sendUsage(CommandSender $sender, $alias){
-        $message = $this->getAPI()->getMessage("error.usage", "/$alias");
         if(!$sender instanceof Player){
             if(is_string($this->consoleUsageMessage)){
-                $message .= $this->consoleUsageMessage;
+                $message = $this->consoleUsageMessage;
             }elseif(!$this->consoleUsageMessage){
                 $message = TextFormat::RED . "[Error] Please run this command in-game";
             }else{
-                $message .= str_replace("[player]", "<player>", parent::getUsage());
+                $message = str_replace("[player]", "<player>", parent::getUsage());
             }
         }else{
-            $message .= parent::getUsage();
+            $message = parent::getUsage();
         }
-        $sender->sendMessage($message);
+        $this->sendMessage($sender, "error.usage", "/$alias" . $message);
+    }
+
+    /**
+     * @param CommandSender $sender
+     * @param string $message
+     * @param ...$args
+     */
+    public function sendMessage(CommandSender $sender, $message, ...$args){
+        $sender->sendMessage($this->getAPI()->getMessage($message, ...$args));
     }
 }

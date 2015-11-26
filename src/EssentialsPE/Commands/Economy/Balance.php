@@ -36,13 +36,11 @@ class Balance extends BaseCommand{
                 $sender->sendMessage(TextFormat::RED . $this->getPermissionMessage());
                 return false;
             }elseif(!$player = $this->getAPI()->getPlayer($args[0])){
-                $sender->sendMessage(TextFormat::RED . "[Error] Player not found");
-                #$sender->sendMessage($this->getAPI()->getMessage("error.player.notfound"));
+                $this->sendMessage($sender, "error.playernotfound");
                 return false;
             }
         }
-        $sender->sendMessage(TextFormat::AQUA . ($player === $sender ? "Your current balance is " : $player->getDisplayName() . TextFormat::AQUA . " has ") . TextFormat::YELLOW . $this->getAPI()->getCurrencySymbol() . $this->getAPI()->getPlayerBalance($player));
-        #$sender->sendMessage(TextFormat::AQUA . $this->getAPI()->getMessage("balance.message." . ($player === $sender ? "self" : "other"), $player->getName(), TextFormat::YELLOW . $this->getAPI()->getMessage("balance.sign") . $this->getAPI()->getPlayerBalance($player)));
+        $this->sendMessage($sender, "economy.balance." . ($player === $sender ? "self" : "other"), $player->getName(), $this->getAPI()->getMessage("economy.sign") . $this->getAPI()->getPlayerBalance($player));
         return true;
     }
 }
