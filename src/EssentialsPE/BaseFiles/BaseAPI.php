@@ -1050,8 +1050,7 @@ class BaseAPI{
      */
     public function getMessage($message, ...$args){
         $string = $this->language->getNested($message, $message);
-        $p = explode(".", $message);
-        if($this->language->exists($p = array_shift($p) . ".prefix")){
+        if(($p = strpos($message, ".")) !== false && $this->language->exists($p = substr($message, 0, $p - 1) . ".prefix")){
             $string = $this->language->get($p, "") . $string;
         }
         if(count($args) > 0){
@@ -1065,9 +1064,8 @@ class BaseAPI{
                 }
                 $string = str_replace("{" . $i . "}", $a, $string);
             }
-            return $string;
         }
-        return $string;
+        return $this->colorMessage($string);
     }
 
     /**

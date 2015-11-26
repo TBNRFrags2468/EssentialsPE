@@ -1,18 +1,24 @@
 balance:
   sign: "$"
   message:
-    other: "{0} has {1}."
-    self: "You have {1}."
+    other: "&f{0} has &e{1}."
+    self: "You have &e{1}."
 error:
-  prefix: "[Error] "
+  prefix: "&c[Error] "
+  ingame: "&cPlease run this command in-game."
   player:
     gamemode:
-      other: "{0} is already in {1} mode."
+      other: "&f{0} &cis already in &e{1} &cmode."
       self: "You're already in {1}."
     notfound: "Player not found."
-    permission: "You don't have enough permissions to run this command."
-load: "Loading..."
-usage: "Usage: "
+  permission: "You don't have enough permissions to run this command."
+  usage: "&cUsage: &e{0}"
+essentials:
+  prefix: "&f[&aEssentialsPE&f] "
+  version: "&eThis server is using &aEssentialsPE &bv{0}"
+load: "&eLoading..."
 vanish:
-  other: "{0} is now {1}."
-  self: "You are now {1}."
+  other: "&f{0} is now &7{1}."
+  self: "You are now &7{1}."
+warning:
+  updater: "&eThe updater is already working... PLease wait a few moments and try again."
