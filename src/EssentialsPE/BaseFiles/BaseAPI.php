@@ -50,19 +50,8 @@ use pocketmine\utils\Random;
 use pocketmine\utils\TextFormat;
 
 class BaseAPI{
-    /** @var Loader */
-    private $ess;
     /** @var BaseAPI */
     private static $instance;
-
-    /** @var Config */
-    private $economy;
-    /** @var array */
-    private $kits = [];
-    /** @var array */
-    private $warps = [];
-    /** @var Config */
-    private $language;
 
     /**
      * @param Loader $ess
@@ -76,20 +65,6 @@ class BaseAPI{
 
     public function __destruct(){
         $this->encodeWarps(true);
-    }
-
-    /**
-     * @return Loader
-     */
-    public final function getEssentialsPEPlugin(){
-        return $this->ess;
-    }
-
-    /**
-     * @return Server
-     */
-    public function getServer(){
-        return $this->getEssentialsPEPlugin()->getServer();
     }
 
     /**
@@ -224,6 +199,23 @@ class BaseAPI{
     const NON_SOLID_BLOCKS = [Block::SAPLING, Block::WATER, Block::STILL_WATER, Block::LAVA, Block::STILL_LAVA, Block::COBWEB, Block::TALL_GRASS, Block::BUSH, Block::DANDELION,
         Block::POPPY, Block::BROWN_MUSHROOM, Block::RED_MUSHROOM, Block::TORCH, Block::FIRE, Block::WHEAT_BLOCK, Block::SIGN_POST, Block::WALL_SIGN, Block::SUGARCANE_BLOCK,
         Block::PUMPKIN_STEM, Block::MELON_STEM, Block::VINE, Block::CARROT_BLOCK, Block::POTATO_BLOCK, Block::DOUBLE_PLANT];
+
+    /** @var Loader */
+    private $ess;
+
+    /**
+     * @return Loader
+     */
+    public final function getEssentialsPEPlugin(){
+        return $this->ess;
+    }
+
+    /**
+     * @return Server
+     */
+    public function getServer(){
+        return $this->getEssentialsPEPlugin()->getServer();
+    }
 
     /**
      *            ______ _  __
@@ -382,6 +374,9 @@ class BaseAPI{
      *                                          __/ |
      *                                         |___/
      */
+
+    /** @var Config */
+    private $economy;
 
     /**
      * Get the default balance for new players
@@ -976,6 +971,9 @@ class BaseAPI{
      *  |_|\_|_|\__|___/
      */
 
+    /** @var array */
+    private $kits = [];
+
     /**
      * Check if a kit exists
      *
@@ -1025,6 +1023,9 @@ class BaseAPI{
      *                              __/ |
      *                             |___/
      */
+
+    /** @var Config */
+    private $language;
 
     private function loadLanguages(){
         if(\Phar::running(true) !== ""){
@@ -2279,6 +2280,9 @@ class BaseAPI{
      *                       | |
      *                       |_|
      */
+
+    /** @var array */
+    private $warps = [];
 
     /**
      * Tell if a warp exists
