@@ -23,6 +23,10 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @param array $aliases
      */
     public function __construct(BaseAPI $api, $name, $description = "", $usageMessage = null, $consoleUsageMessage = true, array $aliases = []){
+        #$identifier = "commands.essentialspe";
+        /** @var array $identifier */
+        #$identifier = $this->getAPI()->getMessage($identifier);
+        #parent::__construct($identifier["name"], $identifier["description"], $usageMessage, $aliases); TODO
         parent::__construct($name, $description, $usageMessage, $aliases);
         $this->api = $api;
         $this->consoleUsageMessage = $consoleUsageMessage;

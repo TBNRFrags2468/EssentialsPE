@@ -47,3 +47,11 @@ vanish:
   self: "You are now &7{1}."
 warning:
   updater: "&eThe updater is already working... PLease wait a few moments and try again."
+commands:
+  essentialspe:
+    name: "essentialspe"
+    description: "Useful tools for EssentialsPE plugin"
+    alias:
+      - "esspe"
+      - "ess"
+      - "essentials"

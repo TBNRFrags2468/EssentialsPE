@@ -1047,12 +1047,12 @@ class BaseAPI{
     /**
      * @param string $message
      * @param string[] ...$args
-     * @return string
+     * @return string|array
      */
     public function getMessage($message, ...$args){
-        $string = $this->language->getNested($message, $message);
+        $result = $this->language->getNested($message, $message);
         if(($p = strpos($message, ".")) !== false && $this->language->exists($p = substr($message, 0, $p - 1) . ".prefix")){
-            $string = $this->language->get($p, "") . $string;
+            $result = $this->language->get($p, "") . $result;
         }
         if(count($args) > 0){
             /** @var string[] $args */
@@ -1063,10 +1063,10 @@ class BaseAPI{
                 }elseif(is_array($a)){
                     $a = $this->getMessage(array_shift($a), ...$a);
                 }
-                $string = str_replace("{" . $i . "}", $a, $string);
+                $result = str_replace("{" . $i . "}", $a, $result);
             }
         }
-        return $this->colorMessage($string);
+        return $this->colorMessage($result);
     }
 
     /**
