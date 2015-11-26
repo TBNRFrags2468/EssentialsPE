@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class SetHome extends BaseCommand{
     /**
@@ -31,17 +30,18 @@ class SetHome extends BaseCommand{
             return false;
         }
         if(strtolower($args[0]) === "bed"){
-            $sender->sendMessage(TextFormat::RED . "[Error] You can only set a \"bed\" home by sleeping in a bed");
+            $this->sendMessage($sender, "error.home.bed");
             return false;
         }elseif(trim($args[0] === "")){
-            $sender->sendMessage(TextFormat::RED . "[Error] Please provide a Home name");
+            $this->sendMessage($sender, "error.alphanumeric");
             return false;
         }
+        $updated = $this->getAPI()->homeExists($sender, $args[0]);
         if(!$this->getAPI()->setHome($sender, strtolower($args[0]), $sender->getLocation(), $sender->getYaw(), $sender->getPitch())){
-            $sender->sendMessage(TextFormat::RED . "Invalid home name given! Please be sure to only use alphanumerical characters and underscores");
+            $this->sendMessage($sender, "error.alphanumeric");
             return false;
         }
-        $sender->sendMessage(TextFormat::GREEN . "Home successfully " . ($this->getAPI()->homeExists($sender, $args[0]) ? "updated" : "created"));
+        $this->sendMessage($sender, "home." . ($updated ? "update" : "create"), $args[0]);
         return true;
     }
 } 

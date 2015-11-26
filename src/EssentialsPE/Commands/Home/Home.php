@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class Home extends BaseCommand{
     /**
@@ -32,18 +31,18 @@ class Home extends BaseCommand{
         }
         if(count($args) === 0){
             if(($list = $this->getAPI()->homesList($sender, false)) === false){
-                $sender->sendMessage(TextFormat::AQUA . "You don't have any home yet");
+                $this->sendMessage($sender, "error.home.empty");
                 return false;
             }
-            $sender->sendMessage(TextFormat::AQUA . "Available homes:\n" . $list);
+            $this->sendMessage($sender, "home.list", $list);
             return true;
         }
         if(!($home = $this->getAPI()->getHome($sender, $args[0]))){
-            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exists or the world is not available");
+            $this->sendMessage($sender, "error.home.exists", $args[0]);
             return false;
         }
         $sender->teleport($home);
-        $sender->sendMessage(TextFormat::GREEN . "Teleporting to home " . TextFormat::AQUA . $home->getName() . TextFormat::GREEN . "...");
+        $this->sendMessage($sender, "home.teleport", $home->getName());
         return true;
     }
 } 

@@ -6,7 +6,6 @@ use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\item\Item;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class Sell extends BaseCommand{
     /**

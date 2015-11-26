@@ -4,7 +4,6 @@ namespace EssentialsPE\Commands\Economy;
 use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
-use pocketmine\utils\TextFormat;
 
 class Eco extends BaseCommand{
     /**

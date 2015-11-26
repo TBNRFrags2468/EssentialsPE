@@ -5,7 +5,6 @@ use EssentialsPE\BaseFiles\BaseAPI;
 use EssentialsPE\BaseFiles\BaseCommand;
 use pocketmine\command\CommandSender;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 class DelHome extends BaseCommand{
     /**
@@ -31,11 +30,11 @@ class DelHome extends BaseCommand{
             return false;
         }
         if(!$this->getAPI()->homeExists($sender, $args[0])){
-            $sender->sendMessage(TextFormat::RED . "[Error] Home doesn't exist");
+            $this->sendMessage($sender, "error.home.exists", $args[0]);
             return false;
         }
         $this->getAPI()->removeHome($sender, $args[0]);
-        $sender->sendMessage(TextFormat::GREEN . "Home successfully removed!");
+        $this->sendMessage($sender, "home.remove", $args[0]);
         return true;
     }
 } 

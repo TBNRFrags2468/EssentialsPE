@@ -27,6 +27,10 @@ error:
   gamemode:
     other: "&f{0} &cis in &e{1} &cmode."
     self: "You're in {1}."
+  home:
+    exists: "&cHome \"{0}\" doesn't exists, or maybe the world is not available."
+    empty: "&cYou don't have any home yet."
+    bed: "&cYou can only set a \"&ebed\" &chome by sleeping in one."
   ingame: "&cPlease run this command in-game."
   item:
     in:
@@ -35,12 +39,19 @@ error:
     invalid: "&cPlease provide a valid item."
     unknown: "&cUnknown Item."
     quantity: "&cYou don't have that amount of items."
+  alphanumeric: "&cPlease provide a valid alphanumeric name (and underscores, without spaces):&e _ a-z A-Z 0-9"
   playernotfound: "Player not found."
   permission: "You don't have enough permissions to run this command."
   usage: "&cUsage: &e{0}"
 essentials:
   prefix: "&f[&aEssentialsPE&f] "
   version: "&eThis server is using &aEssentialsPE &bv{0}"
+home:
+  create: "&aSuccessfully created home \"&b{0}\""
+  list: "&bAvailable homes:\n{0}"
+  remove: "&aSuccessfully removed home \"{0}\"!"
+  teleport: "&aTeleporting to home &b{0} &a..."
+  update: "&aSuccessfully updated home \"&b{0}\""
 load: "&eLoading..."
 vanish:
   other: "&f{0} is now &7{1}."
