@@ -1033,7 +1033,7 @@ class BaseAPI{
         }else{
             $path = $this->getServer()->getPluginPath() . DIRECTORY_SEPARATOR . "EssentialsPE" . DIRECTORY_SEPARATOR;
         }
-        if(!file_exists(($path .= "src" . DIRECTORY_SEPARATOR . "EssentialsPE" . DIRECTORY_SEPARATOR .  "languages" . DIRECTORY_SEPARATOR) . ($lang = $this->getEssentialsPEPlugin()->getConfig()->get("language", "en") . ".yml"))){
+        if(!file_exists(($path .= "src" . DIRECTORY_SEPARATOR . "EssentialsPE" . DIRECTORY_SEPARATOR .  "Languages" . DIRECTORY_SEPARATOR) . ($lang = $this->getEssentialsPEPlugin()->getConfig()->get("language", "en") . ".yml"))){
             $this->getServer()->getLogger()->warning(TextFormat::RED . "[EssentialsPE] " . TextFormat::YELLOW . "Language " . TextFormat::RED . $lang . TextFormat::YELLOW . " not found, going to use 'English' instead");
             $lang = "en.yml";
         }
