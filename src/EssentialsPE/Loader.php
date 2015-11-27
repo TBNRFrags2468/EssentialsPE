@@ -74,7 +74,6 @@ use EssentialsPE\EventHandlers\OtherEvents;
 use EssentialsPE\EventHandlers\PlayerEvents;
 use EssentialsPE\EventHandlers\SignEvents;
 use EssentialsPE\Events\CreateAPIEvent;
-use pocketmine\Player;
 use pocketmine\plugin\PluginBase;
 use pocketmine\utils\TextFormat;
 
