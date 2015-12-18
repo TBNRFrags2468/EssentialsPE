@@ -6,7 +6,6 @@ use pocketmine\command\Command;
 use pocketmine\command\CommandSender;
 use pocketmine\command\PluginIdentifiableCommand;
 use pocketmine\Player;
-use pocketmine\utils\TextFormat;
 
 abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
     /** @var BaseAPI  */
@@ -66,18 +65,20 @@ abstract class BaseCommand extends Command implements PluginIdentifiableCommand{
      * @param string $alias
      */
     public function sendUsage(CommandSender $sender, $alias){
+        $error = "error.usage";
+        $message = "/$alias ";
         if(!$sender instanceof Player){
             if(is_string($this->consoleUsageMessage)){
-                $message = $this->consoleUsageMessage;
+                $message .= $this->consoleUsageMessage;
             }elseif(!$this->consoleUsageMessage){
-                $message = TextFormat::RED . "[Error] Please run this command in-game";
+                $error = "error.ingame";
             }else{
-                $message = str_replace("[player]", "<player>", parent::getUsage());
+                $message .= str_replace("[player]", "<player>", parent::getUsage());
             }
         }else{
             $message = parent::getUsage();
         }
-        $this->sendMessage($sender, "error.usage", "/$alias" . $message);
+        $this->sendMessage($sender, $error, $message);
     }
 
     /**

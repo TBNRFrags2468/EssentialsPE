@@ -253,7 +253,7 @@ class BaseAPI{
         }
         $state = $ev->getAFKMode();
         $this->getSession($player)->setAFK($state);
-        $time = $this-$this->getEssentialsPEPlugin()->getConfig()->getNested("afk.auto-kick");
+        $time = $this->getEssentialsPEPlugin()->getConfig()->getNested("afk.auto-kick");
         if($state === false && ($id = $this->getSession($player)->getAFKKickTaskID()) !== false){
             $this->getServer()->getScheduler()->cancelTask($id);
             $this->getSession($player)->removeAFKKickTaskID();
@@ -1050,8 +1050,8 @@ class BaseAPI{
      */
     public function getMessage($message, ...$args){
         $result = $this->language->getNested($message, $message);
-        if(($p = strpos($message, ".")) !== false && $this->language->exists($p = substr($message, 0, $p - 1) . ".prefix")){
-            $result = $this->language->get($p, "") . $result;
+        if(($p = stripos($message, ".")) !== false && ($p = $this->language->getNested(substr($message, 0, $p) . ".prefix")) !== null){
+            $result = $p . $result;
         }
         if(count($args) > 0){
             /** @var string[] $args */
