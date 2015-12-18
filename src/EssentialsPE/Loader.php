@@ -81,13 +81,13 @@ class Loader extends PluginBase{
     /** @var BaseAPI */
     private $api;
 
-    public function onLoad(){
+    public function onEnable(){
+        // Custom API Setup :3
         $this->getServer()->getPluginManager()->callEvent($ev = new CreateAPIEvent($this, BaseAPI::class));
         $class = $ev->getClass();
         $this->api = new $class($this);
-    }
 
-    public function onEnable(){
+        // Other startup code...
         if(!is_dir($this->getDataFolder())){
             mkdir($this->getDataFolder());
         }
