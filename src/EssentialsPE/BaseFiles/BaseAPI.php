@@ -163,7 +163,6 @@ class BaseAPI{
 
     private final function loadWarps(){
         $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Warps.yml", Config::YAML);
-        $cfg->reload();
         $children = [];
         foreach($cfg->getAll() as $n => $v){
             if($this->getServer()->isLevelGenerated($v[3])){
@@ -187,7 +186,7 @@ class BaseAPI{
                 $warps[$name] = [$object->getX(), $object->getY(), $object->getZ(), $object->getLevel()->getName(), $object->getYaw(), $object->getPitch()];
             }
         }
-        if($save){
+        if($save && count($warps) > 0){
             $cfg = new Config($this->getEssentialsPEPlugin()->getDataFolder() . "Warps.yml", Config::YAML);
             $cfg->setAll($warps);
             $cfg->save();
